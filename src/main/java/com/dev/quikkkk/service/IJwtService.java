@@ -25,4 +25,6 @@ public interface IJwtService {
     boolean isTokenValid(String token, String expectedEmail);
 
     boolean isTokenExpired(String token);
+
+    boolean isRefreshToken(String token);
 }

@@ -2,6 +2,7 @@ package com.dev.quikkkk.service.impl;
 
 import com.dev.quikkkk.entity.Role;
 import com.dev.quikkkk.entity.User;
+import com.dev.quikkkk.enums.JwtTokenType;
 import com.dev.quikkkk.repository.IUserRepository;
 import com.dev.quikkkk.service.IJwtService;
 import com.dev.quikkkk.utils.KeyUtils;
@@ -57,7 +58,7 @@ public class JwtServiceImpl implements IJwtService {
     @Override
     public String generateAccessToken(User user) {
         Map<String, Object> claims = Map.of(
-                TOKEN_TYPE, "ACCESS_TOKEN",
+                TOKEN_TYPE, JwtTokenType.ACCESS.name(),
                 USER_ID, user.getId(),
                 "roles", user.getRoles().stream().map(Role::getName).toList()
         );
@@ -68,7 +69,7 @@ public class JwtServiceImpl implements IJwtService {
     @Override
     public String generateRefreshToken(User user) {
         Map<String, Object> claims = Map.of(
-                TOKEN_TYPE, "REFRESH_TOKEN",
+                TOKEN_TYPE, JwtTokenType.REFRESH.name(),
                 USER_ID, user.getId()
         );
 
@@ -79,7 +80,7 @@ public class JwtServiceImpl implements IJwtService {
     public String refreshAccessToken(String refreshToken) {
         Claims claims = extractClaims(refreshToken);
 
-        if (!"REFRESH_TOKEN".equals(claims.get(TOKEN_TYPE))) throw new JwtException("Invalid token type");
+        if (!JwtTokenType.REFRESH.name().equals(claims.get(TOKEN_TYPE))) throw new JwtException("Invalid token type");
         if (isTokenExpired(refreshToken)) throw new RuntimeException("Token is expired");
 
         String email = claims.getSubject();
@@ -88,7 +89,7 @@ public class JwtServiceImpl implements IJwtService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Map<String, Object> claimsForNewToken = Map.of(
-                TOKEN_TYPE, "ACCESS_TOKEN",
+                TOKEN_TYPE, JwtTokenType.ACCESS.name(),
                 USER_ID, userId,
                 "roles", user.getRoles().stream().map(Role::getName).toList()
         );
@@ -161,6 +162,11 @@ public class JwtServiceImpl implements IJwtService {
         return getCachedClaims(token)
                 .getExpiration()
                 .before(new Date());
+    }
+
+    @Override
+    public boolean isRefreshToken(String token) {
+        return JwtTokenType.REFRESH.name().equals(extractTokenType(token));
     }
 
     private Claims getCachedClaims(String token) {

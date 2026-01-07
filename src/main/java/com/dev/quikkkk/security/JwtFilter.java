@@ -1,6 +1,8 @@
 package com.dev.quikkkk.security;
 
+import com.dev.quikkkk.enums.JwtTokenType;
 import com.dev.quikkkk.service.IJwtService;
+import com.dev.quikkkk.service.ITokenBlacklistService;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -23,6 +25,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
     private final IJwtService jwtService;
+    private final ITokenBlacklistService tokenBlacklistService;
 
     @Override
     protected void doFilterInternal(
@@ -40,7 +43,7 @@ public class JwtFilter extends OncePerRequestFilter {
         try {
             String jwt = authHeader.substring(7);
 
-            if (!"ACCESS_TOKEN".equals(jwtService.extractTokenType(jwt))) {
+            if (!JwtTokenType.ACCESS.name().equals(jwtService.extractTokenType(jwt))) {
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -50,6 +53,12 @@ public class JwtFilter extends OncePerRequestFilter {
                 String userId = jwtService.extractUserId(jwt);
 
                 if (!jwtService.isTokenExpired(jwt)) {
+                    if (tokenBlacklistService.isTokenBlacklisted(jwt)) {
+                        SecurityContextHolder.clearContext();
+                        filterChain.doFilter(request, response);
+                        return;
+                    }
+
                     var roles = jwtService.extractRoles(jwt);
                     var authorities = roles.stream()
                             .map(r -> new SimpleGrantedAuthority("ROLE_" + r))
