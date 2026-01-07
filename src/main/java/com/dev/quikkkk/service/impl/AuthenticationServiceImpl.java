@@ -16,6 +16,7 @@ import com.dev.quikkkk.repository.IUserRepository;
 import com.dev.quikkkk.service.IAuthenticationService;
 import com.dev.quikkkk.service.IEmailService;
 import com.dev.quikkkk.service.IJwtService;
+import com.dev.quikkkk.service.ITokenBlacklistService;
 import com.dev.quikkkk.service.IVerificationTokenService;
 import com.dev.quikkkk.utils.ServiceUtils;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 @Slf4j
 public class AuthenticationServiceImpl implements IAuthenticationService {
-    private final static String TOKEN_TYPE = "Bearer";
+    private final static String TOKEN_TYPE = "Bearer ";
 
     private final IUserRepository userRepository;
     private final IRoleRepository roleRepository;
@@ -39,6 +40,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     private final IEmailService emailService;
     private final ServiceUtils serviceUtils;
     private final IVerificationTokenService verificationTokenService;
+    private final ITokenBlacklistService tokenBlacklistService;
     private final AuthenticationManager authenticationManager;
     private final UserMapper userMapper;
     private final MessageMapper messageMapper;
@@ -71,9 +73,21 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     @Override
     public AuthenticationResponse refreshToken(RefreshTokenRequest request) {
         log.info("Refresh token request: {}", request);
-        String newAccessToken = jwtService.refreshAccessToken(request.getRefreshToken());
+        String refreshToken = request.getRefreshToken();
 
-        return authMapper.toResponse(newAccessToken, request.getRefreshToken(), TOKEN_TYPE);
+        if (!jwtService.isRefreshToken(refreshToken)) throw new RuntimeException("INVALID_TOKEN_TYPE");
+        if (tokenBlacklistService.isTokenBlacklisted(refreshToken)) throw new RuntimeException("TOKEN_REVOKED");
+        if (jwtService.isTokenExpired(refreshToken)) throw new RuntimeException("TOKEN_EXPIRED");
+
+        String userId = jwtService.extractUserId(refreshToken);
+        User user = serviceUtils.getUserByIdOrThrow(userId);
+
+        tokenBlacklistService.blacklistToken(refreshToken);
+
+        String newAccess = jwtService.generateAccessToken(user);
+        String newRefresh = jwtService.generateRefreshToken(user);
+
+        return authMapper.toResponse(newAccess, newRefresh, TOKEN_TYPE);
     }
 
     @Override
@@ -102,11 +116,13 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     }
 
     @Override
-    public MessageResponse logout(String token) { // TODO
-        log.info("Logging out user with token: {}", token);
+    public MessageResponse logout(String accessToken) {
+        log.info("Logging out user with access token: {}", accessToken);
 
-        String actualToken = token.startsWith(TOKEN_TYPE) ? token.substring(TOKEN_TYPE.length()).trim() : token;
-        return messageMapper.message(actualToken);
+        tokenBlacklistService.blacklistToken(accessToken);
+
+        log.info("User logged out successfully.");
+        return messageMapper.message("User logged out.");
     }
 
     private void checkUserEmail(String email) {

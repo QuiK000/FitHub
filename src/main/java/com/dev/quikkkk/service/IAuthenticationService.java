@@ -13,5 +13,5 @@ public interface IAuthenticationService {
 
     MessageResponse register(RegistrationRequest request);
 
-    MessageResponse logout(String token);
+    MessageResponse logout(String accessToken);
 }
