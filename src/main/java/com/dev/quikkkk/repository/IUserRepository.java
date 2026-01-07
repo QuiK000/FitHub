@@ -16,4 +16,8 @@ public interface IUserRepository extends JpaRepository<User, String> {
             WHERE u.email = :email
             """)
     Optional<User> findByEmailWithRoles(@Param("email") String email);
+
+    Optional<User> findByEmailIgnoreCase(String email);
+
+    boolean existsByEmailIgnoreCase(String email);
 }
