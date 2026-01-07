@@ -32,3 +32,9 @@ spring:
     redis:
       host: 172.19.94.160
       password: password123
+
+app:
+  security:
+    jwt:
+      access-token-expiration: 86400000
+      refresh-token-expiration: 684000000
