@@ -1,11 +1,14 @@
 package com.dev.quikkkk.service.impl;
 
 import com.dev.quikkkk.dto.request.LoginRequest;
+import com.dev.quikkkk.dto.request.RefreshTokenRequest;
 import com.dev.quikkkk.dto.request.RegistrationRequest;
 import com.dev.quikkkk.dto.response.AuthenticationResponse;
 import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.entity.Role;
 import com.dev.quikkkk.entity.User;
+import com.dev.quikkkk.enums.TokenType;
+import com.dev.quikkkk.mapper.AuthenticationMapper;
 import com.dev.quikkkk.mapper.MessageMapper;
 import com.dev.quikkkk.mapper.UserMapper;
 import com.dev.quikkkk.repository.IRoleRepository;
@@ -13,6 +16,8 @@ import com.dev.quikkkk.repository.IUserRepository;
 import com.dev.quikkkk.service.IAuthenticationService;
 import com.dev.quikkkk.service.IEmailService;
 import com.dev.quikkkk.service.IJwtService;
+import com.dev.quikkkk.service.IVerificationTokenService;
+import com.dev.quikkkk.utils.ServiceUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,15 +37,17 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     private final IRoleRepository roleRepository;
     private final IJwtService jwtService;
     private final IEmailService emailService;
+    private final ServiceUtils serviceUtils;
+    private final IVerificationTokenService verificationTokenService;
     private final AuthenticationManager authenticationManager;
     private final UserMapper userMapper;
     private final MessageMapper messageMapper;
+    private final AuthenticationMapper authMapper;
 
     @Override
     public AuthenticationResponse login(LoginRequest request) {
         log.info("Login request for email: {}", request.getEmail());
-
-        User user = findUserByEmail(request.getEmail());
+        User user = serviceUtils.getUserByEmailOrThrow(request.getEmail());
 
         if (!user.isEnabled()) {
             log.warn("User {} is disabled", request.getEmail());
@@ -58,11 +65,15 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         String refreshToken = jwtService.generateRefreshToken(user);
 
         log.info("User {} logged successfully", request.getEmail());
-        return AuthenticationResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .tokenType(TOKEN_TYPE)
-                .build();
+        return authMapper.toResponse(accessToken, refreshToken, TOKEN_TYPE);
+    }
+
+    @Override
+    public AuthenticationResponse refreshToken(RefreshTokenRequest request) {
+        log.info("Refresh token request: {}", request);
+        String newAccessToken = jwtService.refreshAccessToken(request.getRefreshToken());
+
+        return authMapper.toResponse(newAccessToken, request.getRefreshToken(), TOKEN_TYPE);
     }
 
     @Override
@@ -84,12 +95,18 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         userRepository.save(user);
         log.info("User {} registered", user.getEmail());
 
+        String token = verificationTokenService.createVerificationCode(TokenType.EMAIL_VERIFICATION, user.getId());
+        emailService.sendVerificationEmail(user.getEmail(), token);
+
         return messageMapper.message("User registered successfully");
     }
 
-    private User findUserByEmail(String email) {
-        return userRepository.findByEmailIgnoreCase(email)
-                .orElseThrow(() -> new RuntimeException("USER_NOT_FOUND"));
+    @Override
+    public MessageResponse logout(String token) { // TODO
+        log.info("Logging out user with token: {}", token);
+
+        String actualToken = token.startsWith(TOKEN_TYPE) ? token.substring(TOKEN_TYPE.length()).trim() : token;
+        return messageMapper.message(actualToken);
     }
 
     private void checkUserEmail(String email) {

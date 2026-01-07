@@ -1,6 +1,7 @@
 package com.dev.quikkkk.controller;
 
 import com.dev.quikkkk.dto.request.LoginRequest;
+import com.dev.quikkkk.dto.request.RefreshTokenRequest;
 import com.dev.quikkkk.dto.request.RegistrationRequest;
 import com.dev.quikkkk.dto.response.AuthenticationResponse;
 import com.dev.quikkkk.dto.response.MessageResponse;
@@ -27,5 +28,10 @@ public class AuthenticationController {
     @PostMapping("/signup")
     public ResponseEntity<MessageResponse> Registration(@Valid @RequestBody RegistrationRequest request) {
         return ResponseEntity.ok(authenticationService.register(request));
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<AuthenticationResponse> refreshToken(@RequestBody @Valid RefreshTokenRequest request) {
+        return ResponseEntity.ok(authenticationService.refreshToken(request));
     }
 }
