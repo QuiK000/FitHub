@@ -1,5 +1,6 @@
 package com.dev.quikkkk.service.impl;
 
+import com.dev.quikkkk.enums.TokenType;
 import com.dev.quikkkk.service.IEmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,11 +25,21 @@ public class EmailServiceImpl implements IEmailService {
     public void sendVerificationEmail(String toEmail, String token) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
+            String verificationLink = frontendUrl + "/verify-email?token=" + token;
+            String emailBody =
+                    "Welcome to FitHub!\n\n"
+                        + "Thank you for registration. Please verify your email address by clicking the link below:\n\n"
+                        + verificationLink
+                        + "\n\n"
+                        + "This link will expire in " + TokenType.EMAIL_VERIFICATION.getTtlMinutes() + " minutes.\n\n"
+                        + "If you didn't create this account, please ignore this email. \n\n"
+                        + "Best regards,\n"
+                        + "FitHub Team";
 
             message.setFrom(fromEmail);
             message.setTo(toEmail);
-            message.setSubject("Verification Email");
-            message.setText("Welcome to FitHub!!");
+            message.setSubject("FitHub - Verification email!");
+            message.setText(emailBody);
 
             mailSender.send(message);
             log.info("Email sent to {}", toEmail);
