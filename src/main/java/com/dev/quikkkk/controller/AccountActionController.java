@@ -19,4 +19,9 @@ public class AccountActionController {
     public ResponseEntity<MessageResponse> verifyEmail(@RequestParam String token) {
         return ResponseEntity.ok(accountActionService.verifyEmail(token));
     }
+
+    @GetMapping("/resend-verification")
+    public ResponseEntity<MessageResponse> resendVerificationCode(@RequestParam String email) {
+        return ResponseEntity.ok(accountActionService.resendVerificationCode(email));
+    }
 }

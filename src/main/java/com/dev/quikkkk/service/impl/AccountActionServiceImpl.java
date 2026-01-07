@@ -8,6 +8,10 @@ import com.dev.quikkkk.mapper.MessageMapper;
 import com.dev.quikkkk.repository.IUserRepository;
 import com.dev.quikkkk.repository.IVerificationTokenRepository;
 import com.dev.quikkkk.service.IAccountActionService;
+import com.dev.quikkkk.service.IEmailService;
+import com.dev.quikkkk.service.IRateLimitService;
+import com.dev.quikkkk.service.IVerificationTokenService;
+import com.dev.quikkkk.utils.ServiceUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,6 +25,10 @@ import java.time.LocalDateTime;
 @Slf4j
 public class AccountActionServiceImpl implements IAccountActionService {
     private final IVerificationTokenRepository tokenRepository;
+    private final ServiceUtils serviceUtils;
+    private final IVerificationTokenService verificationTokenService;
+    private final IEmailService emailService;
+    private final IRateLimitService rateLimitService;
     private final IUserRepository userRepository;
     private final MessageMapper messageMapper;
 
@@ -49,5 +57,17 @@ public class AccountActionServiceImpl implements IAccountActionService {
         tokenRepository.save(verificationToken);
 
         return messageMapper.message("Email verified successfully!");
+    }
+
+    @Override
+    public MessageResponse resendVerificationCode(String email) {
+        rateLimitService.checkResendVerificationLimit(email);
+        User user = serviceUtils.getUserByEmailOrThrow(email);
+
+        if (user.isEnabled()) throw new RuntimeException("EMAIL_ALREADY_VERIFIED");
+        String token = verificationTokenService.createVerificationCode(TokenType.EMAIL_VERIFICATION, user.getId());
+
+        emailService.sendVerificationEmail(email, token);
+        return messageMapper.message("Verification email sent!");
     }
 }
