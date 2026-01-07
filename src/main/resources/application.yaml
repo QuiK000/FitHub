@@ -28,3 +28,7 @@ spring:
           connectiontimeout: 5000
           timeout: 5000
           writetimeout: 5000
+  data:
+    redis:
+      host: 172.19.94.160
+      password: password123
