@@ -10,7 +10,7 @@ import java.util.Set;
 
 @Repository
 public interface ISpecializationRepository extends JpaRepository<Specialization, String> {
-    Set<Specialization> findByIdIn(Set<String> ids);
+    Set<Specialization> findByIdInAndActiveTrue(Set<String> ids);
 
     boolean existsByNameIgnoreCase(String name);
 
