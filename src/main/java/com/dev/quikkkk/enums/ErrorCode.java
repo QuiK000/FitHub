@@ -29,6 +29,10 @@ public enum ErrorCode {
     RESEND_TOO_FREQUENT("RESEND_TOO_FREQUENT", "Verification email was sent recently. Try again later", TOO_MANY_REQUESTS),
     VALIDATION_ERROR("VALIDATION_ERROR", "Validation failed", BAD_REQUEST),
     PASSWORD_MISMATCH("PASSWORD_MISMATCH", "Password and confirm password do not match", BAD_REQUEST),
+    UNAUTHORIZED_USER("UNAUTHORIZED_USER", "Unauthorized", FORBIDDEN),
+    CLIENT_PROFILE_ALREADY_EXISTS("CLIENT_PROFILE_ALREADY_EXISTS", "Client Profile Already Exists", CONFLICT),
+    CLIENT_PROFILE_NOT_FOUND("CLIENT_PROFILE_NOT_FOUND", "Client Profile Not Found", NOT_FOUND),
+    CLIENT_PROFILE_DEACTIVATED("CLIENT_PROFILE_DEACTIVATED", "Client Profile Deactivated", FORBIDDEN),
     ;
 
     private final String code;
