@@ -1,5 +1,6 @@
 package com.dev.quikkkk.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,10 +16,12 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TrainerProfileResponse {
+    private String id;
     private String firstname;
     private String lastname;
-    private Set<String> specialization;
+    private Set<String> specializations;
     private int experienceYears;
     private String description;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 }
