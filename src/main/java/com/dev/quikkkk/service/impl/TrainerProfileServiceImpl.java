@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
-import static com.dev.quikkkk.enums.ErrorCode.SPECIALIZATION_NOT_FOUND;
 import static com.dev.quikkkk.enums.ErrorCode.SPECIALIZATION_NOT_FOUND_OR_INACTIVE;
 import static com.dev.quikkkk.enums.ErrorCode.TRAINER_PROFILE_ALREADY_EXISTS;
 import static com.dev.quikkkk.enums.ErrorCode.TRAINER_PROFILE_DEACTIVATED;
@@ -47,7 +46,7 @@ public class TrainerProfileServiceImpl implements ITrainerProfileService {
         Set<Specialization> specializations = specializationRepository
                 .findByIdInAndActiveTrue(request.getSpecializationIds());
         if (specializations.size() != request.getSpecializationIds().size())
-            throw new BusinessException(SPECIALIZATION_NOT_FOUND);
+            throw new BusinessException(SPECIALIZATION_NOT_FOUND_OR_INACTIVE);
 
         TrainerProfile profile = trainerProfileMapper.toEntity(request, user, specializations);
 
@@ -59,6 +58,7 @@ public class TrainerProfileServiceImpl implements ITrainerProfileService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public TrainerProfileResponse getTrainerProfile() {
         User user = getCurrentUser();
         TrainerProfile profile = getTrainerProfileOrThrow(user);
@@ -69,6 +69,7 @@ public class TrainerProfileServiceImpl implements ITrainerProfileService {
     }
 
     @Override
+    @Transactional
     public TrainerProfileResponse updateTrainerProfile(UpdateTrainerProfileRequest request) {
         User user = getCurrentUser();
         TrainerProfile profile = getTrainerProfileOrThrow(user);
@@ -91,6 +92,7 @@ public class TrainerProfileServiceImpl implements ITrainerProfileService {
     }
 
     @Override
+    @Transactional
     public MessageResponse deactivateProfile() {
         User user = getCurrentUser();
         TrainerProfile profile = getTrainerProfileOrThrow(user);
@@ -106,13 +108,14 @@ public class TrainerProfileServiceImpl implements ITrainerProfileService {
     }
 
     @Override
+    @Transactional
     public TrainerProfileResponse clearProfile() {
         User user = getCurrentUser();
         TrainerProfile profile = getTrainerProfileOrThrow(user);
 
         ensureProfileIsActive(profile);
         profile.clearPersonalData();
-        deactivateProfile();
+        profile.setActive(false);
 
         trainerProfileRepository.save(profile);
         return trainerProfileMapper.toResponse(profile);
@@ -124,8 +127,8 @@ public class TrainerProfileServiceImpl implements ITrainerProfileService {
     }
 
     private TrainerProfile getTrainerProfileOrThrow(User user) {
-        if (user.getTrainerProfile() == null) throw new BusinessException(TRAINER_PROFILE_NOT_FOUND);
-        return user.getTrainerProfile();
+        return trainerProfileRepository.findByUserIdWithSpecializations(user.getId())
+                .orElseThrow(() -> new BusinessException(TRAINER_PROFILE_NOT_FOUND));
     }
 
     private void ensureProfileIsActive(TrainerProfile profile) {

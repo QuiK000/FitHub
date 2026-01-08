@@ -50,7 +50,9 @@ public class ClientProfileServiceImpl implements IClientProfileService {
     @Transactional(readOnly = true)
     public ClientProfileResponse getClientProfile() {
         User user = getCurrentUser();
-        ClientProfile profile = getClientProfileOrThrow(user);
+        ClientProfile profile = clientProfileRepository
+                .findByUserId(user.getId())
+                .orElseThrow(() -> new BusinessException(CLIENT_PROFILE_NOT_FOUND));
 
         log.info("Getting client profile for user: {}", user.getId());
         ensureProfileIsActive(profile);
@@ -95,7 +97,7 @@ public class ClientProfileServiceImpl implements IClientProfileService {
 
         ensureProfileIsActive(profile);
         profile.clearPersonalData();
-        deactivateProfile();
+        profile.setActive(false);
 
         clientProfileRepository.save(profile);
         return clientProfileMapper.toResponse(profile);
