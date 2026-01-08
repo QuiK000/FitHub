@@ -15,7 +15,7 @@ import lombok.experimental.SuperBuilder;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "clients_profiles")
+@Table(name = "client_profiles")
 @SuperBuilder
 @Getter
 @Setter
