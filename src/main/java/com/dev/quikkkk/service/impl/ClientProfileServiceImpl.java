@@ -95,6 +95,7 @@ public class ClientProfileServiceImpl implements IClientProfileService {
 
         ensureProfileIsActive(profile);
         profile.clearPersonalData();
+        deactivateProfile();
 
         clientProfileRepository.save(profile);
         return clientProfileMapper.toResponse(profile);
