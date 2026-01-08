@@ -38,6 +38,8 @@ public enum ErrorCode {
     TRAINER_PROFILE_DEACTIVATED("TRAINER_PROFILE_DEACTIVATED", "Trainer Profile Deactivated", FORBIDDEN),
     SPECIALIZATION_NOT_FOUND("SPECIALIZATION_NOT_FOUND", "Specialization Not Found", NOT_FOUND),
     SPECIALIZATION_ALREADY_EXISTS("SPECIALIZATION_ALREADY_EXISTS", "Specialization Already Exists", CONFLICT),
+    SPECIALIZATION_NOT_FOUND_OR_INACTIVE("SPECIALIZATION_NOT_FOUND_OR_INACTIVE", "Specialization Not Found or Inactive", NOT_FOUND),
+
     ;
 
     private final String code;
@@ -49,4 +51,4 @@ public enum ErrorCode {
         this.defaultMessage = defaultMessage;
         this.status = status;
     }
-    }
+}
