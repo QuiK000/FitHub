@@ -4,6 +4,7 @@ import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.entity.User;
 import com.dev.quikkkk.entity.VerificationToken;
 import com.dev.quikkkk.enums.TokenType;
+import com.dev.quikkkk.exception.BusinessException;
 import com.dev.quikkkk.mapper.MessageMapper;
 import com.dev.quikkkk.repository.IUserRepository;
 import com.dev.quikkkk.repository.IVerificationTokenRepository;
@@ -18,6 +19,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+
+import static com.dev.quikkkk.enums.ErrorCode.EMAIL_ALREADY_VERIFIED;
+import static com.dev.quikkkk.enums.ErrorCode.VERIFICATION_TOKEN_EXPIRED;
+import static com.dev.quikkkk.enums.ErrorCode.VERIFICATION_TOKEN_INVALID;
+import static com.dev.quikkkk.enums.ErrorCode.VERIFICATION_TOKEN_TYPE_INVALID;
 
 @Service
 @RequiredArgsConstructor
@@ -36,16 +42,16 @@ public class AccountActionServiceImpl implements IAccountActionService {
     public MessageResponse verifyEmail(String token) {
         VerificationToken verificationToken = tokenRepository
                 .findByTokenAndUsedFalse(token)
-                .orElseThrow(() -> new RuntimeException("INVALID_TOKEN"));
+                .orElseThrow(() -> new BusinessException(VERIFICATION_TOKEN_INVALID));
 
         if (verificationToken.getType() != TokenType.EMAIL_VERIFICATION) {
             log.error("Invalid token type");
-            throw new RuntimeException("INVALID_TOKEN_TYPE");
+            throw new BusinessException(VERIFICATION_TOKEN_TYPE_INVALID);
         }
 
         if (verificationToken.getExpiresAt().isBefore(LocalDateTime.now())) {
             log.error("Invalid token expires at");
-            throw new RuntimeException("INVALID_TOKEN_EXPIRES");
+            throw new BusinessException(VERIFICATION_TOKEN_EXPIRED);
         }
 
         User user = verificationToken.getUser();
@@ -64,7 +70,7 @@ public class AccountActionServiceImpl implements IAccountActionService {
         rateLimitService.checkResendVerificationLimit(email);
         User user = serviceUtils.getUserByEmailOrThrow(email);
 
-        if (user.isEnabled()) throw new RuntimeException("EMAIL_ALREADY_VERIFIED");
+        if (user.isEnabled()) throw new BusinessException(EMAIL_ALREADY_VERIFIED);
         String token = verificationTokenService.createVerificationCode(TokenType.EMAIL_VERIFICATION, user.getId());
 
         emailService.sendVerificationEmail(email, token);
