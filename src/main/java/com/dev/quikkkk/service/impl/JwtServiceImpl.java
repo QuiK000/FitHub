@@ -3,6 +3,7 @@ package com.dev.quikkkk.service.impl;
 import com.dev.quikkkk.entity.Role;
 import com.dev.quikkkk.entity.User;
 import com.dev.quikkkk.enums.JwtTokenType;
+import com.dev.quikkkk.exception.BusinessException;
 import com.dev.quikkkk.repository.IUserRepository;
 import com.dev.quikkkk.service.IJwtService;
 import com.dev.quikkkk.utils.KeyUtils;
@@ -22,6 +23,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import static com.dev.quikkkk.enums.ErrorCode.INVALID_REFRESH_TOKEN;
+import static com.dev.quikkkk.enums.ErrorCode.TOKEN_EXPIRED;
+import static com.dev.quikkkk.enums.ErrorCode.TOKEN_INVALID;
+import static com.dev.quikkkk.enums.ErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -80,13 +86,13 @@ public class JwtServiceImpl implements IJwtService {
     public String refreshAccessToken(String refreshToken) {
         Claims claims = extractClaims(refreshToken);
 
-        if (!JwtTokenType.REFRESH.name().equals(claims.get(TOKEN_TYPE))) throw new JwtException("Invalid token type");
-        if (isTokenExpired(refreshToken)) throw new RuntimeException("Token is expired");
+        if (!JwtTokenType.REFRESH.name().equals(claims.get(TOKEN_TYPE))) throw new BusinessException(INVALID_REFRESH_TOKEN);
+        if (isTokenExpired(refreshToken)) throw new BusinessException(TOKEN_EXPIRED);
 
         String email = claims.getSubject();
         String userId = claims.get(USER_ID, String.class);
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new BusinessException(USER_NOT_FOUND));
 
         Map<String, Object> claimsForNewToken = Map.of(
                 TOKEN_TYPE, JwtTokenType.ACCESS.name(),
@@ -153,7 +159,7 @@ public class JwtServiceImpl implements IJwtService {
                     .parseSignedClaims(token)
                     .getPayload();
         } catch (JwtException e) {
-            throw new JwtException("Invalid JWT Token", e);
+            throw new BusinessException(TOKEN_INVALID);
         }
     }
 
@@ -181,7 +187,7 @@ public class JwtServiceImpl implements IJwtService {
                     .parseSignedClaims(token)
                     .getPayload();
         } catch (JwtException e) {
-            throw new JwtException("Invalid JWT Token", e);
+            throw new BusinessException(TOKEN_INVALID);
         }
     }
 }
