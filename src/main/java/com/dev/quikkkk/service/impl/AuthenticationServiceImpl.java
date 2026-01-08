@@ -8,6 +8,7 @@ import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.entity.Role;
 import com.dev.quikkkk.entity.User;
 import com.dev.quikkkk.enums.TokenType;
+import com.dev.quikkkk.exception.BusinessException;
 import com.dev.quikkkk.mapper.AuthenticationMapper;
 import com.dev.quikkkk.mapper.MessageMapper;
 import com.dev.quikkkk.mapper.UserMapper;
@@ -27,6 +28,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import static com.dev.quikkkk.enums.ErrorCode.ACCOUNT_DISABLED;
+import static com.dev.quikkkk.enums.ErrorCode.EMAIL_ALREADY_EXISTS;
+import static com.dev.quikkkk.enums.ErrorCode.PASSWORD_MISMATCH;
+import static com.dev.quikkkk.enums.ErrorCode.TOKEN_BLACKLISTED;
+import static com.dev.quikkkk.enums.ErrorCode.TOKEN_EXPIRED;
+import static com.dev.quikkkk.enums.ErrorCode.TOKEN_INVALID;
 
 @Service
 @RequiredArgsConstructor
@@ -53,7 +61,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
         if (!user.isEnabled()) {
             log.warn("User {} is disabled", request.getEmail());
-            throw new RuntimeException("User " + request.getEmail() + " is disabled");
+            throw new BusinessException(ACCOUNT_DISABLED);
         }
 
         authenticationManager.authenticate(
@@ -75,9 +83,9 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         log.info("Refresh token request: {}", request);
         String refreshToken = request.getRefreshToken();
 
-        if (!jwtService.isRefreshToken(refreshToken)) throw new RuntimeException("INVALID_TOKEN_TYPE");
-        if (tokenBlacklistService.isTokenBlacklisted(refreshToken)) throw new RuntimeException("TOKEN_REVOKED");
-        if (jwtService.isTokenExpired(refreshToken)) throw new RuntimeException("TOKEN_EXPIRED");
+        if (!jwtService.isRefreshToken(refreshToken)) throw new BusinessException(TOKEN_INVALID);
+        if (tokenBlacklistService.isTokenBlacklisted(refreshToken)) throw new BusinessException(TOKEN_BLACKLISTED);
+        if (jwtService.isTokenExpired(refreshToken)) throw new BusinessException(TOKEN_EXPIRED);
 
         String userId = jwtService.extractUserId(refreshToken);
         User user = serviceUtils.getUserByIdOrThrow(userId);
@@ -127,10 +135,10 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
     private void checkUserEmail(String email) {
         boolean emailExists = userRepository.existsByEmailIgnoreCase(email);
-        if (emailExists) throw new RuntimeException("EMAIL_ALREADY_EXISTS");
+        if (emailExists) throw new BusinessException(EMAIL_ALREADY_EXISTS);
     }
 
     private void checkPassword(String password, String confirmPassword) {
-        if (password == null || !password.equals(confirmPassword)) throw new RuntimeException("PASSWORD_MISMATCH");
+        if (password == null || !password.equals(confirmPassword)) throw new BusinessException(PASSWORD_MISMATCH);
     }
 }
