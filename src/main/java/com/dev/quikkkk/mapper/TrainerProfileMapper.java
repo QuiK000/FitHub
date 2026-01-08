@@ -1,6 +1,7 @@
 package com.dev.quikkkk.mapper;
 
 import com.dev.quikkkk.dto.request.CreateTrainerProfileRequest;
+import com.dev.quikkkk.dto.request.UpdateTrainerProfileRequest;
 import com.dev.quikkkk.dto.response.TrainerProfileResponse;
 import com.dev.quikkkk.entity.Specialization;
 import com.dev.quikkkk.entity.TrainerProfile;
@@ -27,9 +28,10 @@ public class TrainerProfileMapper {
 
     public TrainerProfileResponse toResponse(TrainerProfile profile) {
         return TrainerProfileResponse.builder()
+                .id(profile.getId())
                 .firstname(profile.getFirstname())
                 .lastname(profile.getLastname())
-                .specialization(profile.getSpecialization()
+                .specializations(profile.getSpecialization()
                         .stream()
                         .map(Specialization::getName)
                         .collect(Collectors.toSet()))
@@ -37,5 +39,16 @@ public class TrainerProfileMapper {
                 .description(profile.getDescription())
                 .createdAt(profile.getCreatedDate())
                 .build();
+    }
+
+    public void update(TrainerProfile profile, UpdateTrainerProfileRequest request, Set<Specialization> specializations) {
+        if (request.getFirstname() != null) profile.setFirstname(request.getFirstname());
+        if (request.getLastname() != null) profile.setLastname(request.getLastname());
+        if (request.getDescription() != null) profile.setDescription(request.getDescription());
+        if (request.getExperienceYears() != null) profile.setExperienceYears(request.getExperienceYears());
+        if (specializations != null)  {
+            profile.getSpecialization().clear();
+            profile.getSpecialization().addAll(specializations);
+        }
     }
 }

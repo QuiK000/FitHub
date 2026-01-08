@@ -39,10 +39,10 @@ public class TrainerProfile extends BaseEntity {
     )
     private Set<Specialization> specialization = new HashSet<>();
 
-    @Column(name = "experience_years", nullable = false)
-    private int experienceYears;
+    @Column(name = "experience_years")
+    private Integer experienceYears;
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "description")
     private String description;
 
     @Column(name = "active", nullable = false)
@@ -51,4 +51,12 @@ public class TrainerProfile extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
+
+    public void clearPersonalData() {
+        this.firstname = null;
+        this.lastname = null;
+        this.description = null;
+        this.specialization.clear();
+        this.experienceYears = null;
+    }
 }
