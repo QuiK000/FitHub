@@ -2,8 +2,14 @@ package com.dev.quikkkk.repository;
 
 import com.dev.quikkkk.entity.ClientProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 @Repository
 public interface IClientProfileRepository extends JpaRepository<ClientProfile, String> {
+    @Query("SELECT c FROM ClientProfile c WHERE c.user.id = :userId")
+    Optional<ClientProfile> findByUserId(@Param("userId") String userId);
 }
