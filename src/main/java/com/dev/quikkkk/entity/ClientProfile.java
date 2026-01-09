@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -13,6 +14,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "client_profiles")
@@ -46,6 +48,9 @@ public class ClientProfile extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
+
+    @OneToMany(mappedBy = "client")
+    private List<Membership> memberships;
 
     public void clearPersonalData() {
         this.firstname = null;
