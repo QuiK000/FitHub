@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.dev.quikkkk.enums.ErrorCode.SPECIALIZATION_ALREADY_EXISTS;
 import static com.dev.quikkkk.enums.ErrorCode.SPECIALIZATION_NOT_FOUND;
@@ -38,19 +39,12 @@ public class SpecializationServiceImpl implements ISpecializationService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<SpecializationResponse> getAllActive(int page, int size, String search) {
         Pageable pageable = PaginationUtils.createPageRequest(page, size);
-        Page<Specialization> specializationPage;
+        Page<Specialization> pageResult = specializationRepository.findActiveWithOptionalSearch(search, pageable);
 
-        if (search != null && !search.isBlank()) {
-            specializationPage = specializationRepository.findAllByActiveTrueAndNameContainingIgnoreCase(
-                    search, pageable
-            );
-        } else {
-            specializationPage = specializationRepository.findAllByActiveTrue(pageable);
-        }
-
-        return PaginationUtils.toPageResponse(specializationPage, specializationMapper::toResponse);
+        return PaginationUtils.toPageResponse(pageResult, specializationMapper::toResponse);
     }
 
     @Override
