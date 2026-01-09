@@ -3,6 +3,7 @@ package com.dev.quikkkk.service.impl;
 import com.dev.quikkkk.dto.request.CreateTrainerProfileRequest;
 import com.dev.quikkkk.dto.request.UpdateTrainerProfileRequest;
 import com.dev.quikkkk.dto.response.MessageResponse;
+import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.dto.response.TrainerProfileResponse;
 import com.dev.quikkkk.entity.Specialization;
 import com.dev.quikkkk.entity.TrainerProfile;
@@ -13,10 +14,13 @@ import com.dev.quikkkk.mapper.TrainerProfileMapper;
 import com.dev.quikkkk.repository.ISpecializationRepository;
 import com.dev.quikkkk.repository.ITrainerProfileRepository;
 import com.dev.quikkkk.service.ITrainerProfileService;
+import com.dev.quikkkk.utils.PaginationUtils;
 import com.dev.quikkkk.utils.SecurityUtils;
 import com.dev.quikkkk.utils.ServiceUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,6 +70,25 @@ public class TrainerProfileServiceImpl implements ITrainerProfileService {
         log.info("Trainer profile retrieved: {}", profile.getId());
         ensureProfileIsActive(profile);
         return trainerProfileMapper.toResponse(profile);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<TrainerProfileResponse> findAllTrainerProfiles(int page, int size, String search) {
+        log.info("Getting all trainer profiles for page: {}, size: {}", page, size);
+        Pageable pageable = PaginationUtils.createPageRequest(page, size);
+        Page<TrainerProfile> trainerProfilePage = trainerProfileRepository.findActiveWithOptionalSearch(search, pageable);
+
+        return PaginationUtils.toPageResponse(trainerProfilePage, trainerProfileMapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public TrainerProfileResponse getTrainerById(String id) {
+        log.info("Getting trainer profile by id: {}", id);
+        return trainerProfileRepository.findTrainerProfileById(id)
+                .map(trainerProfileMapper::toResponse)
+                .orElseThrow(() -> new BusinessException(TRAINER_PROFILE_NOT_FOUND));
     }
 
     @Override
