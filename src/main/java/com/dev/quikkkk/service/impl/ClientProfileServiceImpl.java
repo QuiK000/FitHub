@@ -4,6 +4,7 @@ import com.dev.quikkkk.dto.request.CreateClientProfileRequest;
 import com.dev.quikkkk.dto.request.UpdateClientProfileRequest;
 import com.dev.quikkkk.dto.response.ClientProfileResponse;
 import com.dev.quikkkk.dto.response.MessageResponse;
+import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.entity.ClientProfile;
 import com.dev.quikkkk.entity.User;
 import com.dev.quikkkk.exception.BusinessException;
@@ -11,10 +12,13 @@ import com.dev.quikkkk.mapper.ClientProfileMapper;
 import com.dev.quikkkk.mapper.MessageMapper;
 import com.dev.quikkkk.repository.IClientProfileRepository;
 import com.dev.quikkkk.service.IClientProfileService;
+import com.dev.quikkkk.utils.PaginationUtils;
 import com.dev.quikkkk.utils.SecurityUtils;
 import com.dev.quikkkk.utils.ServiceUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,6 +61,15 @@ public class ClientProfileServiceImpl implements IClientProfileService {
         log.info("Getting client profile for user: {}", user.getId());
         ensureProfileIsActive(profile);
         return clientProfileMapper.toResponse(profile);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<ClientProfileResponse> getAllClientsProfile(int page, int size, String search) {
+        Pageable pageable = PaginationUtils.createPageRequest(page, size);
+        Page<ClientProfile> clientProfilePage = clientProfileRepository.findActiveWithOptionalSearch(search, pageable);
+
+        return PaginationUtils.toPageResponse(clientProfilePage, clientProfileMapper::toResponse);
     }
 
     @Override
