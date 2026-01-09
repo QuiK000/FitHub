@@ -1,5 +1,6 @@
 package com.dev.quikkkk.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,9 +18,11 @@ public class ClientProfileResponse {
     private String firstname;
     private String lastname;
     private String phone;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime birthdate;
     private Double height;
     private Double weight;
     private boolean active;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 }
