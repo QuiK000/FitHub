@@ -19,6 +19,8 @@ public interface ITrainerProfileRepository extends JpaRepository<TrainerProfile,
             """)
     Optional<TrainerProfile> findByUserIdWithSpecializations(@Param("userId") String id);
 
+    Optional<TrainerProfile> findTrainerProfileByUserId(String userId);
+
     Optional<TrainerProfile> findTrainerProfileById(String id);
 
     @Query("""
