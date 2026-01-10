@@ -58,7 +58,11 @@ public enum ErrorCode {
     NO_ACTIVE_MEMBERSHIP("NO_ACTIVE_MEMBERSHIP", "No Active Membership", NOT_FOUND),
     MEMBERSHIP_FROZEN("MEMBERSHIP_FROZEN", "Membership Frozen", FORBIDDEN),
     VISITS_LIMIT_REACHED("VISITS_LIMIT_REACHED", "Visits limit Reached", BAD_REQUEST),
-    MEMBERSHIP_EXPIRED("MEMBERSHIP_EXPIRED", "Membership Expired", BAD_REQUEST),;
+    MEMBERSHIP_EXPIRED("MEMBERSHIP_EXPIRED", "Membership Expired", BAD_REQUEST),
+    PERSONAL_TRAINING_MAX_ONE_PARTICIPANT("PERSONAL_TRAINING_MAX_ONE_PARTICIPANT", "Personal Training Max One Participant", BAD_REQUEST),
+    GROUP_TRAINING_MIN_TWO_PARTICIPANTS("GROUP_TRAINING_MIN_TWO_PARTICIPANTS", "Group Training Min Two Participants", BAD_REQUEST),
+    START_TIME_IN_PAST("START_TIME_IN_PAST", "Start time in past", BAD_REQUEST),
+    ;
 
     private final String code;
     private final String defaultMessage;
