@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -14,7 +15,9 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "client_profiles")
@@ -51,6 +54,9 @@ public class ClientProfile extends BaseEntity {
 
     @OneToMany(mappedBy = "client")
     private List<Membership> memberships;
+
+    @ManyToMany(mappedBy = "clients")
+    private Set<TrainingSession> trainingSessions = new HashSet<>();
 
     public void clearPersonalData() {
         this.firstname = null;
