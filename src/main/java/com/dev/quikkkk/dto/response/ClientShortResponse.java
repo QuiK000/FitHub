@@ -11,8 +11,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TrainerShortResponse {
-    private String trainerId;
-    private String firstname;
-    private String lastname;
+public class ClientShortResponse {
+    private String clientId;
+    private String clientFirstname;
+    private String clientLastname;
 }
