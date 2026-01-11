@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -57,4 +58,7 @@ public class TrainingSession extends BaseEntity {
             inverseJoinColumns = @JoinColumn(name = "client_id")
     )
     private Set<ClientProfile> clients = new HashSet<>();
+
+    @OneToMany(mappedBy = "session")
+    private Set<Attendance> attendances = new HashSet<>();
 }
