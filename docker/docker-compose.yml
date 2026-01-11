@@ -1,4 +1,19 @@
 services:
+  postgres:
+    build: ./postgres
+    image: postgres:latest
+    container_name: FitHub
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: fithub_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - network
   redis:
     image: redis:latest
     container_name: redis
@@ -10,4 +25,9 @@ services:
     restart: unless-stopped
 
 volumes:
+  pgdata:
   redis_data:
+
+networks:
+  network:
+    driver: bridge
