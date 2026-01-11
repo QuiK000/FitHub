@@ -4,14 +4,27 @@ import com.dev.quikkkk.dto.response.ErrorResponse;
 import com.dev.quikkkk.enums.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @RestControllerAdvice
 @RequiredArgsConstructor
@@ -50,6 +63,155 @@ public class GlobalExceptionHandler {
                         .code(ErrorCode.VALIDATION_ERROR.getCode())
                         .message(ErrorCode.VALIDATION_ERROR.getDefaultMessage())
                         .validationErrors(errors)
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        String message = "Data integrity violation";
+        String code = "DATA_INTEGRITY_ERROR";
+        String exMessage = ex.getMessage();
+
+        if (exMessage != null) {
+            if (exMessage.contains("unique constraint") || exMessage.contains("duplicate key")) {
+                message = "A record with this value already exists";
+                code = "DUPLICATE_ENTRY";
+            } else if (exMessage.contains("foreign key constraint")) {
+                message = "Cannot perform operation due to related accords";
+                code = "FOREIGN_KEY_ERROR";
+            } else if (exMessage.contains("not-null constraint")) {
+                message = "Required field cannot be null";
+                code = "NULL_VALUE_ERROR";
+            }
+        }
+
+        log.error("Data integrity violation: {}", ex.getMessage());
+        log.debug("Full exception: ", ex);
+
+        return ResponseEntity.status(CONFLICT).body(
+                ErrorResponse.builder()
+                        .code(code)
+                        .message(message)
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
+        log.warn("Access denied: {}", ex.getMessage());
+        return ResponseEntity.status(FORBIDDEN).body(
+                ErrorResponse.builder()
+                        .code("ACCESS_DENIED")
+                        .message("You don't have permission to access this resource")
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ignoredEx) {
+        log.warn("Bad credentials attempt");
+        return ResponseEntity.status(UNAUTHORIZED).body(
+                ErrorResponse.builder()
+                        .code("INVALID_CREDENTIALS")
+                        .message("Invalid email or password")
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<ErrorResponse> handleDisabled(DisabledException ignoredEx) {
+        log.warn("Disabled account login attempt");
+        return ResponseEntity.status(FORBIDDEN).body(
+                ErrorResponse.builder()
+                        .code("ACCOUNT_DISABLED")
+                        .message("Your account is disabled. Please verify your email")
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(LockedException.class)
+    public ResponseEntity<ErrorResponse> handleLocked(LockedException ignoredEx) {
+        log.warn("Locked account login attempt");
+        return ResponseEntity.status(FORBIDDEN).body(
+                ErrorResponse.builder()
+                        .code("ACCOUNT_LOCKED")
+                        .message("Your account has been locked. Please contact support")
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorResponse> handleMissingParameter(MissingServletRequestParameterException ex) {
+        log.warn("Missing request parameter: {}", ex.getParameterName());
+        return ResponseEntity.badRequest().body(
+                ErrorResponse.builder()
+                        .code("MISSING_PARAMETER")
+                        .message(String.format("Required parameter '%s' is missing", ex.getParameterName()))
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        String message = String.format(
+                "Invalid value '%s' for parameter '%s'. Expected type: %s",
+                ex.getValue(),
+                ex.getName(),
+                ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "unknown"
+        );
+
+        log.warn("Type mismatch: {}", message);
+        return ResponseEntity.badRequest().body(
+                ErrorResponse.builder()
+                        .code("TYPE_MISMATCH")
+                        .message(message)
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFound(NoHandlerFoundException ex) {
+        log.warn("Endpoint not found: {} {}", ex.getHttpMethod(), ex.getRequestURL());
+        return ResponseEntity.status(NOT_FOUND).body(
+                ErrorResponse.builder()
+                        .code("ENDPOINT_NOT_FOUND")
+                        .message("The requested endpoint does not exist")
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
+        log.warn("Illegal argument: {}", ex.getMessage());
+        return ResponseEntity.badRequest().body(
+                ErrorResponse.builder()
+                        .code("INVALID_ARGUMENT")
+                        .message(ex.getMessage() != null ? ex.getMessage() : "Invalid argument provider")
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalState(IllegalStateException ex) {
+        log.error("Illegal state: {}", ex.getMessage());
+        return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(
+                ErrorResponse.builder()
+                        .code("ILLEGAL_STATE")
+                        .message("The application is in an invalid state. Please try again")
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
+        log.error("Unexpected error occurred", ex);
+        String message = "An unexpected error occurred. Please try again later";
+
+        return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(
+                ErrorResponse.builder()
+                        .code("INTERNAL_SERVER_ERROR")
+                        .message(message)
                         .build()
         );
     }
