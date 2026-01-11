@@ -1,6 +1,5 @@
 services:
   postgres:
-    build: ./postgres
     image: postgres:latest
     container_name: FitHub
     restart: unless-stopped
