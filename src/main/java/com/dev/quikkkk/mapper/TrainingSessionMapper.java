@@ -34,7 +34,7 @@ public class TrainingSessionMapper {
                 .currentParticipants(session.getClients() == null ? 0 : session.getClients().size())
                 .trainer(
                         TrainerShortResponse.builder()
-                                .id(session.getTrainer().getId())
+                                .trainerId(session.getTrainer().getId())
                                 .firstname(session.getTrainer().getFirstname())
                                 .lastname(session.getTrainer().getLastname())
                                 .build()
