@@ -1,6 +1,7 @@
 package com.dev.quikkkk.mapper;
 
 import com.dev.quikkkk.dto.request.CreateTrainingSessionRequest;
+import com.dev.quikkkk.dto.request.UpdateTrainingSessionRequest;
 import com.dev.quikkkk.dto.response.TrainerShortResponse;
 import com.dev.quikkkk.dto.response.TrainingSessionResponse;
 import com.dev.quikkkk.entity.TrainerProfile;
@@ -30,7 +31,7 @@ public class TrainingSessionMapper {
                 .startTime(session.getStartTime())
                 .endTime(session.getEndTime())
                 .maxParticipants(session.getMaxParticipants())
-                .currentParticipants(session.getClients() == null ? 0 :  session.getClients().size())
+                .currentParticipants(session.getClients() == null ? 0 : session.getClients().size())
                 .trainer(
                         TrainerShortResponse.builder()
                                 .id(session.getTrainer().getId())
@@ -39,5 +40,12 @@ public class TrainingSessionMapper {
                                 .build()
                 )
                 .build();
+    }
+
+    public void updateSession(TrainingSession session, UpdateTrainingSessionRequest request) {
+        if (request.getStarTime() != null) session.setStartTime(request.getStarTime());
+        if (request.getEndTime() != null) session.setEndTime(request.getEndTime());
+        if (request.getMaxParticipants() != null) session.setMaxParticipants(request.getMaxParticipants());
+        session.setLastModifiedBy(session.getTrainer().getId());
     }
 }
