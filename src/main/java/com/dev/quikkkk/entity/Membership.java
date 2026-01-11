@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -19,7 +20,31 @@ import lombok.experimental.SuperBuilder;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "memberships")
+@Table(
+        name = "memberships",
+        indexes = {
+                @Index(
+                        name = "idx_membership_client_status",
+                        columnList = "client_id, membership_status"
+                ),
+                @Index(
+                        name = "idx_membership_end_date",
+                        columnList = "end_date"
+                ),
+                @Index(
+                        name = "idx_membership_status_freeze",
+                        columnList = "membership_status, freeze_date"
+                ),
+                @Index(
+                        name = "idx_membership_type",
+                        columnList = "membership_type"
+                ),
+                @Index(
+                        name = "idx_membership_client_created",
+                        columnList = "client_id, created_date DESC"
+                )
+        }
+)
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
