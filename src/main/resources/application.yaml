@@ -8,13 +8,22 @@ spring:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
         format_sql: true
+        jdbc:
+          batch_size: 20
+        order_updates: true
   mail:
     host: ${MAIL_HOST}
     port: ${MAIL_PORT}
@@ -34,6 +43,13 @@ spring:
     redis:
       host: ${REDIS_HOST}
       password: ${REDIS_PASSWORD}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
 
 app:
   frontend:
@@ -44,3 +60,15 @@ app:
       access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
       refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
     disposable-email: 10minutemail,20minutemail,33mail,5ymail,anonbox,guerrillamail,mailinator,maildrop,mailnesia,moakt,my10minutemail,throwawaymail,trashmail,temp-mail,tempmail,truemail,yopmail
+
+logging:
+  level:
+    root: INFO
+    com.dev.quikkkk: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/fithub.log
