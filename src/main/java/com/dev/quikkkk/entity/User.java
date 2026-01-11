@@ -4,6 +4,7 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
@@ -20,7 +21,24 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "users")
+@Table(
+        name = "users",
+        indexes = {
+                @Index(
+                        name = "idx_user_email",
+                        columnList = "user_email",
+                        unique = true
+                ),
+                @Index(
+                        name = "idx_user_enabled",
+                        columnList = "user_enabled"
+                ),
+                @Index(
+                        name = "idx_user_created",
+                        columnList = "created_date DESC"
+                )
+        }
+)
 @SuperBuilder
 @Getter
 @Setter
@@ -40,7 +58,11 @@ public class User extends BaseEntity {
     @JoinTable(
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
+            inverseJoinColumns = @JoinColumn(name = "role_id"),
+            indexes = {
+                    @Index(name = "idx_user_roles_user", columnList = "user_id"),
+                    @Index(name = "idx_user_roles_role", columnList = "role_id")
+            }
     )
     private Set<Role> roles = new HashSet<>();
 

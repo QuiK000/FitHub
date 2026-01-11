@@ -3,6 +3,7 @@ package com.dev.quikkkk.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
@@ -20,7 +21,28 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "client_profiles")
+@Table(
+        name = "client_profiles",
+        indexes = {
+                @Index(
+                        name = "idx_client_user",
+                        columnList = "user_id",
+                        unique = true
+                ),
+                @Index(
+                        name = "idx_client_active",
+                        columnList = "active"
+                ),
+                @Index(
+                        name = "idx_client_names",
+                        columnList = "last_name, first_name"
+                ),
+                @Index(
+                        name = "idx_client_phone",
+                        columnList = "phone"
+                )
+        }
+)
 @SuperBuilder
 @Getter
 @Setter

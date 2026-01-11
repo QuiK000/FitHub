@@ -3,6 +3,7 @@ package com.dev.quikkkk.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
@@ -19,7 +20,28 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "trainer_profiles")
+@Table(
+        name = "trainer_profiles",
+        indexes = {
+                @Index(
+                        name = "idx_trainer_user",
+                        columnList = "user_id",
+                        unique = true
+                ),
+                @Index(
+                        name = "idx_trainer_active",
+                        columnList = "active"
+                ),
+                @Index(
+                        name = "idx_trainer_names",
+                        columnList = "last_name, first_name"
+                ),
+                @Index(
+                        name = "idx_trainer_experience",
+                        columnList = "experience_years"
+                )
+        }
+)
 @SuperBuilder
 @Getter
 @Setter
@@ -36,7 +58,11 @@ public class TrainerProfile extends BaseEntity {
     @JoinTable(
             name = "trainer_specialization",
             joinColumns = @JoinColumn(name = "trainer_id"),
-            inverseJoinColumns = @JoinColumn(name = "specialization_id")
+            inverseJoinColumns = @JoinColumn(name = "specialization_id"),
+            indexes = {
+                    @Index(name = "idx_trainer_spec_trainer", columnList = "trainer_id"),
+                    @Index(name = "idx_trainer_spec_spec", columnList = "specialization_id")
+            }
     )
     private Set<Specialization> specialization = new HashSet<>();
 

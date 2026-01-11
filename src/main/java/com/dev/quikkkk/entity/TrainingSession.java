@@ -6,6 +6,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
@@ -23,7 +24,31 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "training_sessions")
+@Table(
+        name = "training_sessions",
+        indexes = {
+                @Index(
+                        name = "idx_session_start_time",
+                        columnList = "start_time"
+                ),
+                @Index(
+                        name = "idx_session_trainer_status",
+                        columnList = "trainer_id, training_status"
+                ),
+                @Index(
+                        name = "idx_session_status_end",
+                        columnList = "training_status, end_time"
+                ),
+                @Index(
+                        name = "idx_session_type_start",
+                        columnList = "training_type, start_time"
+                ),
+                @Index(
+                        name = "idx_session_trainer_start_status",
+                        columnList = "trainer_id, start_time, training_status"
+                )
+        }
+)
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -55,7 +80,11 @@ public class TrainingSession extends BaseEntity {
     @JoinTable(
             name = "training_client",
             joinColumns = @JoinColumn(name = "training_id"),
-            inverseJoinColumns = @JoinColumn(name = "client_id")
+            inverseJoinColumns = @JoinColumn(name = "client_id"),
+            indexes = {
+                    @Index(name = "idx_training_client_training", columnList = "training_id"),
+                    @Index(name = "idx_training_client_client", columnList = "client_id")
+            }
     )
     private Set<ClientProfile> clients = new HashSet<>();
 
