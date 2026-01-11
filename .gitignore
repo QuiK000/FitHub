@@ -6,6 +6,7 @@ target/
 
 env.properties
 src/main/resources/keys/*.pem
+logs/
 
 ### STS ###
 .apt_generated
