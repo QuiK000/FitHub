@@ -4,8 +4,8 @@ import com.dev.quikkkk.entity.Role;
 import com.dev.quikkkk.entity.User;
 import com.dev.quikkkk.enums.JwtTokenType;
 import com.dev.quikkkk.exception.BusinessException;
+import com.dev.quikkkk.security.JwtKeyProvider;
 import com.dev.quikkkk.service.IJwtService;
-import com.dev.quikkkk.utils.KeyUtils;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import io.jsonwebtoken.Claims;
@@ -16,8 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -31,24 +29,12 @@ public class JwtServiceImpl implements IJwtService {
     private static final String TOKEN_TYPE = "token_type";
     private static final String USER_ID = "user_id";
     private static final String ROLES = "roles";
-    private static final String PATH_TO_PRIVATE_KEY = "keys/local-only/private_key.pem";
-    private static final String PATH_TO_PUBLIC_KEY = "keys/local-only/public_key.pem";
-    private static final PrivateKey PRIVATE_KEY;
-    private static final PublicKey PUBLIC_KEY;
 
+    private final JwtKeyProvider provider;
     private final Cache<@NonNull String, Claims> claimsCache = Caffeine.newBuilder()
             .maximumSize(10000)
             .expireAfterWrite(5, TimeUnit.MINUTES)
             .build();
-
-    static {
-        try {
-            PRIVATE_KEY = KeyUtils.loadPrivateKey(PATH_TO_PRIVATE_KEY);
-            PUBLIC_KEY = KeyUtils.loadPublicKey(PATH_TO_PUBLIC_KEY);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to load JWT Keys", e);
-        }
-    }
 
     @Value("${app.security.jwt.access-token-expiration:860000}")
     private long accessTokenExpiration;
@@ -117,7 +103,7 @@ public class JwtServiceImpl implements IJwtService {
                 .subject(email)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(PRIVATE_KEY)
+                .signWith(provider.getPrivateKey())
                 .compact();
     }
 
@@ -140,7 +126,7 @@ public class JwtServiceImpl implements IJwtService {
     private Claims extractClaimsInternal(String token) {
         try {
             return Jwts.parser()
-                    .verifyWith(PUBLIC_KEY)
+                    .verifyWith(provider.getPublicKey())
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
