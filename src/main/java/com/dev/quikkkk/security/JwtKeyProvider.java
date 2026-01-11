@@ -131,12 +131,12 @@ public class JwtKeyProvider {
             IllegalBlockSizeException,
             BadPaddingException {
         String testData = "test-validation-data";
-        Cipher encryptCipher = Cipher.getInstance("RSA");
+        Cipher encryptCipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 
         encryptCipher.init(Cipher.ENCRYPT_MODE, publicKey);
         byte[] encrypted = encryptCipher.doFinal(testData.getBytes());
 
-        Cipher decryptCipher = Cipher.getInstance("RSA");
+        Cipher decryptCipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
         decryptCipher.init(Cipher.DECRYPT_MODE, privateKey);
         byte[] decrypted = decryptCipher.doFinal(encrypted);
 
