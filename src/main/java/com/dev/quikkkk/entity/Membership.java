@@ -2,6 +2,7 @@ package com.dev.quikkkk.entity;
 
 import com.dev.quikkkk.enums.MembershipStatus;
 import com.dev.quikkkk.enums.MembershipType;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,6 +11,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -77,4 +79,7 @@ public class Membership extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "client_id")
     private ClientProfile client;
+
+    @OneToOne(mappedBy = "membership")
+    private Payment payment;
 }
