@@ -17,6 +17,9 @@ import com.dev.quikkkk.utils.SecurityUtils;
 import com.dev.quikkkk.utils.ServiceUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -53,6 +56,10 @@ public class ClientProfileServiceImpl implements IClientProfileService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(
+            value = "clientProfiles",
+            key = "'current:' + T(com.dev.quikkkk.utils.SecurityUtils).getCurrentUserId()"
+    )
     public ClientProfileResponse getClientProfile() {
         User user = getCurrentUser();
         ClientProfile profile = clientProfileRepository
@@ -66,7 +73,12 @@ public class ClientProfileServiceImpl implements IClientProfileService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(
+            value = "lists",
+            key = "'clients:' + #page + ':' + #size + ':' + (#search != null ? #search : 'all')"
+    )
     public PageResponse<ClientProfileResponse> getAllClientsProfile(int page, int size, String search) {
+        log.info("Fetching client profiles page={}, size={}, search={}", page, size, search);
         Pageable pageable = PaginationUtils.createPageRequest(page, size);
         Page<ClientProfile> clientProfilePage = clientProfileRepository.findActiveWithOptionalSearch(search, pageable);
 
@@ -75,6 +87,10 @@ public class ClientProfileServiceImpl implements IClientProfileService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "clientProfiles", key = "'current:' + T(com.dev.quikkkk.utils.SecurityUtils).getCurrentUserId()"),
+            @CacheEvict(value = "lists", allEntries = true)
+    })
     public MessageResponse updateClientProfile(UpdateClientProfileRequest request) {
         User user = getCurrentUser();
         ClientProfile profile = getClientProfileOrThrow(user);
@@ -89,6 +105,10 @@ public class ClientProfileServiceImpl implements IClientProfileService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "clientProfiles", key = "'current:' + T(com.dev.quikkkk.utils.SecurityUtils).getCurrentUserId()"),
+            @CacheEvict(value = "lists", allEntries = true)
+    })
     public MessageResponse deactivateProfile() {
         User user = getCurrentUser();
         ClientProfile profile = getClientProfileOrThrow(user);
@@ -105,7 +125,12 @@ public class ClientProfileServiceImpl implements IClientProfileService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "clientProfiles", key = "'current:' + T(com.dev.quikkkk.utils.SecurityUtils).getCurrentUserId()"),
+            @CacheEvict(value = "lists", allEntries = true)
+    })
     public ClientProfileResponse clearProfile() {
+        log.info("Clearing client profile");
         User user = getCurrentUser();
         ClientProfile profile = getClientProfileOrThrow(user);
 

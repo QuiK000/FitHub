@@ -19,6 +19,9 @@ import com.dev.quikkkk.utils.SecurityUtils;
 import com.dev.quikkkk.utils.ServiceUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -43,6 +46,7 @@ public class TrainerProfileServiceImpl implements ITrainerProfileService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "trainerProfiles", allEntries = true)
     public TrainerProfileResponse createTrainerProfile(CreateTrainerProfileRequest request) {
         User user = getCurrentUser();
         if (user.getTrainerProfile() != null) throw new BusinessException(TRAINER_PROFILE_ALREADY_EXISTS);
@@ -63,6 +67,10 @@ public class TrainerProfileServiceImpl implements ITrainerProfileService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(
+            value = "trainerProfiles",
+            key = "'current:' + T(com.dev.quikkkk.utils.SecurityUtils).getCurrentUserId()"
+    )
     public TrainerProfileResponse getTrainerProfile() {
         User user = getCurrentUser();
         TrainerProfile profile = getTrainerProfileOrThrow(user);
@@ -74,6 +82,10 @@ public class TrainerProfileServiceImpl implements ITrainerProfileService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(
+            value = "lists",
+            key = "'trainers:' + #page + ':' + #size + ':' + (#search != null ? #search : 'all')"
+    )
     public PageResponse<TrainerProfileResponse> findAllTrainerProfiles(int page, int size, String search) {
         log.info("Getting all trainer profiles for page: {}, size: {}", page, size);
         Pageable pageable = PaginationUtils.createPageRequest(page, size);
@@ -84,6 +96,7 @@ public class TrainerProfileServiceImpl implements ITrainerProfileService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "trainerProfiles", key = "'byId:' + #id")
     public TrainerProfileResponse getTrainerById(String id) {
         log.info("Getting trainer profile by id: {}", id);
         return trainerProfileRepository.findTrainerProfileById(id)
@@ -93,6 +106,10 @@ public class TrainerProfileServiceImpl implements ITrainerProfileService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "trainerProfiles", allEntries = true),
+            @CacheEvict(value = "lists", allEntries = true)
+    })
     public TrainerProfileResponse updateTrainerProfile(UpdateTrainerProfileRequest request) {
         User user = getCurrentUser();
         TrainerProfile profile = getTrainerProfileOrThrow(user);
@@ -116,6 +133,10 @@ public class TrainerProfileServiceImpl implements ITrainerProfileService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "trainerProfiles", allEntries = true),
+            @CacheEvict(value = "lists", allEntries = true)
+    })
     public MessageResponse deactivateProfile() {
         User user = getCurrentUser();
         TrainerProfile profile = getTrainerProfileOrThrow(user);
@@ -132,7 +153,12 @@ public class TrainerProfileServiceImpl implements ITrainerProfileService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "trainerProfiles", allEntries = true),
+            @CacheEvict(value = "lists", allEntries = true)
+    })
     public TrainerProfileResponse clearProfile() {
+        log.info("Clearing trainer profile");
         User user = getCurrentUser();
         TrainerProfile profile = getTrainerProfileOrThrow(user);
 

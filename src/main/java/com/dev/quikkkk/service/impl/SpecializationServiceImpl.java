@@ -12,6 +12,9 @@ import com.dev.quikkkk.service.ISpecializationService;
 import com.dev.quikkkk.utils.PaginationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,7 +31,9 @@ public class SpecializationServiceImpl implements ISpecializationService {
     private final SpecializationMapper specializationMapper;
 
     @Override
+    @CacheEvict(value = "specializations", allEntries = true)
     public SpecializationResponse create(CreateSpecializationRequest request) {
+        log.info("Specialization request: {}", request);
         if (specializationRepository.existsByNameIgnoreCase(request.getName()))
             throw new BusinessException(SPECIALIZATION_ALREADY_EXISTS);
 
@@ -40,7 +45,12 @@ public class SpecializationServiceImpl implements ISpecializationService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(
+            value = "lists",
+            key = "'specializations:' + #page + ':' + #size + ':' + (#search != null ? #search : 'all')"
+    )
     public PageResponse<SpecializationResponse> getAllActive(int page, int size, String search) {
+        log.info("Fetching specializations page, size, search: {}, {}, {}", page, size, search);
         Pageable pageable = PaginationUtils.createPageRequest(page, size);
         Page<Specialization> pageResult = specializationRepository.findActiveWithOptionalSearch(search, pageable);
 
@@ -48,7 +58,13 @@ public class SpecializationServiceImpl implements ISpecializationService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "specializations", allEntries = true),
+            @CacheEvict(value = "lists", allEntries = true)
+    })
+    @Transactional
     public SpecializationResponse update(String id, UpdateSpecializationRequest request) {
+        log.info("Updating specialization with id: {}", id);
         Specialization specialization = findSpecializationById(id);
 
         specializationMapper.update(specialization, request);
@@ -58,7 +74,13 @@ public class SpecializationServiceImpl implements ISpecializationService {
     }
 
     @Override
+    @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "specializations", allEntries = true),
+            @CacheEvict(value = "lists", allEntries = true)
+    })
     public SpecializationResponse disable(String id) {
+        log.info("Specialization with id {} disabled", id);
         Specialization specialization = findSpecializationById(id);
 
         specialization.setActive(false);

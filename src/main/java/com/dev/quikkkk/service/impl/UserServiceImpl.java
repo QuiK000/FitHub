@@ -9,6 +9,7 @@ import com.dev.quikkkk.service.IUserService;
 import com.dev.quikkkk.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,12 +25,14 @@ public class UserServiceImpl implements IUserService {
     private final UserMapper userMapper;
 
     @Override
+    @Cacheable(value = "users", key = "#root.method.name + ':' + T(com.dev.quikkkk.utils.SecurityUtils).getCurrentUserId()")
     public UserResponse getCurrentUser() {
         log.info("Fetching current authenticated user");
         return userMapper.toResponse(getCurrentUserEntity());
     }
 
     @Override
+    @Cacheable(value = "users", key = "'byId:' + #id")
     public UserResponse getUser(String id) {
         log.info("Fetching user by id={}", id);
         return userMapper.toResponse(findUserById(id));

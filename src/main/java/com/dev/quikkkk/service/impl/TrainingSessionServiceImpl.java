@@ -21,11 +21,15 @@ import com.dev.quikkkk.repository.IAttendanceRepository;
 import com.dev.quikkkk.repository.IClientProfileRepository;
 import com.dev.quikkkk.repository.ITrainerProfileRepository;
 import com.dev.quikkkk.repository.ITrainingSessionRepository;
+import com.dev.quikkkk.service.ISessionLockService;
 import com.dev.quikkkk.service.ITrainingSessionService;
 import com.dev.quikkkk.utils.PaginationUtils;
 import com.dev.quikkkk.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -38,6 +42,8 @@ import static com.dev.quikkkk.enums.ErrorCode.CLIENT_PROFILE_NOT_FOUND;
 import static com.dev.quikkkk.enums.ErrorCode.GROUP_TRAINING_MIN_TWO_PARTICIPANTS;
 import static com.dev.quikkkk.enums.ErrorCode.NO_ACTIVE_MEMBERSHIP;
 import static com.dev.quikkkk.enums.ErrorCode.PERSONAL_TRAINING_MAX_ONE_PARTICIPANT;
+import static com.dev.quikkkk.enums.ErrorCode.SESSION_ALREADY_FINISHED;
+import static com.dev.quikkkk.enums.ErrorCode.SESSION_CHECKIN_TOO_EARLY;
 import static com.dev.quikkkk.enums.ErrorCode.SESSION_IS_FULL;
 import static com.dev.quikkkk.enums.ErrorCode.SESSION_NOT_FOUND;
 import static com.dev.quikkkk.enums.ErrorCode.SESSION_NOT_JOINABLE;
@@ -56,10 +62,13 @@ public class TrainingSessionServiceImpl implements ITrainingSessionService {
     private final IAttendanceRepository attendanceRepository;
     private final TrainingSessionMapper trainingSessionMapper;
     private final MessageMapper messageMapper;
+    private final ISessionLockService sessionLockService;
 
     @Override
     @Transactional
+    @CacheEvict(value = "trainingSessions", allEntries = true)
     public TrainingSessionResponse createSession(CreateTrainingSessionRequest request) {
+        log.info("Create session request: {}", request);
         TrainerProfile trainer = findTrainerProfileByUserId();
 
         if (!trainer.isActive()) throw new BusinessException(TRAINER_PROFILE_DEACTIVATED);
@@ -80,7 +89,12 @@ public class TrainingSessionServiceImpl implements ITrainingSessionService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(
+            value = "lists",
+            key = "'sessions:' + #page + ':' + #size + ':' + (#search != null ? #search : 'all')"
+    )
     public PageResponse<TrainingSessionResponse> getTrainingSessions(int page, int size, String search) {
+        log.info("Fetching training sessions page, size, search: {}, {}, {}", page, size, search);
         Pageable pageable = PaginationUtils.createPageRequest(page, size, "startTime");
         Page<TrainingSession> sessionPage = trainingSessionRepository.findAllWithOptionalSearch(search, pageable);
 
@@ -89,7 +103,12 @@ public class TrainingSessionServiceImpl implements ITrainingSessionService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "trainingSessions", allEntries = true),
+            @CacheEvict(value = "lists", allEntries = true)
+    })
     public TrainingSessionResponse updateSession(String sessionId, UpdateTrainingSessionRequest request) {
+        log.info("Update session with id: {}", sessionId);
         TrainerProfile trainer = findTrainerProfileByUserId();
         TrainingSession session = findSessionById(sessionId);
 
@@ -105,31 +124,42 @@ public class TrainingSessionServiceImpl implements ITrainingSessionService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "trainingSessions", key = "#sessionId"),
+            @CacheEvict(value = "lists", allEntries = true)
+    })
     public MessageResponse joinToSession(String sessionId) {
-        String userId = SecurityUtils.getCurrentUserId();
-        TrainingSession session = findSessionById(sessionId);
+        log.info("Join session with id: {}", sessionId);
+        return sessionLockService.executeWithLock(sessionId, () -> {
+            String userId = SecurityUtils.getCurrentUserId();
+            TrainingSession session = findSessionById(sessionId);
 
-        if (!session.getStatus().equals(TrainingStatus.SCHEDULED)) throw new BusinessException(SESSION_NOT_JOINABLE);
-        if (session.getStartTime().isBefore(LocalDateTime.now())) throw new BusinessException(START_TIME_IN_PAST);
+            if (!session.getStatus().equals(TrainingStatus.SCHEDULED))
+                throw new BusinessException(SESSION_NOT_JOINABLE);
+            if (session.getStartTime().isBefore(LocalDateTime.now())) throw new BusinessException(START_TIME_IN_PAST);
 
-        ClientProfile client = clientProfileRepository
-                .findByUserIdAndActiveMembership(userId, MembershipStatus.ACTIVE)
-                .orElseThrow(() -> new BusinessException(NO_ACTIVE_MEMBERSHIP));
+            ClientProfile client = clientProfileRepository
+                    .findByUserIdAndActiveMembership(userId, MembershipStatus.ACTIVE)
+                    .orElseThrow(() -> new BusinessException(NO_ACTIVE_MEMBERSHIP));
 
-        if (session.getClients().contains(client)) throw new BusinessException(CLIENT_ALREADY_JOINED_SESSION);
-        if (session.getClients().size() >= session.getMaxParticipants()) throw new BusinessException(SESSION_IS_FULL);
+            if (session.getClients().contains(client)) throw new BusinessException(CLIENT_ALREADY_JOINED_SESSION);
+            if (session.getClients().size() >= session.getMaxParticipants())
+                throw new BusinessException(SESSION_IS_FULL);
 
-        session.getClients().add(client);
-        trainingSessionRepository.save(session);
+            session.getClients().add(client);
+            trainingSessionRepository.save(session);
 
-        return messageMapper.message("Successfully joined training session");
+            return messageMapper.message("Successfully joined training session");
+        });
     }
 
     @Override
     @Transactional
     public CheckInResponse checkIn(String sessionId, CheckInTrainingSessionRequest request) {
+        log.info("CheckIn session with id: {}", sessionId);
         TrainerProfile trainer = findTrainerProfileByUserId();
         TrainingSession session = findSessionById(sessionId);
+        LocalDateTime now = LocalDateTime.now();
 
         if (!session.getTrainer().getId().equals(trainer.getId())) throw new BusinessException(UNAUTHORIZED_USER);
         if (!session.getStatus().equals(TrainingStatus.SCHEDULED)) throw new BusinessException(SESSION_NOT_JOINABLE);
@@ -137,22 +167,22 @@ public class TrainingSessionServiceImpl implements ITrainingSessionService {
         ClientProfile client = clientProfileRepository.findById(request.getClientId())
                 .orElseThrow(() -> new BusinessException(CLIENT_PROFILE_NOT_FOUND));
 
-        if (!session.getClients().contains(client)) throw new BusinessException(UNAUTHORIZED_USER);
-        if (LocalDateTime.now().isBefore(session.getStartTime().minusMinutes(10)))
-            throw new BusinessException(START_TIME_IN_PAST);
+        if (!session.getClients().contains(client)) throw new BusinessException(CLIENT_PROFILE_NOT_FOUND);
+        if (now.isBefore(session.getStartTime().minusMinutes(10)))
+            throw new BusinessException(SESSION_CHECKIN_TOO_EARLY);
 
-        if (LocalDateTime.now().isAfter(session.getEndTime())) throw new BusinessException(START_TIME_IN_PAST);
-        boolean alreadyCheckedIn = attendanceRepository.existsByClientIdAndSessionId(client.getId(), session.getId());
-        if (alreadyCheckedIn) throw new BusinessException(CLIENT_ALREADY_JOINED_SESSION);
+        if (now.isAfter(session.getEndTime())) throw new BusinessException(SESSION_ALREADY_FINISHED);
+        if (attendanceRepository.existsByClientIdAndSessionId(client.getId(), sessionId))
+            throw new BusinessException(CLIENT_ALREADY_JOINED_SESSION);
 
-        attendanceRepository.save(
-                Attendance.builder()
-                        .client(client)
-                        .session(session)
-                        .checkInTime(LocalDateTime.now())
-                        .createdBy(session.getCreatedBy())
-                        .build()
-        );
+        Attendance attendance = Attendance.builder()
+                .client(client)
+                .session(session)
+                .checkInTime(LocalDateTime.now())
+                .createdBy(session.getCreatedBy())
+                .build();
+
+        attendanceRepository.save(attendance);
 
         return CheckInResponse.builder()
                 .success(true)
