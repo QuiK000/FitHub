@@ -1,0 +1,75 @@
+package com.dev.quikkkk.service.impl;
+
+import com.dev.quikkkk.dto.request.CreatePaymentRequest;
+import com.dev.quikkkk.dto.response.PageResponse;
+import com.dev.quikkkk.dto.response.PaymentResponse;
+import com.dev.quikkkk.entity.ClientProfile;
+import com.dev.quikkkk.entity.Membership;
+import com.dev.quikkkk.entity.Payment;
+import com.dev.quikkkk.enums.MembershipStatus;
+import com.dev.quikkkk.exception.BusinessException;
+import com.dev.quikkkk.mapper.PaymentMapper;
+import com.dev.quikkkk.repository.IClientProfileRepository;
+import com.dev.quikkkk.repository.IMembershipRepository;
+import com.dev.quikkkk.repository.IPaymentRepository;
+import com.dev.quikkkk.service.IPaymentService;
+import com.dev.quikkkk.utils.SecurityUtils;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import static com.dev.quikkkk.enums.ErrorCode.CLIENT_MEMBERSHIP_NOT_FOUND;
+import static com.dev.quikkkk.enums.ErrorCode.CLIENT_PROFILE_NOT_FOUND;
+import static com.dev.quikkkk.enums.ErrorCode.MEMBERSHIP_ALREADY_ACTIVATED;
+import static com.dev.quikkkk.enums.ErrorCode.MEMBERSHIP_CANCELLED;
+import static com.dev.quikkkk.enums.ErrorCode.MEMBERSHIP_EXPIRED;
+import static com.dev.quikkkk.enums.ErrorCode.MEMBERSHIP_NOT_FOUND;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class PaymentServiceImpl implements IPaymentService {
+    private final IPaymentRepository paymentRepository;
+    private final IMembershipRepository membershipRepository;
+    private final IClientProfileRepository clientProfileRepository;
+    private final PaymentMapper paymentMapper;
+
+    @Override
+    @Transactional
+    public PaymentResponse createPayment(CreatePaymentRequest request) {
+        String userId = SecurityUtils.getCurrentUserId();
+        ClientProfile client = clientProfileRepository.findByUserId(userId)
+                .orElseThrow(() -> new BusinessException(CLIENT_PROFILE_NOT_FOUND));
+        Membership membership = membershipRepository.findById(request.getMembershipId())
+                .orElseThrow(() -> new BusinessException(MEMBERSHIP_NOT_FOUND));
+
+        if (!membership.getClient().getId().equals(client.getId()))
+            throw new BusinessException(CLIENT_MEMBERSHIP_NOT_FOUND);
+
+        switch (membership.getStatus()) {
+            case ACTIVE:
+                throw new BusinessException(MEMBERSHIP_ALREADY_ACTIVATED);
+            case EXPIRED:
+                throw new BusinessException(MEMBERSHIP_EXPIRED);
+            case CANCELLED:
+                throw new BusinessException(MEMBERSHIP_CANCELLED);
+        }
+
+        Payment payment = paymentMapper.toEntity(request, membership);
+
+        membership.setPayment(payment);
+        membership.setStatus(MembershipStatus.ACTIVE);
+
+        paymentRepository.save(payment);
+        membershipRepository.save(membership);
+
+        return paymentMapper.toResponse(payment, membership);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<PaymentResponse> getPayments(int page, int size) {
+        return null;
+    }
+}
