@@ -72,7 +72,18 @@ public class PaymentServiceImpl implements IPaymentService {
     @Transactional(readOnly = true)
     public PageResponse<PaymentResponse> getPayments(int page, int size) {
         ClientProfile client = findClientProfile();
-        Pageable pageable = PaginationUtils.createPageRequest(page, size);
+        Pageable pageable = PaginationUtils.createPageRequest(page, size, "paymentDate");
+        Page<Payment> paymentPage = paymentRepository.findPaymentsByClientId(client.getId(), pageable);
+
+        return PaginationUtils.toPageResponse(paymentPage, paymentMapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<PaymentResponse> getPaymentsByClientId(String clientId, int page, int size) {
+        ClientProfile client = clientProfileRepository.findById(clientId)
+                .orElseThrow(() -> new BusinessException(CLIENT_PROFILE_NOT_FOUND));
+        Pageable pageable = PaginationUtils.createPageRequest(page, size, "paymentDate");
         Page<Payment> paymentPage = paymentRepository.findPaymentsByClientId(client.getId(), pageable);
 
         return PaginationUtils.toPageResponse(paymentPage, paymentMapper::toResponse);
