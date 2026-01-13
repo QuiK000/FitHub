@@ -25,7 +25,7 @@ public class PaymentMapper {
                 .build();
     }
 
-    public PaymentResponse toResponse(Payment payment, Membership membership) {
+    public PaymentResponse toResponse(Payment payment) {
         return PaymentResponse.builder()
                 .id(payment.getId())
                 .amount(payment.getAmount())
@@ -34,9 +34,9 @@ public class PaymentMapper {
                 .paymentDate(payment.getPaymentDate())
                 .membership(
                         MembershipShortResponse.builder()
-                                .membershipId(membership.getId())
-                                .type(membership.getType())
-                                .status(membership.getStatus())
+                                .membershipId(payment.getMembership().getId())
+                                .type(payment.getMembership().getType())
+                                .status(payment.getMembership().getStatus())
                                 .build()
                 )
                 .build();
