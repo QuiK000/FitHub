@@ -23,4 +23,12 @@ public interface ITrainingSessionRepository extends JpaRepository<TrainingSessio
                         OR LOWER(spec.name) LIKE LOWER(CONCAT('%', :search, '%'))
             """)
     Page<TrainingSession> findAllWithOptionalSearch(@Param("search") String search, Pageable pageable);
+
+    @Query("""
+            SELECT COUNT(c) > 0
+            FROM TrainingSession s
+            JOIN s.clients c
+            WHERE s.id = :sessionId AND c.id = :clientId
+            """)
+    boolean existsClientInSession(String sessionId, String clientId);
 }
