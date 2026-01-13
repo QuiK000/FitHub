@@ -156,30 +156,32 @@ public class TrainingSessionServiceImpl implements ITrainingSessionService {
     @Override
     @Transactional
     public CheckInResponse checkIn(String sessionId, CheckInTrainingSessionRequest request) {
-        log.info("CheckIn session with id: {}", sessionId);
+        log.info("Check-in: sessionId={}, clientId={}", sessionId, request.getClientId());
+        LocalDateTime now = LocalDateTime.now();
+
         TrainerProfile trainer = findTrainerProfileByUserId();
         TrainingSession session = findSessionById(sessionId);
-        LocalDateTime now = LocalDateTime.now();
 
         if (!session.getTrainer().getId().equals(trainer.getId())) throw new BusinessException(UNAUTHORIZED_USER);
         if (!session.getStatus().equals(TrainingStatus.SCHEDULED)) throw new BusinessException(SESSION_NOT_JOINABLE);
 
+        if (now.isBefore(session.getStartTime().minusMinutes(10))) throw new BusinessException(SESSION_CHECKIN_TOO_EARLY);
+        if (now.isAfter(session.getEndTime())) throw new BusinessException(SESSION_ALREADY_FINISHED);
+
         ClientProfile client = clientProfileRepository.findById(request.getClientId())
                 .orElseThrow(() -> new BusinessException(CLIENT_PROFILE_NOT_FOUND));
 
-        if (!session.getClients().contains(client)) throw new BusinessException(CLIENT_PROFILE_NOT_FOUND);
-        if (now.isBefore(session.getStartTime().minusMinutes(10)))
-            throw new BusinessException(SESSION_CHECKIN_TOO_EARLY);
+        if (!trainingSessionRepository.existsClientInSession(session.getId(), client.getId()))
+            throw new BusinessException(CLIENT_PROFILE_NOT_FOUND);
 
-        if (now.isAfter(session.getEndTime())) throw new BusinessException(SESSION_ALREADY_FINISHED);
         if (attendanceRepository.existsByClientIdAndSessionId(client.getId(), sessionId))
             throw new BusinessException(CLIENT_ALREADY_JOINED_SESSION);
 
         Attendance attendance = Attendance.builder()
                 .client(client)
                 .session(session)
-                .checkInTime(LocalDateTime.now())
-                .createdBy(session.getCreatedBy())
+                .checkInTime(now)
+                .createdBy(trainer.getId())
                 .build();
 
         attendanceRepository.save(attendance);
@@ -188,7 +190,7 @@ public class TrainingSessionServiceImpl implements ITrainingSessionService {
                 .success(true)
                 .sessionId(session.getId())
                 .clientId(client.getId())
-                .checkInTime(LocalDateTime.now())
+                .checkInTime(now)
                 .message("Client successfully checked in")
                 .build();
     }
