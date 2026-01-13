@@ -38,4 +38,7 @@ public interface IClientProfileRepository extends JpaRepository<ClientProfile, S
             @Param("userId") String userId,
             @Param("status") MembershipStatus status
     );
+
+    @Query("SELECT COUNT(c) FROM ClientProfile c WHERE c.active = true")
+    Integer findAllActiveClients();
 }

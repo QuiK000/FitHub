@@ -5,6 +5,7 @@ import com.dev.quikkkk.enums.MembershipStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -22,4 +23,7 @@ public interface IMembershipRepository extends JpaRepository<Membership, String>
     List<Membership> findAllByClientIdOrderByCreatedDateDesc(String clientId);
 
     List<Membership> findByStatusAndEndDateBefore(MembershipStatus status, LocalDateTime endDate);
+
+    @Query("SELECT COUNT(m) FROM Membership m WHERE m.status = 'ACTIVE'")
+    Integer findAllActiveMemberships();
 }

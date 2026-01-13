@@ -8,8 +8,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
+
 @Repository
 public interface IPaymentRepository extends JpaRepository<Payment, String> {
-    @Query("SELECT p FROM Payment p WHERE p.client.id = :clientId")
+    @Query("FROM Payment p WHERE p.client.id = :clientId")
     Page<Payment> findPaymentsByClientId(@Param("clientId") String clientId, Pageable pageable);
+
+    @Query("SELECT SUM(p.amount) FROM Payment p WHERE p.status = 'PAID'")
+    BigDecimal findPaymentsWhereStatusPaid();
 }
