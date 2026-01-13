@@ -69,7 +69,8 @@ public enum ErrorCode {
     SESSION_CHECKIN_TOO_EARLY("SESSION_CHECKIN_TOO_EARLY", "Session Checkin Too Early", BAD_REQUEST),
     SESSION_ALREADY_FINISHED("SESSION_ALREADY_FINISHED", "Session Already Finished", BAD_REQUEST),
     CLIENT_ALREADY_CHECKED_IN("CLIENT_ALREADY_CHECKED_IN", "Client Already Checked In", FORBIDDEN),
-    ;
+    MEMBERSHIP_CANCELLED("MEMBERSHIP_CANCELLED", "Membership Cancelled", BAD_REQUEST),
+    CLIENT_MEMBERSHIP_NOT_FOUND("CLIENT_MEMBERSHIP_NOT_FOUND", "Client Membership Not Found", NOT_FOUND),;
 
     private final String code;
     private final String defaultMessage;
