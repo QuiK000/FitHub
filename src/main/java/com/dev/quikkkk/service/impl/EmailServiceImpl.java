@@ -5,8 +5,10 @@ import com.dev.quikkkk.service.IEmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,30 +24,48 @@ public class EmailServiceImpl implements IEmailService {
     private String fromEmail;
 
     @Override
+    @Async("emailTaskExecutor")
     public void sendVerificationEmail(String toEmail, String token) {
+        log.debug("Starting async email send to: {}", toEmail);
+
         try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            String verificationLink = frontendUrl + "/verify-email?token=" + token;
-            String emailBody =
-                    "Welcome to FitHub!\n\n"
-                        + "Thank you for registration. Please verify your email address by clicking the link below:\n\n"
-                        + verificationLink
-                        + "\n\n"
-                        + "This link will expire in " + TokenType.EMAIL_VERIFICATION.getTtlMinutes() + " minutes.\n\n"
-                        + "If you didn't create this account, please ignore this email. \n\n"
-                        + "Best regards,\n"
-                        + "FitHub Team";
-
-            message.setFrom(fromEmail);
-            message.setTo(toEmail);
-            message.setSubject("FitHub - Verification email!");
-            message.setText(emailBody);
-
+            SimpleMailMessage message = buildVerificationMessage(toEmail, token);
             mailSender.send(message);
-            log.info("Email sent to {}", toEmail);
+
+            log.info("Verification email successfully sent to: {}", toEmail);
+        } catch (MailException e) {
+            log.error("Mail server error sending email to: {}. Error: {}", toEmail, e.getMessage(), e);
         } catch (Exception e) {
-            log.error("Error sending email to {}", toEmail, e);
-            throw new RuntimeException("Error sending email to " + toEmail, e);
+            log.error("Unexpected error sending email to: {}", toEmail, e);
         }
+    }
+
+    private SimpleMailMessage buildVerificationMessage(String toEmail, String token) {
+        String verificationLink = frontendUrl + "/verify-email?token=" + token;
+
+        String emailBody = String.format("""
+                Welcome to FitHub!
+                
+                Thank you for registration. Please verify your email address by clicking the link below:
+                
+                %s
+                
+                This link will expire in %d minutes.
+                
+                If you didn't create this account, please ignore this email.
+                
+                Best regards,
+                FitHub Team
+                """,
+                verificationLink,
+                TokenType.EMAIL_VERIFICATION.getTtlMinutes());
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(fromEmail);
+        message.setTo(toEmail);
+        message.setSubject("FitHub - Verify Your Email");
+        message.setText(emailBody);
+
+        return message;
     }
 }
