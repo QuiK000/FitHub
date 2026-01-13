@@ -5,6 +5,7 @@ import com.dev.quikkkk.enums.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -17,7 +18,10 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.nio.file.AccessDeniedException;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
@@ -214,5 +218,51 @@ public class GlobalExceptionHandler {
                         .message(message)
                         .build()
         );
+    }
+
+    @ExceptionHandler(InvalidEmailAddressException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidEmailAddress(InvalidEmailAddressException ex) {
+        log.warn("Invalid email address: {}", ex.getInvalidEmail());
+        Map<String, Object> errorResponse = new HashMap<>();
+
+        errorResponse.put("timestamp", LocalDateTime.now());
+        errorResponse.put("status", HttpStatus.BAD_REQUEST.value());
+        errorResponse.put("error", "Invalid email address");
+        errorResponse.put("message", ex.getMessage());
+        errorResponse.put("invalidEmail", ex.getInvalidEmail());
+
+        return ResponseEntity
+                .status(BAD_REQUEST)
+                .body(errorResponse);
+    }
+
+    @ExceptionHandler(EmailSendException.class)
+    public ResponseEntity<Map<String, Object>> handleEmailSendException(EmailSendException ex) {
+        log.error("Email send failed: recipient={}, type={}", ex.getRecipientEmail(), ex.getEmailType());
+        Map<String, Object> errorResponse = new HashMap<>();
+
+        errorResponse.put("timestamp", LocalDateTime.now());
+        errorResponse.put("status", INTERNAL_SERVER_ERROR.value());
+        errorResponse.put("error", "Email send failed");
+        errorResponse.put("message", "Failed to send email. Please try again later.");
+
+        return ResponseEntity
+                .status(INTERNAL_SERVER_ERROR)
+                .body(errorResponse);
+    }
+
+    @ExceptionHandler(EmailException.class)
+    public ResponseEntity<Map<String, Object>> handleEmailException(EmailException ex) {
+        log.error("Email error: {}", ex.getMessage(), ex);
+        Map<String, Object> errorResponse = new HashMap<>();
+
+        errorResponse.put("timestamp", LocalDateTime.now());
+        errorResponse.put("status", INTERNAL_SERVER_ERROR.value());
+        errorResponse.put("error", "Email error");
+        errorResponse.put("message", "An error occurred while processing email.");
+
+        return ResponseEntity
+                .status(INTERNAL_SERVER_ERROR)
+                .body(errorResponse);
     }
 }
