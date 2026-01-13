@@ -13,9 +13,12 @@ import com.dev.quikkkk.repository.IClientProfileRepository;
 import com.dev.quikkkk.repository.IMembershipRepository;
 import com.dev.quikkkk.repository.IPaymentRepository;
 import com.dev.quikkkk.service.IPaymentService;
+import com.dev.quikkkk.utils.PaginationUtils;
 import com.dev.quikkkk.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,9 +41,7 @@ public class PaymentServiceImpl implements IPaymentService {
     @Override
     @Transactional
     public PaymentResponse createPayment(CreatePaymentRequest request) {
-        String userId = SecurityUtils.getCurrentUserId();
-        ClientProfile client = clientProfileRepository.findByUserId(userId)
-                .orElseThrow(() -> new BusinessException(CLIENT_PROFILE_NOT_FOUND));
+        ClientProfile client = findClientProfile();
         Membership membership = membershipRepository.findById(request.getMembershipId())
                 .orElseThrow(() -> new BusinessException(MEMBERSHIP_NOT_FOUND));
 
@@ -64,12 +65,21 @@ public class PaymentServiceImpl implements IPaymentService {
         paymentRepository.save(payment);
         membershipRepository.save(membership);
 
-        return paymentMapper.toResponse(payment, membership);
+        return paymentMapper.toResponse(payment);
     }
 
     @Override
     @Transactional(readOnly = true)
     public PageResponse<PaymentResponse> getPayments(int page, int size) {
-        return null;
+        ClientProfile client = findClientProfile();
+        Pageable pageable = PaginationUtils.createPageRequest(page, size);
+        Page<Payment> paymentPage = paymentRepository.findPaymentsByClientId(client.getId(), pageable);
+
+        return PaginationUtils.toPageResponse(paymentPage, paymentMapper::toResponse);
+    }
+
+    private ClientProfile findClientProfile() {
+        return clientProfileRepository.findByUserId(SecurityUtils.getCurrentUserId())
+                .orElseThrow(() -> new BusinessException(CLIENT_PROFILE_NOT_FOUND));
     }
 }
