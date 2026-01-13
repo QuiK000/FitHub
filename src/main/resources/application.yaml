@@ -50,6 +50,13 @@ spring:
           max-idle: 8
           min-idle: 0
           max-wait: -1ms
+  task:
+    execution:
+      pool:
+        core-size: 2
+        max-size: 5
+        queue-capacity: 100
+      thread-name-prefix: async-
 
 app:
   frontend:
