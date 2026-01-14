@@ -31,4 +31,10 @@ public interface ITrainingSessionRepository extends JpaRepository<TrainingSessio
             WHERE s.id = :sessionId AND c.id = :clientId
             """)
     boolean existsClientInSession(String sessionId, String clientId);
+
+    @Query("""
+            SELECT COUNT(s) FROM TrainingSession s
+            WHERE s.trainer.id = :trainerId
+            """)
+    long countAllSessionsByTrainer(@Param("trainerId") String trainerId);
 }
