@@ -41,4 +41,20 @@ public interface IAttendanceRepository extends JpaRepository<Attendance, String>
             ORDER BY COUNT(a) DESC
             """)
     Page<PopularSessionResponse> findTopSessions(Pageable pageable);
+
+    @Query("""
+            SELECT COUNT(DISTINCT a.client.id)
+            FROM Attendance a
+            JOIN a.session s
+            WHERE s.trainer.id = :trainerId
+            """)
+    long countAllClientsByTrainer(@Param("trainerId") String trainerId);
+
+    @Query("""
+            SELECT COUNT(a)
+            FROM Attendance a
+            JOIN a.session s
+            WHERE s.trainer.id = :trainerId
+            """)
+    long countAllAttendancesByTrainer(@Param("trainerId") String trainerId);
 }
