@@ -30,7 +30,7 @@ public class DashboardController {
     }
 
     @GetMapping("/trainers/me")
-    @PreAuthorize("hasRole('CLIENT')")
+    @PreAuthorize("hasRole('TRAINER')")
     public ResponseEntity<TrainerAnalyticsResponse> getTrainerAnalyticsByClient() {
         return ResponseEntity.ok(dashboardService.trainerAnalytics());
     }
