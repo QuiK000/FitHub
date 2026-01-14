@@ -1,6 +1,9 @@
 package com.dev.quikkkk.repository;
 
+import com.dev.quikkkk.dto.response.PopularSessionResponse;
 import com.dev.quikkkk.entity.Attendance;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -24,4 +27,18 @@ public interface IAttendanceRepository extends JpaRepository<Attendance, String>
             AND a.createdDate < :end
             """)
     Integer countAttendanceByToday(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
+    @Query("""
+            SELECT new com.dev.quikkkk.dto.response.PopularSessionResponse(
+            s.id,
+            CONCAT(t.firstname, ' ', t.lastname),
+            COUNT(a)
+            )
+            FROM Attendance a
+            JOIN a.session s
+            JOIN s.trainer t
+            GROUP BY s.id, t.firstname, t.lastname
+            ORDER BY COUNT(a) DESC
+            """)
+    Page<PopularSessionResponse> findTopSessions(Pageable pageable);
 }
