@@ -14,5 +14,5 @@ import lombok.Setter;
 public class PopularSessionResponse {
     private String sessionId;
     private String trainerName;
-    private Integer attendanceCount;
+    private Long attendanceCount;
 }
