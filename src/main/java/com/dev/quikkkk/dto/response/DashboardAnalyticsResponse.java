@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -19,5 +19,5 @@ public class DashboardAnalyticsResponse {
     private Integer activeMemberships;
     private BigDecimal revenue;
     private Integer todayCheckIns;
-    private Set<PopularSessionResponse> popularSessions;
+    private List<PopularSessionResponse> popularSessions;
 }
