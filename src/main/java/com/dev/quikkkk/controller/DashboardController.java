@@ -1,5 +1,6 @@
 package com.dev.quikkkk.controller;
 
+import com.dev.quikkkk.dto.response.ClientAnalyticsResponse;
 import com.dev.quikkkk.dto.response.DashboardAnalyticsResponse;
 import com.dev.quikkkk.dto.response.TrainerAnalyticsResponse;
 import com.dev.quikkkk.service.IDashboardService;
@@ -27,6 +28,12 @@ public class DashboardController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TrainerAnalyticsResponse> getTrainerAnalytics(@PathVariable("trainer-id") String trainerId) {
         return ResponseEntity.ok(dashboardService.trainerAnalyticsById(trainerId));
+    }
+
+    @GetMapping("/clients/{client-id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ClientAnalyticsResponse> getClientsAnalytics(@PathVariable("client-id") String clientId) {
+        return ResponseEntity.ok(dashboardService.clientAnalyticsById(clientId));
     }
 
     @GetMapping("/trainers/me")
