@@ -1,9 +1,11 @@
 package com.dev.quikkkk.service.impl;
 
+import com.dev.quikkkk.dto.response.ClientAnalyticsResponse;
 import com.dev.quikkkk.dto.response.DashboardAnalyticsResponse;
 import com.dev.quikkkk.dto.response.PopularSessionResponse;
 import com.dev.quikkkk.dto.response.TrainerAnalyticsResponse;
 import com.dev.quikkkk.dto.response.TrainerAttendanceMetrics;
+import com.dev.quikkkk.entity.ClientProfile;
 import com.dev.quikkkk.entity.TrainerProfile;
 import com.dev.quikkkk.exception.BusinessException;
 import com.dev.quikkkk.mapper.DashboardMapper;
@@ -26,6 +28,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.dev.quikkkk.enums.ErrorCode.CLIENT_PROFILE_NOT_FOUND;
 import static com.dev.quikkkk.enums.ErrorCode.TRAINER_PROFILE_NOT_FOUND;
 
 @Service
@@ -81,6 +84,19 @@ public class DashboardServiceImpl implements IDashboardService {
         return dashboardMapper.trainerAnalyticsToResponse(trainer, metrics);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public ClientAnalyticsResponse clientAnalyticsById(String clientId) {
+        ClientProfile client = clientProfileRepository.findById(clientId)
+                .orElseThrow(() -> new BusinessException(CLIENT_PROFILE_NOT_FOUND));
+
+        long totalVisits = attendanceRepository.countTotalVisitsByClient(clientId);
+        long missedSessions = calculateMissedSessions(clientId);
+        LocalDateTime lastVisit = attendanceRepository.findLastVisitByClient(clientId);
+
+        return dashboardMapper.clientAnalyticsResponse(client, totalVisits, missedSessions, lastVisit);
+    }
+
     private TrainerAttendanceMetrics calculateTrainerAttendanceMetrics(String trainerId) {
         long totalSessions = trainingSessionRepository.countAllSessionsByTrainer(trainerId);
         long totalClients = attendanceRepository.countAllClientsByTrainer(trainerId);
@@ -92,5 +108,12 @@ public class DashboardServiceImpl implements IDashboardService {
                 .totalClients(totalClients)
                 .attendanceRate(attendanceRate)
                 .build();
+    }
+
+    private long calculateMissedSessions(String clientId) {
+        long plannedSessions = trainingSessionRepository.countPlannedSessionsByClient(clientId);
+        long attendedSessions = attendanceRepository.countAttendedSessionsByClient(clientId);
+        long missedSessions = plannedSessions - attendedSessions;
+        return Math.max(missedSessions, 0);
     }
 }
