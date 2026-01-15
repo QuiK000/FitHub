@@ -37,4 +37,13 @@ public interface ITrainingSessionRepository extends JpaRepository<TrainingSessio
             WHERE s.trainer.id = :trainerId
             """)
     long countAllSessionsByTrainer(@Param("trainerId") String trainerId);
+
+    @Query("""
+            SELECT COUNT(s)
+            FROM TrainingSession s
+            JOIN s.clients c
+            WHERE c.id = :clientId
+            AND s.startTime < CURRENT_TIMESTAMP
+            """)
+    long countPlannedSessionsByClient(@Param("clientId") String clientId);
 }
