@@ -57,4 +57,21 @@ public interface IAttendanceRepository extends JpaRepository<Attendance, String>
             WHERE s.trainer.id = :trainerId
             """)
     long countAllAttendancesByTrainer(@Param("trainerId") String trainerId);
+
+    @Query("""
+            SELECT COUNT(a.session)
+            FROM Attendance a
+            WHERE a.client.id = :clientId
+            """)
+    long countTotalVisitsByClient(@Param("clientId") String clientId);
+
+    @Query("SELECT COUNT(a) FROM Attendance a WHERE a.client.id = :clientId")
+    long countAttendedSessionsByClient(@Param("clientId") String clientId);
+
+    @Query("""
+            SELECT MAX(a.checkInTime)
+            FROM Attendance a
+            WHERE a.client.id = :clientId
+            """)
+    LocalDateTime findLastVisitByClient(@Param("clientId") String clientId);
 }
