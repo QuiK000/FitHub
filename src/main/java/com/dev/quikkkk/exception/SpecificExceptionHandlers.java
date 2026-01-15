@@ -1,10 +1,14 @@
 package com.dev.quikkkk.exception;
 
 import com.dev.quikkkk.dto.response.ErrorResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.TransactionException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -13,14 +17,20 @@ import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.sql.SQLException;
+import java.util.concurrent.TimeoutException;
 
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.CONTENT_TOO_LARGE;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.PAYMENT_REQUIRED;
+import static org.springframework.http.HttpStatus.REQUEST_TIMEOUT;
+import static org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.http.HttpStatus.UNSUPPORTED_MEDIA_TYPE;
 
@@ -167,6 +177,116 @@ public class SpecificExceptionHandlers {
                 ErrorResponse.builder()
                         .code("AUTHENTICATION_FAILED")
                         .message("Authentication failed. Please check your credentials.")
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(TimeoutException.class)
+    public ResponseEntity<ErrorResponse> handleTimeout(TimeoutException ex) {
+        log.error("Request timeout: {}", ex.getMessage());
+        return ResponseEntity.status(REQUEST_TIMEOUT).body(
+                ErrorResponse.builder()
+                        .code("REQUEST_TIMEOUT")
+                        .message("Request timed out. Please try again.")
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(AsyncRequestTimeoutException.class)
+    public ResponseEntity<ErrorResponse> handleAsyncTimeout(AsyncRequestTimeoutException ignoredEx) {
+        log.error("Async request timeout");
+        return ResponseEntity.status(REQUEST_TIMEOUT).body(
+                ErrorResponse.builder()
+                        .code("ASYNC_TIMEOUT")
+                        .message("Request processing took too long")
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(JsonProcessingException.class)
+    public ResponseEntity<ErrorResponse> handleJsonProcessing(JsonProcessingException ex) {
+        log.error("JSON processing error: {}", ex.getMessage());
+        return ResponseEntity.badRequest().body(
+                ErrorResponse.builder()
+                        .code("JSON_PROCESSING_ERROR")
+                        .message("Invalid JSON format: " + ex.getOriginalMessage())
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<ErrorResponse> handleNullPointer(NullPointerException ex) {
+        log.error("Null pointer exception", ex);
+        return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(
+                ErrorResponse.builder()
+                        .code("NULL_POINTER_ERROR")
+                        .message("An unexpected error occurred. Our team has been notified.")
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(RedisConnectionFailureException.class)
+    public ResponseEntity<ErrorResponse> handleRedisConnection(RedisConnectionFailureException ex) {
+        log.error("Redis connection failure: {}", ex.getMessage());
+        return ResponseEntity.status(SERVICE_UNAVAILABLE).body(
+                ErrorResponse.builder()
+                        .code("CACHE_UNAVAILABLE")
+                        .message("Cache service temporarily unavailable")
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<ErrorResponse> handleExpiredJwt(ExpiredJwtException ignoredEx) {
+        log.warn("JWT token expired");
+        return ResponseEntity.status(UNAUTHORIZED).body(
+                ErrorResponse.builder()
+                        .code("TOKEN_EXPIRED")
+                        .message("Your session has expired. Please login again.")
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(MalformedJwtException.class)
+    public ResponseEntity<ErrorResponse> handleMalformedJwt(MalformedJwtException ignoredEx) {
+        log.warn("Malformed JWT token");
+        return ResponseEntity.status(UNAUTHORIZED).body(
+                ErrorResponse.builder()
+                        .code("INVALID_TOKEN")
+                        .message("Invalid authentication token")
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleResourceNotFound(ResourceNotFoundException ex) {
+        log.warn("Resource not found: {}", ex.getMessage());
+        return ResponseEntity.status(NOT_FOUND).body(
+                ErrorResponse.builder()
+                        .code("RESOURCE_NOT_FOUND")
+                        .message(ex.getMessage())
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(DuplicateResourceException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateResource(DuplicateResourceException ex) {
+        log.warn("Duplicate resource: {}", ex.getMessage());
+        return ResponseEntity.status(CONFLICT).body(
+                ErrorResponse.builder()
+                        .code("DUPLICATE_RESOURCE")
+                        .message(ex.getMessage())
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(InsufficientBalanceException.class)
+    public ResponseEntity<ErrorResponse> handleInsufficientBalance(InsufficientBalanceException ex) {
+        log.warn("Insufficient balance: {}", ex.getMessage());
+        return ResponseEntity.status(PAYMENT_REQUIRED).body(
+                ErrorResponse.builder()
+                        .code("INSUFFICIENT_BALANCE")
+                        .message(ex.getMessage())
                         .build()
         );
     }
