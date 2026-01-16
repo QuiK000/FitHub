@@ -1,5 +1,6 @@
 package com.dev.quikkkk.repository;
 
+import com.dev.quikkkk.dto.response.AttendanceStatsResponse;
 import com.dev.quikkkk.dto.response.PopularSessionResponse;
 import com.dev.quikkkk.entity.Attendance;
 import org.springframework.data.domain.Page;
@@ -74,4 +75,20 @@ public interface IAttendanceRepository extends JpaRepository<Attendance, String>
             WHERE a.client.id = :clientId
             """)
     LocalDateTime findLastVisitByClient(@Param("clientId") String clientId);
+
+    @Query("""
+            SELECT new com.dev.quikkkk.dto.response.AttendanceStatsResponse(
+                        FUNCTION('DATE', a.checkInTime),
+                        COUNT(a)
+            )
+            FROM Attendance a
+            WHERE a.checkInTime >= :from
+            AND a.checkInTime < :to
+            GROUP BY FUNCTION('DATE', a.checkInTime)
+            ORDER BY FUNCTION('DATE', a.checkInTime)
+            """)
+    List<AttendanceStatsResponse> findAttendanceStatsByDateRange(
+            @Param("from") LocalDateTime from,
+            @Param("to") LocalDateTime to
+    );
 }
