@@ -1,5 +1,6 @@
 package com.dev.quikkkk.controller;
 
+import com.dev.quikkkk.dto.response.AttendanceStatsResponse;
 import com.dev.quikkkk.dto.response.ClientAnalyticsResponse;
 import com.dev.quikkkk.dto.response.DashboardAnalyticsResponse;
 import com.dev.quikkkk.dto.response.TrainerAnalyticsResponse;
@@ -10,7 +11,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/analytics")
@@ -34,6 +39,15 @@ public class DashboardController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ClientAnalyticsResponse> getClientsAnalytics(@PathVariable("client-id") String clientId) {
         return ResponseEntity.ok(dashboardService.clientAnalyticsById(clientId));
+    }
+
+    @GetMapping("/analytics/attendance")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<AttendanceStatsResponse>> getAttendanceStats(
+            @RequestParam LocalDate from,
+            @RequestParam LocalDate to
+    ) {
+        return ResponseEntity.ok(dashboardService.getAttendanceStats(from, to));
     }
 
     @GetMapping("/trainers/me")

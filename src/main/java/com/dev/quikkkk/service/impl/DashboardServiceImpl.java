@@ -1,5 +1,6 @@
 package com.dev.quikkkk.service.impl;
 
+import com.dev.quikkkk.dto.response.AttendanceStatsResponse;
 import com.dev.quikkkk.dto.response.ClientAnalyticsResponse;
 import com.dev.quikkkk.dto.response.DashboardAnalyticsResponse;
 import com.dev.quikkkk.dto.response.PopularSessionResponse;
@@ -95,6 +96,15 @@ public class DashboardServiceImpl implements IDashboardService {
         LocalDateTime lastVisit = attendanceRepository.findLastVisitByClient(clientId);
 
         return dashboardMapper.clientAnalyticsResponse(client, totalVisits, missedSessions, lastVisit);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AttendanceStatsResponse> getAttendanceStats(LocalDate from, LocalDate to) {
+        LocalDateTime start = from.atStartOfDay();
+        LocalDateTime end = to.plusDays(1).atStartOfDay();
+
+        return attendanceRepository.findAttendanceStatsByDateRange(start, end);
     }
 
     private TrainerAttendanceMetrics calculateTrainerAttendanceMetrics(String trainerId) {
