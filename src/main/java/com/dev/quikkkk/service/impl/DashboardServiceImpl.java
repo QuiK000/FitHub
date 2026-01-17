@@ -4,6 +4,7 @@ import com.dev.quikkkk.dto.response.AttendanceStatsResponse;
 import com.dev.quikkkk.dto.response.ClientAnalyticsResponse;
 import com.dev.quikkkk.dto.response.DashboardAnalyticsResponse;
 import com.dev.quikkkk.dto.response.PopularSessionResponse;
+import com.dev.quikkkk.dto.response.RevenueStatsResponse;
 import com.dev.quikkkk.dto.response.TrainerAnalyticsResponse;
 import com.dev.quikkkk.dto.response.TrainerAttendanceMetrics;
 import com.dev.quikkkk.entity.ClientProfile;
@@ -101,10 +102,19 @@ public class DashboardServiceImpl implements IDashboardService {
     @Override
     @Transactional(readOnly = true)
     public List<AttendanceStatsResponse> getAttendanceStats(LocalDate from, LocalDate to) {
-        LocalDateTime start = from.atStartOfDay();
-        LocalDateTime end = to.plusDays(1).atStartOfDay();
+        return attendanceRepository.findAttendanceStatsByDateRange(
+                from.atStartOfDay(),
+                to.plusDays(1).atStartOfDay()
+        );
+    }
 
-        return attendanceRepository.findAttendanceStatsByDateRange(start, end);
+    @Override
+    @Transactional(readOnly = true)
+    public List<RevenueStatsResponse> getRevenueStats(LocalDate from, LocalDate to) {
+        return paymentRepository.findRevenueStatsByDateRange(
+                from.atStartOfDay(),
+                to.plusDays(1).atStartOfDay()
+        );
     }
 
     private TrainerAttendanceMetrics calculateTrainerAttendanceMetrics(String trainerId) {
