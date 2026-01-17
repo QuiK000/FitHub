@@ -41,7 +41,7 @@ public class DashboardController {
         return ResponseEntity.ok(dashboardService.clientAnalyticsById(clientId));
     }
 
-    @GetMapping("/analytics/attendance")
+    @GetMapping("/attendance")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<AttendanceStatsResponse>> getAttendanceStats(
             @RequestParam LocalDate from,
