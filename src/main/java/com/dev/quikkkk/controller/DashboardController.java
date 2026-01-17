@@ -3,6 +3,7 @@ package com.dev.quikkkk.controller;
 import com.dev.quikkkk.dto.response.AttendanceStatsResponse;
 import com.dev.quikkkk.dto.response.ClientAnalyticsResponse;
 import com.dev.quikkkk.dto.response.DashboardAnalyticsResponse;
+import com.dev.quikkkk.dto.response.RevenueStatsResponse;
 import com.dev.quikkkk.dto.response.TrainerAnalyticsResponse;
 import com.dev.quikkkk.service.IDashboardService;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +49,15 @@ public class DashboardController {
             @RequestParam LocalDate to
     ) {
         return ResponseEntity.ok(dashboardService.getAttendanceStats(from, to));
+    }
+
+    @GetMapping("/revenue")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<RevenueStatsResponse>> getRevenueStats(
+            @RequestParam LocalDate from,
+            @RequestParam LocalDate to
+    ) {
+        return ResponseEntity.ok(dashboardService.getRevenueStats(from, to));
     }
 
     @GetMapping("/trainers/me")
