@@ -24,7 +24,7 @@ public interface IClientProfileRepository extends JpaRepository<ClientProfile, S
                     OR TRIM(:search) = ''
                     OR LOWER(c.lastname) LIKE LOWER(CONCAT('%', :search, '%'))
                     OR LOWER(c.firstname) LIKE LOWER(CONCAT('%', :search, '%'))
-                )
+                ) ORDER BY c.createdDate DESC
             """)
     Page<ClientProfile> findActiveWithOptionalSearch(@Param("search") String search, Pageable pageable);
 
