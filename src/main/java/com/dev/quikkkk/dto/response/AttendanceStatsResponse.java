@@ -12,10 +12,11 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class AttendanceStatsResponse {
     private LocalDate date;
-    private long checkIns;
+    private Long checkIns;
 
-    public AttendanceStatsResponse(Date date, long checkIns) {
+    public AttendanceStatsResponse(Date date, Long checkIns) {
         this.date = date.toLocalDate();
         this.checkIns = checkIns;
     }
 }
+
