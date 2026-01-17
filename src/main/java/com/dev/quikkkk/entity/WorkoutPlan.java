@@ -1,6 +1,7 @@
 package com.dev.quikkkk.entity;
 
 import com.dev.quikkkk.enums.DifficultyLevel;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -8,12 +9,16 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "workout_plans")
@@ -45,4 +50,10 @@ public class WorkoutPlan extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "trainer_id", nullable = false)
     private TrainerProfile trainer;
+
+    @OneToMany(mappedBy = "workoutPlan", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<WorkoutPlanExercise> exercises = new HashSet<>();
+
+    @OneToMany(mappedBy = "workoutPlan")
+    private Set<ClientWorkoutPlan> clientAssignments = new HashSet<>();
 }
