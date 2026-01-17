@@ -77,15 +77,15 @@ public interface IAttendanceRepository extends JpaRepository<Attendance, String>
     LocalDateTime findLastVisitByClient(@Param("clientId") String clientId);
 
     @Query("""
-            SELECT new com.dev.quikkkk.dto.response.AttendanceStatsResponse(
-                        FUNCTION('DATE', a.checkInTime),
-                        COUNT(a)
-            )
-            FROM Attendance a
-            WHERE a.checkInTime >= :from
-            AND a.checkInTime < :to
-            GROUP BY FUNCTION('DATE', a.checkInTime)
-            ORDER BY FUNCTION('DATE', a.checkInTime)
+                SELECT new com.dev.quikkkk.dto.response.AttendanceStatsResponse(
+                    CAST(a.checkInTime AS date),
+                    COUNT(a.id)
+                )
+                FROM Attendance a
+                WHERE a.checkInTime >= :from
+                  AND a.checkInTime < :to
+                GROUP BY CAST(a.checkInTime AS date)
+                ORDER BY CAST(a.checkInTime AS date)
             """)
     List<AttendanceStatsResponse> findAttendanceStatsByDateRange(
             @Param("from") LocalDateTime from,
