@@ -46,7 +46,7 @@ public class Exercise extends BaseEntity {
     @CollectionTable(name = "exercise_secondary_muscles", joinColumns = @JoinColumn(name = "exercise_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "muscle_group")
-    private Set<MuscleGroup> secondaryMuscleGroup = new HashSet<>();
+    private Set<MuscleGroup> secondaryMuscleGroups = new HashSet<>();
 
     @Column(name = "video_url")
     private String videoUrl;
