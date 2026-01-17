@@ -1,5 +1,6 @@
 package com.dev.quikkkk.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -81,6 +82,9 @@ public class TrainerProfile extends BaseEntity {
 
     @OneToMany(mappedBy = "trainer", fetch = FetchType.LAZY)
     private Set<TrainingSession> trainingSessions = new HashSet<>();
+
+    @OneToMany(mappedBy = "trainer",  cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<WorkoutPlan> workoutPlans = new HashSet<>();
 
     public void clearPersonalData() {
         this.firstname = null;
