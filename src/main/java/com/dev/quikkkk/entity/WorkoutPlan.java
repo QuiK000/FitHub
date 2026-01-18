@@ -12,6 +12,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -51,6 +52,7 @@ public class WorkoutPlan extends BaseEntity {
     @JoinColumn(name = "trainer_id", nullable = false)
     private TrainerProfile trainer;
 
+    @Builder.Default
     @OneToMany(mappedBy = "workoutPlan", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<WorkoutPlanExercise> exercises = new HashSet<>();
 
