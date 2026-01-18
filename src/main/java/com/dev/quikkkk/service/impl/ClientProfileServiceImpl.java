@@ -58,7 +58,8 @@ public class ClientProfileServiceImpl implements IClientProfileService {
     @Transactional(readOnly = true)
     @Cacheable(
             value = "clientProfiles",
-            key = "'current:' + T(com.dev.quikkkk.utils.SecurityUtils).getCurrentUserId()"
+            key = "'current:' + T(com.dev.quikkkk.utils.SecurityUtils).getCurrentUserId()",
+            sync = true
     )
     public ClientProfileResponse getClientProfile() {
         User user = getCurrentUser();
