@@ -1,6 +1,7 @@
 package com.dev.quikkkk.mapper;
 
 import com.dev.quikkkk.dto.request.CreateWorkoutPlanRequest;
+import com.dev.quikkkk.dto.request.UpdateWorkoutPlanRequest;
 import com.dev.quikkkk.dto.response.ExerciseShortResponse;
 import com.dev.quikkkk.dto.response.TrainerShortResponse;
 import com.dev.quikkkk.dto.response.WorkoutPlanExerciseResponse;
@@ -71,5 +72,14 @@ public class WorkoutPlanMapper {
                 .restSeconds(wpe.getRestSeconds())
                 .notes(wpe.getNotes())
                 .build();
+    }
+
+    public void update(UpdateWorkoutPlanRequest request, WorkoutPlan plan) {
+        if (request.getName() != null) plan.setName(request.getName());
+        if (request.getDescription() != null) plan.setDescription(request.getDescription());
+        if (request.getDifficultyLevel() != null) plan.setDifficultyLevel(request.getDifficultyLevel());
+        if (request.getDurationWeeks() != null) plan.setDurationWeeks(request.getDurationWeeks());
+        if (request.getSessionsPerWeek() != null) plan.setSessionsPerWeek(request.getSessionsPerWeek());
+        plan.setLastModifiedBy(plan.getTrainer().getId());
     }
 }
