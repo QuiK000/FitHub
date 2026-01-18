@@ -41,6 +41,9 @@ public class EmailServiceImpl implements IEmailService {
     @Value("${app.email.retry-delay-minutes:5}")
     private int retryDelayMinutes;
 
+    @Value("${app.email.max-retry-attempts}")
+    private int retryAttempts;
+
     @Override
     @Async("emailTaskExecutor")
     public void sendVerificationEmail(String toEmail, String token) {
@@ -113,7 +116,7 @@ public class EmailServiceImpl implements IEmailService {
                     .errorMessage(cause.getMessage())
                     .attemptCount(1)
                     .retryScheduled(true)
-                    .nextRetryAt(LocalDateTime.now().plusMinutes(retryDelayMinutes))
+                    .nextRetryAt(calculateNextRetry(retryAttempts))
                     .lastAttemptAt(LocalDateTime.now())
                     .createdBy("SYSTEM")
                     .build();
@@ -126,5 +129,10 @@ public class EmailServiceImpl implements IEmailService {
         } catch (Exception ex) {
             log.error("Failed to save email failure log", ex);
         }
+    }
+
+    private LocalDateTime calculateNextRetry(int attemptCount) {
+        long delayMinutes = (long) Math.pow(2, attemptCount) * retryDelayMinutes;
+        return LocalDateTime.now().plusMinutes(Math.min(delayMinutes, 60));
     }
 }
