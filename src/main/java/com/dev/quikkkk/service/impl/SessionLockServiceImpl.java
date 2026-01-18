@@ -1,6 +1,5 @@
 package com.dev.quikkkk.service.impl;
 
-import com.dev.quikkkk.enums.ErrorCode;
 import com.dev.quikkkk.exception.BusinessException;
 import com.dev.quikkkk.functional.LockOperation;
 import com.dev.quikkkk.service.ISessionLockService;
@@ -11,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.UUID;
+
+import static com.dev.quikkkk.enums.ErrorCode.SESSION_IS_FULL;
 
 @Service
 @RequiredArgsConstructor
@@ -52,12 +53,28 @@ public class SessionLockServiceImpl implements ISessionLockService {
     @Override
     public <T> T executeWithLock(String sessionId, LockOperation<T> operation) {
         String lockValue = acquireLock(sessionId);
-        if (lockValue == null) throw new BusinessException(ErrorCode.SESSION_IS_FULL);
-
         try {
+            lockValue = acquireLockWithRetry(sessionId, 3, Duration.ofMillis(100));
+            if (lockValue == null) throw new BusinessException(SESSION_IS_FULL);
             return operation.execute();
         } finally {
-            releaseLock(sessionId, lockValue);
+            if (lockValue != null) {
+                releaseLock(sessionId, lockValue);
+            }
         }
+    }
+
+    private String acquireLockWithRetry(String sessionId, int maxRetries, Duration delay) {
+        for (int i = 0; i < maxRetries; i++) {
+            String lock = acquireLock(sessionId);
+            if (lock != null) return lock;
+            try {
+                Thread.sleep(delay.toMillis());
+            } catch (InterruptedException e) {
+                break;
+            }
+        }
+
+        return null;
     }
 }
