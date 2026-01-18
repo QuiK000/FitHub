@@ -48,7 +48,7 @@ public class ExerciseServiceImpl implements IExerciseService {
     @Override
     @Transactional(readOnly = true)
     public ExerciseResponse findExerciseById(String exerciseId) {
-        return exerciseMapper.toResponse(findActiveExerciseOrThrow(exerciseId));
+        return exerciseMapper.toResponse(findExerciseOrThrow(exerciseId));
     }
 
     @Override
@@ -128,21 +128,6 @@ public class ExerciseServiceImpl implements IExerciseService {
 
         exerciseRepository.save(exercise);
         return messageMapper.message("Exercise successfully deactivated");
-    }
-
-    @Override
-    @Transactional
-    public MessageResponse deleteExercise(String exerciseId) {
-        String userId = SecurityUtils.getCurrentUserId();
-        Exercise exercise = findExerciseOrThrow(exerciseId);
-
-        if (!exercise.isActive()) throw new BusinessException(EXERCISE_ALREADY_DEACTIVATED);
-
-        exercise.setActive(false);
-        exercise.setLastModifiedBy(userId);
-
-        exerciseRepository.save(exercise);
-        return messageMapper.message("Exercise successfully deleted");
     }
 
     private Exercise findExerciseOrThrow(String exerciseId) {

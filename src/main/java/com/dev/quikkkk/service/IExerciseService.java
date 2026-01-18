@@ -26,6 +26,4 @@ public interface IExerciseService {
     MessageResponse activateExercise(String exerciseId);
 
     MessageResponse deactivateExercise(String exerciseId);
-
-    MessageResponse deleteExercise(String exerciseId);
 }
