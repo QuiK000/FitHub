@@ -7,7 +7,6 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @Getter
@@ -26,7 +25,7 @@ public enum ErrorCode {
     VERIFICATION_TOKEN_INVALID("VERIFICATION_TOKEN_INVALID", "Verification Token Invalid", BAD_REQUEST),
     VERIFICATION_TOKEN_EXPIRED("VERIFICATION_TOKEN_EXPIRED", "Verification Token Expired", BAD_REQUEST),
     VERIFICATION_TOKEN_TYPE_INVALID("VERIFICATION_TOKEN_TYPE_INVALID", "Verification Token Type Invalid", BAD_REQUEST),
-    RESEND_TOO_FREQUENT("RESEND_TOO_FREQUENT", "Verification email was sent recently. Try again later", TOO_MANY_REQUESTS),
+    RESEND_TOO_FREQUENT("RESEND_TOO_FREQUENT", "Verification email was sent recently. Try again later", HttpStatus.TOO_MANY_REQUESTS),
     VALIDATION_ERROR("VALIDATION_ERROR", "Validation failed", BAD_REQUEST),
     PASSWORD_MISMATCH("PASSWORD_MISMATCH", "Password and confirm password do not match", BAD_REQUEST),
     UNAUTHORIZED_USER("UNAUTHORIZED_USER", "Unauthorized", FORBIDDEN),
@@ -44,7 +43,7 @@ public enum ErrorCode {
     MEMBERSHIP_NOT_FOUND("MEMBERSHIP_NOT_FOUND", "Membership Not Found", NOT_FOUND),
     MEMBERSHIP_ALREADY_ACTIVATED("MEMBERSHIP_ALREADY_ACTIVATED", "Membership Already Activated", FORBIDDEN),
     MEMBERSHIP_CANNOT_BE_FROZEN("MEMBERSHIP_CANNOT_BE_FROZEN", "Membership Cannot be Frozen", BAD_REQUEST),
-    MEMBERSHIP_NOT_FROZEN("MEMBERSHIP_NOT_FROZEN",  "Membership Not Frozen", BAD_REQUEST),
+    MEMBERSHIP_NOT_FROZEN("MEMBERSHIP_NOT_FROZEN", "Membership Not Frozen", BAD_REQUEST),
     MEMBERSHIP_INVALID_STATUS("MEMBERSHIP_INVALID_STATUS", "Membership Invalid Status", CONFLICT),
     MEMBERSHIP_TYPE_NOT_EXTENDABLE("MEMBERSHIP_TYPE_NOT_EXTENDABLE", "Membership Type Not Extendable", BAD_REQUEST),
     MEMBERSHIP_STATUS_NOT_EXTENDABLE("MEMBERSHIP_STATUS_NOT_EXTENDABLE", "Membership Status Not Extendable", CONFLICT),
@@ -82,6 +81,7 @@ public enum ErrorCode {
     WORKOUT_PLAN_FORBIDDEN("WORKOUT_PLAN_FORBIDDEN", "Forbidden", FORBIDDEN),
     WORKOUT_PLAN_ALREADY_ACTIVATED("WORKOUT_PLAN_ALREADY_ACTIVATED", "Workout Plan Already Activated", BAD_REQUEST),
     WORKOUT_PLAN_ALREADY_DEACTIVATED("WORKOUT_PLAN_ALREADY_DEACTIVATED", "Workout Plan Deactivated", BAD_REQUEST),
+    TOO_MANY_REQUESTS("TOO_MANY_REQUESTS", "Too many requests", HttpStatus.TOO_MANY_REQUESTS),
     ;
 
     private final String code;
