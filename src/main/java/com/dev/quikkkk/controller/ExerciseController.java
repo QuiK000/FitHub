@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -95,11 +94,5 @@ public class ExerciseController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MessageResponse> deactivateExercise(@PathVariable("exercise-id") String exerciseId) {
         return ResponseEntity.ok(exerciseService.deactivateExercise(exerciseId));
-    }
-
-    @DeleteMapping("/{exercise-id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<MessageResponse> deleteExercise(@PathVariable("exercise-id") String exerciseId) {
-        return ResponseEntity.ok(exerciseService.deleteExercise(exerciseId));
     }
 }
