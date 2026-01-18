@@ -5,6 +5,7 @@ import com.dev.quikkkk.dto.response.PopularSessionResponse;
 import com.dev.quikkkk.entity.Attendance;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,9 +18,10 @@ import java.util.List;
 public interface IAttendanceRepository extends JpaRepository<Attendance, String> {
     boolean existsByClientIdAndSessionId(String clientId, String sessionId);
 
+    @EntityGraph(attributePaths = {"session", "session.trainer", "client"})
     List<Attendance> findAllByClientId(String id);
 
-    List<Attendance> findALlBySessionId(String sessionId);
+    List<Attendance> findAllBySessionId(String sessionId);
 
     @Query("""
             SELECT COUNT(a)
