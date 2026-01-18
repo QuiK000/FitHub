@@ -44,7 +44,7 @@ public class AttendanceServiceImpl implements IAttendanceService {
         TrainingSession session = trainingSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new BusinessException(SESSION_NOT_FOUND));
 
-        return attendanceRepository.findALlBySessionId(session.getId()).stream()
+        return attendanceRepository.findAllBySessionId(session.getId()).stream()
                 .map(attendanceMapper::toResponseForTrainer)
                 .toList();
     }
