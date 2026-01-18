@@ -15,7 +15,7 @@ public class PaginationUtils {
     }
 
     public static Pageable createPageRequest(int page, int size) {
-        return PageRequest.of(page, size);
+        return PageRequest.of(page, Math.min(size, 100));
     }
 
     public static <T, R> PageResponse<R> toPageResponse(Page<T> page, Function<T, R> mapper) {
