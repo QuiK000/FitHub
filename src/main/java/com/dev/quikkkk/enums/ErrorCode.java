@@ -74,7 +74,10 @@ public enum ErrorCode {
     EXERCISE_NOT_FOUND("EXERCISE_NOT_FOUND", "Exercise Not Found", NOT_FOUND),
     EXERCISE_ALREADY_ACTIVATED("EXERCISE_ALREADY_ACTIVATED", "Exercise Already Activated", BAD_REQUEST),
     EXERCISE_ALREADY_DEACTIVATED("EXERCISE_ALREADY_DEACTIVATED", "Exercise Already Deactivated", FORBIDDEN),
-    EXERCISE_DEACTIVATED("EXERCISE_DEACTIVATED", "Exercise Deactivated", FORBIDDEN),;
+    EXERCISE_DEACTIVATED("EXERCISE_DEACTIVATED", "Exercise Deactivated", FORBIDDEN),
+    INVALID_WORKOUT_DAY("INVALID_WORKOUT_DAY", "Invalid Workout Day", BAD_REQUEST),
+    DUPLICATE_EXERCISE_ORDER("DUPLICATE_EXERCISE_ORDER", "Duplicate Exercise Order", BAD_REQUEST),
+    ;
 
     private final String code;
     private final String defaultMessage;
