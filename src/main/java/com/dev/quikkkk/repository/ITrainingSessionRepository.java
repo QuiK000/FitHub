@@ -13,7 +13,7 @@ public interface ITrainingSessionRepository extends JpaRepository<TrainingSessio
     @Query("""
             SELECT DISTINCT s FROM TrainingSession s
             JOIN s.trainer t
-            LEFT JOIN t.specialization spec
+            LEFT JOIN FETCH t.specialization spec
             WHERE
                         :search IS NULL
                         OR TRIM(:search) = ''
