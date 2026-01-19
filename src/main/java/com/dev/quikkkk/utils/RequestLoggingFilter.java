@@ -23,9 +23,10 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
         String requestId = UUID.randomUUID().toString();
+        String userId = SecurityUtils.getCurrentUserIdOrNull();
 
         MDC.put("requestId", requestId);
-        MDC.put("userId", SecurityUtils.getCurrentUserId());
+        MDC.put("userId", userId);
         try {
             log.info("Request: {} {}", request.getMethod(), request.getRequestURI());
             filterChain.doFilter(request, response);
