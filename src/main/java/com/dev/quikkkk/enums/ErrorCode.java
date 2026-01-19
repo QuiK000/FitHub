@@ -82,6 +82,7 @@ public enum ErrorCode {
     WORKOUT_PLAN_ALREADY_ACTIVATED("WORKOUT_PLAN_ALREADY_ACTIVATED", "Workout Plan Already Activated", BAD_REQUEST),
     WORKOUT_PLAN_ALREADY_DEACTIVATED("WORKOUT_PLAN_ALREADY_DEACTIVATED", "Workout Plan Deactivated", BAD_REQUEST),
     TOO_MANY_REQUESTS("TOO_MANY_REQUESTS", "Too many requests", HttpStatus.TOO_MANY_REQUESTS),
+    EXERCISE_ALREADY_IN_PLAN("EXERCISE_ALREADY_IN_PLAN", "Exercise Already In Plan", BAD_REQUEST),
     ;
 
     private final String code;
