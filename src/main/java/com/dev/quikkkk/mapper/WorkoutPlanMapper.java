@@ -2,17 +2,17 @@ package com.dev.quikkkk.mapper;
 
 import com.dev.quikkkk.dto.request.CreateWorkoutPlanRequest;
 import com.dev.quikkkk.dto.request.UpdateWorkoutPlanRequest;
-import com.dev.quikkkk.dto.response.ExerciseShortResponse;
 import com.dev.quikkkk.dto.response.TrainerShortResponse;
-import com.dev.quikkkk.dto.response.WorkoutPlanExerciseResponse;
 import com.dev.quikkkk.dto.response.WorkoutPlanResponse;
 import com.dev.quikkkk.entity.TrainerProfile;
 import com.dev.quikkkk.entity.WorkoutPlan;
-import com.dev.quikkkk.entity.WorkoutPlanExercise;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class WorkoutPlanMapper {
+    private final WorkoutPlanExerciseMapper workoutPlanExerciseMapper;
 
     public WorkoutPlan toEntity(CreateWorkoutPlanRequest request, TrainerProfile trainer) {
         return WorkoutPlan.builder()
@@ -44,33 +44,12 @@ public class WorkoutPlanMapper {
                                 .build()
                 )
                 .exercises(
-                        plan.getExercises().stream()
-                                .map(this::mapExercise)
+                        plan.getExercises()
+                                .stream()
+                                .map(workoutPlanExerciseMapper::toResponse)
                                 .toList()
                 )
                 .createdAt(plan.getCreatedDate())
-                .build();
-    }
-
-    private WorkoutPlanExerciseResponse mapExercise(WorkoutPlanExercise wpe) {
-        return WorkoutPlanExerciseResponse.builder()
-                .id(wpe.getId())
-                .exercise(
-                        ExerciseShortResponse.builder()
-                                .exerciseId(wpe.getExercise().getId())
-                                .name(wpe.getExercise().getName())
-                                .category(wpe.getExercise().getCategory())
-                                .primaryMuscleGroup(wpe.getExercise().getPrimaryMuscleGroup())
-                                .imageUrl(wpe.getExercise().getImageUrl())
-                                .build()
-                )
-                .dayNumber(wpe.getDayNumber())
-                .orderIndex(wpe.getOrderIndex())
-                .sets(wpe.getSets())
-                .reps(wpe.getReps())
-                .durationSeconds(wpe.getDurationSeconds())
-                .restSeconds(wpe.getRestSeconds())
-                .notes(wpe.getNotes())
                 .build();
     }
 
