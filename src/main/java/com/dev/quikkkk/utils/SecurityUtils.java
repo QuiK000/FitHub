@@ -19,4 +19,15 @@ public class SecurityUtils {
     public static String getCurrentUserId() {
         return currentUser().id();
     }
+
+    public static UserPrincipal currentUserOrNull() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !(auth.getPrincipal() instanceof UserPrincipal principal)) return null;
+        return principal;
+    }
+
+    public static String getCurrentUserIdOrNull() {
+        UserPrincipal user = currentUserOrNull();
+        return user != null ? user.id() : null;
+    }
 }
