@@ -21,7 +21,7 @@ public interface ISpecializationRepository extends JpaRepository<Specialization,
             WHERE s.active = true
             AND (
                         :search IS NULL
-                        OR TRIM(:search) = ''
+                        OR :search = ''
                         OR LOWER(s.name) LIKE LOWER(CONCAT('%', :search, '%'))
                 )
             """)
