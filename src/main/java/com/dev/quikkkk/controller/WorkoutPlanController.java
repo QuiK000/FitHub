@@ -1,11 +1,14 @@
 package com.dev.quikkkk.controller;
 
+import com.dev.quikkkk.dto.request.AddExerciseToPlanRequest;
 import com.dev.quikkkk.dto.request.CreateWorkoutPlanRequest;
 import com.dev.quikkkk.dto.request.UpdateWorkoutPlanRequest;
 import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.dto.response.PageResponse;
+import com.dev.quikkkk.dto.response.WorkoutPlanExerciseResponse;
 import com.dev.quikkkk.dto.response.WorkoutPlanResponse;
 import com.dev.quikkkk.enums.DifficultyLevel;
+import com.dev.quikkkk.service.IWorkoutPlanExerciseService;
 import com.dev.quikkkk.service.IWorkoutPlanService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,11 +30,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class WorkoutPlanController {
     private final IWorkoutPlanService workoutPlanService;
+    private final IWorkoutPlanExerciseService workoutPlanExerciseService;
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'TRAINER')")
     public ResponseEntity<WorkoutPlanResponse> createWorkoutPlan(@Valid @RequestBody CreateWorkoutPlanRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(workoutPlanService.createWorkoutPlan(request));
+    }
+
+    @PostMapping("/{plan-id}/exercises")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TRAINER')")
+    public ResponseEntity<WorkoutPlanExerciseResponse> addExerciseToPlan(
+            @PathVariable("plan-id") String planId,
+            @Valid @RequestBody AddExerciseToPlanRequest request
+    ) {
+        return ResponseEntity.ok(workoutPlanExerciseService.addExerciseToPlan(planId, request));
     }
 
     @GetMapping
