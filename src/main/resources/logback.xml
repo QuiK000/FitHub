@@ -1,1 +1,0 @@
-<pattern>%d{yyyy-MM-dd HH:mm:ss} [%X{requestId}] [%X{userId}] %-5level - %msg%n</pattern>
