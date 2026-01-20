@@ -73,6 +73,35 @@ public class EmailServiceImpl implements IEmailService {
         }
     }
 
+    @Override
+    @Async("emailTaskExecutor")
+    public void sendForgotPasswordEmail(String toEmail, String token) {
+        log.debug("Starting async email forgot password send to: {}", toEmail);
+        validateEmailAddress(toEmail);
+
+        try {
+            SimpleMailMessage message = buildForgotPasswordMessage(toEmail, token);
+            mailSender.send(message);
+
+            log.info("Forgot password email successfully sent to: {}", toEmail);
+        } catch (MailAuthenticationException e) {
+            log.error("Mail server authentication failed for email to: {}. Check credentials.", toEmail, e);
+            handleEmailFailure(toEmail, EmailType.PASSWORD_RESET, "Authentication failed", e);
+        } catch (MailSendException e) {
+            log.error("Failed to send email to: {}. Recipient might be invalid.", toEmail, e);
+            handleEmailFailure(toEmail, EmailType.PASSWORD_RESET, "Send failed", e);
+        } catch (MailParseException e) {
+            log.error("Email parsing error for: {}. Check email format.", toEmail, e);
+            throw new InvalidEmailAddressException(toEmail);
+        } catch (MailException e) {
+            log.error("Mail server error sending email to: {}", toEmail, e);
+            handleEmailFailure(toEmail, EmailType.PASSWORD_RESET, "Mail server error", e);
+        } catch (Exception e) {
+            log.error("Unexpected error sending forgot password email to: {}", toEmail, e);
+            handleEmailFailure(toEmail, EmailType.PASSWORD_RESET, "Unexpected error", e);
+        }
+    }
+
     private SimpleMailMessage buildVerificationMessage(String toEmail, String token) {
         String verificationLink = frontendUrl + "/verify-email?token=" + token;
 
@@ -97,6 +126,39 @@ public class EmailServiceImpl implements IEmailService {
         message.setFrom(fromEmail);
         message.setTo(toEmail);
         message.setSubject("FitHub - Verify Your Email");
+        message.setText(emailBody);
+
+        return message;
+    }
+
+    private SimpleMailMessage buildForgotPasswordMessage(String toEmail, String token) {
+        String forgotPasswordLink = frontendUrl + "/forgot-password?token=" + token;
+
+        String emailBody = String.format("""
+                        Welcome to FitHub!
+                        
+                        We received a request to reset your password.
+                        
+                        To create a new password, please click the link below:
+                        
+                        %s
+                        
+                        This link will expire in %d minutes.
+                        
+                        If you did not request a password reset, please ignore this email.
+                        Your password will remain unchanged.
+                        
+                        Best regards,
+                        FitHub Team
+                        """,
+                forgotPasswordLink,
+                TokenType.PASSWORD_RESET.getTtlMinutes()
+        );
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(fromEmail);
+        message.setTo(toEmail);
+        message.setSubject("FitHub - Forgot Password");
         message.setText(emailBody);
 
         return message;
