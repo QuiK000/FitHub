@@ -2,6 +2,8 @@ package com.dev.quikkkk.controller;
 
 import com.dev.quikkkk.dto.request.AddExerciseToPlanRequest;
 import com.dev.quikkkk.dto.request.CreateWorkoutPlanRequest;
+import com.dev.quikkkk.dto.request.ReorderWorkoutPlanExerciseRequest;
+import com.dev.quikkkk.dto.request.UpdatePlanExerciseRequest;
 import com.dev.quikkkk.dto.request.UpdateWorkoutPlanRequest;
 import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.dto.response.PageResponse;
@@ -15,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -72,6 +75,16 @@ public class WorkoutPlanController {
         return ResponseEntity.ok(workoutPlanService.updateWorkoutById(workoutPlanId, request));
     }
 
+    @PutMapping("/{workout-plan-id}/exercises/{exercise-id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TRAINER')")
+    public ResponseEntity<WorkoutPlanExerciseResponse> updateWorkoutPlanExerciseById(
+            @PathVariable("workout-plan-id") String workoutPlanId,
+            @PathVariable("exercise-id") String exerciseId,
+            @Valid @RequestBody UpdatePlanExerciseRequest request
+    ) {
+        return ResponseEntity.ok(workoutPlanExerciseService.updatePlanExercise(workoutPlanId, exerciseId, request));
+    }
+
     @PatchMapping("/{workout-plan-id}/activate")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MessageResponse> activateWorkoutPlan(@PathVariable("workout-plan-id") String workoutPlanId) {
@@ -82,5 +95,23 @@ public class WorkoutPlanController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MessageResponse> deactivateWorkoutPlan(@PathVariable("workout-plan-id") String workoutPlanId) {
         return ResponseEntity.ok(workoutPlanService.deactivateWorkoutPlan(workoutPlanId));
+    }
+
+    @PatchMapping("/{workout-plan-id}/exercises/reorder")
+    public ResponseEntity<MessageResponse> reorderExercises(
+            @PathVariable("workout-plan-id") String workoutPlanId,
+            @Valid @RequestBody ReorderWorkoutPlanExerciseRequest request
+    ) {
+        return ResponseEntity.ok(workoutPlanExerciseService.reorderExercises(workoutPlanId, request));
+    }
+
+    @DeleteMapping("/{workout-plan-id}/exercises/{exercise-id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TRAINER')")
+    public ResponseEntity<MessageResponse> deletePlanExercise(
+            @PathVariable("workout-plan-id") String workoutPlanId,
+            @PathVariable("exercise-id") String exerciseId,
+            @RequestParam Integer day
+    ) {
+        return ResponseEntity.ok(workoutPlanExerciseService.deletePlanExercise(workoutPlanId, exerciseId, day));
     }
 }
