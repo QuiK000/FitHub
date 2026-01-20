@@ -1,6 +1,7 @@
 package com.dev.quikkkk.mapper;
 
 import com.dev.quikkkk.dto.request.AddExerciseToPlanRequest;
+import com.dev.quikkkk.dto.request.UpdatePlanExerciseRequest;
 import com.dev.quikkkk.dto.response.ExerciseShortResponse;
 import com.dev.quikkkk.dto.response.WorkoutPlanExerciseResponse;
 import com.dev.quikkkk.entity.Exercise;
@@ -45,5 +46,14 @@ public class WorkoutPlanExerciseMapper {
                 .restSeconds(workoutPlanExercise.getRestSeconds())
                 .notes(workoutPlanExercise.getNotes())
                 .build();
+    }
+
+    public void update(UpdatePlanExerciseRequest request, WorkoutPlanExercise workoutPlanExercise, String userId) {
+        if (request.getSets() != null) workoutPlanExercise.setSets(request.getSets());
+        if (request.getReps() != null) workoutPlanExercise.setReps(request.getReps());
+        if (request.getDurationSeconds() != null) workoutPlanExercise.setDurationSeconds(request.getDurationSeconds());
+        if (request.getRestSeconds() != null) workoutPlanExercise.setRestSeconds(request.getRestSeconds());
+        if (request.getNotes() != null) workoutPlanExercise.setNotes(request.getNotes());
+        workoutPlanExercise.setLastModifiedBy(userId);
     }
 }
