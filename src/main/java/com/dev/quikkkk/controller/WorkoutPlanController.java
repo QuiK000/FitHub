@@ -66,6 +66,15 @@ public class WorkoutPlanController {
         return ResponseEntity.ok(workoutPlanService.getWorkoutPlanById(workoutPlanId));
     }
 
+    @GetMapping("/my-plans")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TRAINER')")
+    public ResponseEntity<PageResponse<WorkoutPlanResponse>> getMyPlans(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(workoutPlanService.getMyPlans(page, size));
+    }
+
     @PutMapping("/{workout-plan-id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'TRAINER')")
     public ResponseEntity<WorkoutPlanResponse> updateWorkoutPlanById(
