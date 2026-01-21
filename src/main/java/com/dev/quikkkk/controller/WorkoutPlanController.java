@@ -1,15 +1,18 @@
 package com.dev.quikkkk.controller;
 
 import com.dev.quikkkk.dto.request.AddExerciseToPlanRequest;
+import com.dev.quikkkk.dto.request.AssignWorkoutPlanRequest;
 import com.dev.quikkkk.dto.request.CreateWorkoutPlanRequest;
 import com.dev.quikkkk.dto.request.ReorderWorkoutPlanExerciseRequest;
 import com.dev.quikkkk.dto.request.UpdatePlanExerciseRequest;
 import com.dev.quikkkk.dto.request.UpdateWorkoutPlanRequest;
+import com.dev.quikkkk.dto.response.ClientWorkoutPlanResponse;
 import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.dto.response.WorkoutPlanExerciseResponse;
 import com.dev.quikkkk.dto.response.WorkoutPlanResponse;
 import com.dev.quikkkk.enums.DifficultyLevel;
+import com.dev.quikkkk.service.IClientWorkoutPlanService;
 import com.dev.quikkkk.service.IWorkoutPlanExerciseService;
 import com.dev.quikkkk.service.IWorkoutPlanService;
 import jakarta.validation.Valid;
@@ -34,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class WorkoutPlanController {
     private final IWorkoutPlanService workoutPlanService;
     private final IWorkoutPlanExerciseService workoutPlanExerciseService;
+    private final IClientWorkoutPlanService clientWorkoutPlanService;
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'TRAINER')")
@@ -48,6 +52,15 @@ public class WorkoutPlanController {
             @Valid @RequestBody AddExerciseToPlanRequest request
     ) {
         return ResponseEntity.ok(workoutPlanExerciseService.addExerciseToPlan(planId, request));
+    }
+
+    @PostMapping("/{plan-id}/assign")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TRAINER')")
+    public ResponseEntity<ClientWorkoutPlanResponse> assignPlanToClient(
+            @RequestBody @Valid AssignWorkoutPlanRequest request,
+            @PathVariable("plan-id") String planId
+    ) {
+        return ResponseEntity.ok(clientWorkoutPlanService.assignPlanToClient(request, planId));
     }
 
     @GetMapping
