@@ -81,6 +81,16 @@ public class WorkoutPlanServiceImpl implements IWorkoutPlanService {
 
     @Override
     @Transactional(readOnly = true)
+    public PageResponse<WorkoutPlanResponse> getMyPlans(int page, int size) {
+        TrainerProfile trainer = getTrainerProfile();
+        Pageable pageable = PaginationUtils.createPageRequest(page, size, "createdDate");
+        Page<WorkoutPlan> workoutPlanPage = workoutPlanRepository.findWorkoutPlansByTrainerId(pageable, trainer.getId());
+
+        return PaginationUtils.toPageResponse(workoutPlanPage, workoutPlanMapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public MessageResponse activateWorkoutPlan(String workoutPlanId) {
         String userId = SecurityUtils.getCurrentUserId();
         WorkoutPlan plan = findWorkoutPlanById(workoutPlanId);
