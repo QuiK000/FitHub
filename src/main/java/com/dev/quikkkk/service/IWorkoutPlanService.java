@@ -16,6 +16,8 @@ public interface IWorkoutPlanService {
 
     WorkoutPlanResponse updateWorkoutById(String workoutPlanId, UpdateWorkoutPlanRequest request);
 
+    PageResponse<WorkoutPlanResponse> getMyPlans(int page, int size);
+
     MessageResponse activateWorkoutPlan(String workoutPlanId);
 
     MessageResponse deactivateWorkoutPlan(String workoutPlanId);
