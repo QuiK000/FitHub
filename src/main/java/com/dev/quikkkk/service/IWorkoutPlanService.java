@@ -18,6 +18,8 @@ public interface IWorkoutPlanService {
 
     PageResponse<WorkoutPlanResponse> getMyPlans(int page, int size);
 
+    PageResponse<WorkoutPlanResponse> getTrainerPlans(int page, int size, String trainerId);
+
     MessageResponse activateWorkoutPlan(String workoutPlanId);
 
     MessageResponse deactivateWorkoutPlan(String workoutPlanId);
