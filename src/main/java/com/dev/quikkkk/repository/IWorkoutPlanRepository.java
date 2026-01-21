@@ -17,4 +17,6 @@ public interface IWorkoutPlanRepository extends JpaRepository<WorkoutPlan, Strin
             AND wp.difficultyLevel = :difficulty
             """)
     Page<WorkoutPlan> findWorkoutPlanByDifficulty(Pageable pageable, @Param("difficulty") DifficultyLevel difficulty);
+
+    Page<WorkoutPlan> findWorkoutPlansByTrainerId(Pageable pageable, String trainerId);
 }
