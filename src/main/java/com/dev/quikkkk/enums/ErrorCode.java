@@ -91,6 +91,7 @@ public enum ErrorCode {
     PLAN_EXERCISE_ALREADY_EXISTS("PLAN_EXERCISE_ALREADY_EXISTS", "Plan Exercise Already Exists", BAD_REQUEST),
     PLAN_EXERCISE_DAY_EMPTY("PLAN_EXERCISE_DAY_EMPTY", "Plan Exercise Day Empty", BAD_REQUEST),
     PLAN_EXERCISE_ORDER_DUPLICATED("PLAN_EXERCISE_ORDER_DUPLICATED", "Plan Exercise Order Duplicated", BAD_REQUEST),
+    TRAINER_SESSION_OVERLAP("TRAINER_SESSION_OVERLAP", "You already have a session scheduled at this time", BAD_REQUEST),
     ;
 
     private final String code;
