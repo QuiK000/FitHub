@@ -2,6 +2,7 @@ package com.dev.quikkkk.service.impl;
 
 import com.dev.quikkkk.dto.request.AssignWorkoutPlanRequest;
 import com.dev.quikkkk.dto.response.ClientWorkoutPlanResponse;
+import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.entity.ClientProfile;
 import com.dev.quikkkk.entity.ClientWorkoutPlan;
 import com.dev.quikkkk.entity.WorkoutPlan;
@@ -11,8 +12,11 @@ import com.dev.quikkkk.repository.IClientProfileRepository;
 import com.dev.quikkkk.repository.IClientWorkoutPlanRepository;
 import com.dev.quikkkk.repository.IWorkoutPlanRepository;
 import com.dev.quikkkk.service.IClientWorkoutPlanService;
+import com.dev.quikkkk.utils.PaginationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,5 +43,14 @@ public class ClientWorkoutPlanServiceImpl implements IClientWorkoutPlanService {
 
         clientWorkoutPlanRepository.save(clientWorkoutPlan);
         return clientWorkoutPlanMapper.toResponse(clientWorkoutPlan);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<ClientWorkoutPlanResponse> getAssignedPlans(int page, int size) {
+        Pageable pageable = PaginationUtils.createPageRequest(page, size, "createdDate");
+        Page<ClientWorkoutPlan> clientWorkoutPlanPage = clientWorkoutPlanRepository.getAllAssignedPlans(pageable);
+
+        return PaginationUtils.toPageResponse(clientWorkoutPlanPage, clientWorkoutPlanMapper::toResponse);
     }
 }
