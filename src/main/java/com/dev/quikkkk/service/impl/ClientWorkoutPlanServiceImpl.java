@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.dev.quikkkk.enums.ErrorCode.CLIENT_ASSIGNMENT_NOT_FOUND;
 import static com.dev.quikkkk.enums.ErrorCode.CLIENT_PROFILE_NOT_FOUND;
 import static com.dev.quikkkk.enums.ErrorCode.WORKOUT_PLAN_NOT_FOUND;
 
@@ -52,5 +53,13 @@ public class ClientWorkoutPlanServiceImpl implements IClientWorkoutPlanService {
         Page<ClientWorkoutPlan> clientWorkoutPlanPage = clientWorkoutPlanRepository.getAllAssignedPlans(pageable);
 
         return PaginationUtils.toPageResponse(clientWorkoutPlanPage, clientWorkoutPlanMapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ClientWorkoutPlanResponse getAssignedPlanById(String assignedPlanId) {
+        return clientWorkoutPlanRepository.findById(assignedPlanId)
+                .map(clientWorkoutPlanMapper::toResponse)
+                .orElseThrow(() -> new BusinessException(CLIENT_ASSIGNMENT_NOT_FOUND));
     }
 }
