@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+
 @Repository
 public interface ITrainingSessionRepository extends JpaRepository<TrainingSession, String> {
     @Query("""
@@ -46,4 +48,19 @@ public interface ITrainingSessionRepository extends JpaRepository<TrainingSessio
             AND s.startTime < CURRENT_TIMESTAMP
             """)
     long countPlannedSessionsByClient(@Param("clientId") String clientId);
+
+    @Query("""
+            SELECT COUNT(ts) > 0
+            FROM TrainingSession ts
+            WHERE ts.trainer.id = :trainerId
+            AND ts.status = 'SCHEDULED'
+            AND (
+                (ts.startTime <= :endTime AND ts.endTime >= :startTime)
+                )
+            """)
+    boolean hasOverlappingSession(
+            @Param("trainerId") String trainerId,
+            @Param("startTime") LocalDateTime startTime,
+            @Param("endTime") LocalDateTime endTime
+    );
 }
