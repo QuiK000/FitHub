@@ -8,4 +8,6 @@ public interface IClientWorkoutPlanService {
     ClientWorkoutPlanResponse assignPlanToClient(AssignWorkoutPlanRequest request, String workoutPlanId);
 
     PageResponse<ClientWorkoutPlanResponse> getAssignedPlans(int page, int size);
+
+    ClientWorkoutPlanResponse getAssignedPlanById(String assignedPlanId);
 }
