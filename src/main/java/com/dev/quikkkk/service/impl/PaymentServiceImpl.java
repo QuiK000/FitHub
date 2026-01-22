@@ -6,12 +6,12 @@ import com.dev.quikkkk.dto.response.PaymentResponse;
 import com.dev.quikkkk.entity.ClientProfile;
 import com.dev.quikkkk.entity.Membership;
 import com.dev.quikkkk.entity.Payment;
-import com.dev.quikkkk.enums.MembershipStatus;
 import com.dev.quikkkk.exception.BusinessException;
 import com.dev.quikkkk.mapper.PaymentMapper;
 import com.dev.quikkkk.repository.IClientProfileRepository;
 import com.dev.quikkkk.repository.IMembershipRepository;
 import com.dev.quikkkk.repository.IPaymentRepository;
+import com.dev.quikkkk.service.IMembershipService;
 import com.dev.quikkkk.service.IPaymentService;
 import com.dev.quikkkk.utils.PaginationUtils;
 import com.dev.quikkkk.utils.SecurityUtils;
@@ -36,6 +36,7 @@ public class PaymentServiceImpl implements IPaymentService {
     private final IPaymentRepository paymentRepository;
     private final IMembershipRepository membershipRepository;
     private final IClientProfileRepository clientProfileRepository;
+    private final IMembershipService membershipService;
     private final PaymentMapper paymentMapper;
 
     @Override
@@ -58,13 +59,14 @@ public class PaymentServiceImpl implements IPaymentService {
         }
 
         Payment payment = paymentMapper.toEntity(request, membership);
+        paymentRepository.save(payment);
 
         membership.setPayment(payment);
-        membership.setStatus(MembershipStatus.ACTIVE);
-
-        paymentRepository.save(payment);
         membershipRepository.save(membership);
 
+        membershipService.activateMembership(membership.getId());
+
+        log.info("Payment processed and membership activated successfully for id: {}", membership.getId());
         return paymentMapper.toResponse(payment);
     }
 
