@@ -9,9 +9,11 @@ import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.dto.response.TrainingSessionResponse;
 import com.dev.quikkkk.entity.Attendance;
 import com.dev.quikkkk.entity.ClientProfile;
+import com.dev.quikkkk.entity.Membership;
 import com.dev.quikkkk.entity.TrainerProfile;
 import com.dev.quikkkk.entity.TrainingSession;
 import com.dev.quikkkk.enums.MembershipStatus;
+import com.dev.quikkkk.enums.MembershipType;
 import com.dev.quikkkk.enums.TrainingStatus;
 import com.dev.quikkkk.enums.TrainingType;
 import com.dev.quikkkk.exception.BusinessException;
@@ -19,6 +21,7 @@ import com.dev.quikkkk.mapper.MessageMapper;
 import com.dev.quikkkk.mapper.TrainingSessionMapper;
 import com.dev.quikkkk.repository.IAttendanceRepository;
 import com.dev.quikkkk.repository.IClientProfileRepository;
+import com.dev.quikkkk.repository.IMembershipRepository;
 import com.dev.quikkkk.repository.ITrainerProfileRepository;
 import com.dev.quikkkk.repository.ITrainingSessionRepository;
 import com.dev.quikkkk.service.ISessionLockService;
@@ -36,10 +39,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static com.dev.quikkkk.enums.ErrorCode.CLIENT_ALREADY_JOINED_SESSION;
 import static com.dev.quikkkk.enums.ErrorCode.CLIENT_PROFILE_NOT_FOUND;
 import static com.dev.quikkkk.enums.ErrorCode.GROUP_TRAINING_MIN_TWO_PARTICIPANTS;
+import static com.dev.quikkkk.enums.ErrorCode.MEMBERSHIP_EXPIRED;
+import static com.dev.quikkkk.enums.ErrorCode.MEMBERSHIP_FROZEN;
 import static com.dev.quikkkk.enums.ErrorCode.NO_ACTIVE_MEMBERSHIP;
 import static com.dev.quikkkk.enums.ErrorCode.PERSONAL_TRAINING_MAX_ONE_PARTICIPANT;
 import static com.dev.quikkkk.enums.ErrorCode.SESSION_ALREADY_FINISHED;
@@ -50,7 +56,9 @@ import static com.dev.quikkkk.enums.ErrorCode.SESSION_NOT_JOINABLE;
 import static com.dev.quikkkk.enums.ErrorCode.START_TIME_IN_PAST;
 import static com.dev.quikkkk.enums.ErrorCode.TRAINER_PROFILE_DEACTIVATED;
 import static com.dev.quikkkk.enums.ErrorCode.TRAINER_PROFILE_NOT_FOUND;
+import static com.dev.quikkkk.enums.ErrorCode.TRAINER_SESSION_OVERLAP;
 import static com.dev.quikkkk.enums.ErrorCode.UNAUTHORIZED_USER;
+import static com.dev.quikkkk.enums.ErrorCode.VISITS_LIMIT_REACHED;
 
 @Service
 @RequiredArgsConstructor
@@ -60,6 +68,7 @@ public class TrainingSessionServiceImpl implements ITrainingSessionService {
     private final ITrainerProfileRepository trainerProfileRepository;
     private final IClientProfileRepository clientProfileRepository;
     private final IAttendanceRepository attendanceRepository;
+    private final IMembershipRepository membershipRepository;
     private final TrainingSessionMapper trainingSessionMapper;
     private final MessageMapper messageMapper;
     private final ISessionLockService sessionLockService;
@@ -70,8 +79,15 @@ public class TrainingSessionServiceImpl implements ITrainingSessionService {
     public TrainingSessionResponse createSession(CreateTrainingSessionRequest request) {
         log.info("Create session request: {}", request);
         TrainerProfile trainer = findTrainerProfileByUserId();
+        boolean hasOverlap = trainingSessionRepository.hasOverlappingSession(
+                trainer.getId(),
+                request.getStartTime(),
+                request.getEndTime()
+        );
 
+        if (hasOverlap) throw new BusinessException(TRAINER_SESSION_OVERLAP);
         if (!trainer.isActive()) throw new BusinessException(TRAINER_PROFILE_DEACTIVATED);
+
         TrainingSession session = trainingSessionMapper.toEntity(request, trainer);
 
         if (session.getStartTime().isBefore(LocalDateTime.now()))
@@ -165,7 +181,8 @@ public class TrainingSessionServiceImpl implements ITrainingSessionService {
         if (!session.getTrainer().getId().equals(trainer.getId())) throw new BusinessException(UNAUTHORIZED_USER);
         if (!session.getStatus().equals(TrainingStatus.SCHEDULED)) throw new BusinessException(SESSION_NOT_JOINABLE);
 
-        if (now.isBefore(session.getStartTime().minusMinutes(10))) throw new BusinessException(SESSION_CHECKIN_TOO_EARLY);
+        if (now.isBefore(session.getStartTime().minusMinutes(10)))
+            throw new BusinessException(SESSION_CHECKIN_TOO_EARLY);
         if (now.isAfter(session.getEndTime())) throw new BusinessException(SESSION_ALREADY_FINISHED);
 
         ClientProfile client = clientProfileRepository.findById(request.getClientId())
@@ -176,6 +193,31 @@ public class TrainingSessionServiceImpl implements ITrainingSessionService {
 
         if (attendanceRepository.existsByClientIdAndSessionId(client.getId(), sessionId))
             throw new BusinessException(CLIENT_ALREADY_JOINED_SESSION);
+
+        Optional<Membership> activeMembership = membershipRepository.findMembershipByClientIdAndStatus(
+                client.getId(),
+                MembershipStatus.ACTIVE
+        );
+
+        if (activeMembership.isEmpty()) throw new BusinessException(NO_ACTIVE_MEMBERSHIP);
+        Membership membership = activeMembership.get();
+
+        if (membership.getStatus() == MembershipStatus.FROZEN) throw new BusinessException(MEMBERSHIP_FROZEN);
+
+        if (membership.getType() == MembershipType.VISITS) {
+            if (membership.getVisitsLeft() == null || membership.getVisitsLeft() <= 0) {
+                throw new BusinessException(VISITS_LIMIT_REACHED);
+            }
+
+            membership.setVisitsLeft(membership.getVisitsLeft() - 1);
+            membershipRepository.save(membership);
+        }
+
+        if (membership.getType() != MembershipType.VISITS) {
+            if (membership.getEndDate() != null && membership.getEndDate().isBefore(now)) {
+                throw new BusinessException(MEMBERSHIP_EXPIRED);
+            }
+        }
 
         Attendance attendance = Attendance.builder()
                 .client(client)
@@ -191,7 +233,9 @@ public class TrainingSessionServiceImpl implements ITrainingSessionService {
                 .sessionId(session.getId())
                 .clientId(client.getId())
                 .checkInTime(now)
-                .message("Client successfully checked in")
+                .message("Client successfully checked in. Visits left: " +
+                        (membership.getVisitsLeft() != null ? membership.getVisitsLeft() : "unlimited")
+                )
                 .build();
     }
 
