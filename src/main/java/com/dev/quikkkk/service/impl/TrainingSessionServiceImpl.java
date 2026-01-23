@@ -36,6 +36,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -139,7 +140,7 @@ public class TrainingSessionServiceImpl implements ITrainingSessionService {
     }
 
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     @Caching(evict = {
             @CacheEvict(value = "trainingSessions", key = "#sessionId"),
             @CacheEvict(value = "lists", allEntries = true)
@@ -148,7 +149,8 @@ public class TrainingSessionServiceImpl implements ITrainingSessionService {
         log.info("Join session with id: {}", sessionId);
         return sessionLockService.executeWithLock(sessionId, () -> {
             String userId = SecurityUtils.getCurrentUserId();
-            TrainingSession session = findSessionById(sessionId);
+            TrainingSession session = trainingSessionRepository.findByIdWithPessimisticLock(sessionId)
+                    .orElseThrow(() -> new BusinessException(SESSION_NOT_FOUND));
 
             if (!session.getStatus().equals(TrainingStatus.SCHEDULED))
                 throw new BusinessException(SESSION_NOT_JOINABLE);
