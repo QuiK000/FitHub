@@ -1,14 +1,17 @@
 package com.dev.quikkkk.repository;
 
 import com.dev.quikkkk.entity.TrainingSession;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Repository
 public interface ITrainingSessionRepository extends JpaRepository<TrainingSession, String> {
@@ -63,4 +66,8 @@ public interface ITrainingSessionRepository extends JpaRepository<TrainingSessio
             @Param("startTime") LocalDateTime startTime,
             @Param("endTime") LocalDateTime endTime
     );
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("FROM TrainingSession ts WHERE ts.id = :id")
+    Optional<TrainingSession> findByIdWithPessimisticLock(@Param("id") String id);
 }
