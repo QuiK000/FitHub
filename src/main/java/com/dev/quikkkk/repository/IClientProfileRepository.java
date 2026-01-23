@@ -4,6 +4,7 @@ import com.dev.quikkkk.entity.ClientProfile;
 import com.dev.quikkkk.enums.MembershipStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,12 +17,12 @@ public interface IClientProfileRepository extends JpaRepository<ClientProfile, S
     @Query("SELECT c FROM ClientProfile c WHERE c.user.id = :userId")
     Optional<ClientProfile> findByUserId(@Param("userId") String userId);
 
+    @EntityGraph(attributePaths = {"user", "memberships"})
     @Query("""
-            SELECT c FROM ClientProfile c
+            SELECT DISTINCT c FROM ClientProfile c
+            LEFT JOIN FETCH c.user
             WHERE c.active = true
-            AND (
-                    :search IS NULL
-                    OR TRIM(:search) = ''
+            AND (:search IS NULL OR TRIM(:search) = ''
                     OR LOWER(c.lastname) LIKE LOWER(CONCAT('%', :search, '%'))
                     OR LOWER(c.firstname) LIKE LOWER(CONCAT('%', :search, '%'))
                 ) ORDER BY c.createdDate DESC
