@@ -107,7 +107,11 @@ public class TrainerProfileServiceImpl implements ITrainerProfileService {
     @Override
     @Transactional
     @Caching(evict = {
-            @CacheEvict(value = "trainerProfiles", allEntries = true),
+            @CacheEvict(
+                    value = "trainerProfiles",
+                    key = "'current:' + T(com.dev.quikkkk.utils.SecurityUtils).getCurrentUserId()",
+                    allEntries = true
+            ),
             @CacheEvict(value = "lists", allEntries = true)
     })
     public TrainerProfileResponse updateTrainerProfile(UpdateTrainerProfileRequest request) {
