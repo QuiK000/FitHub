@@ -1,6 +1,7 @@
 package com.dev.quikkkk.dto.request;
 
 import com.dev.quikkkk.validation.ValidationPatterns;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
@@ -9,7 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -25,7 +26,9 @@ public class UpdateClientProfileRequest {
             message = "VALIDATION.CREATE.CLIENT.PROFILE.PHONE.INVALID"
     )
     private String phone;
-    private LocalDateTime birthdate;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate birthdate;
 
     @Positive(message = "HEIGHT_MUST_BE_POSITIVE")
     private Double height;
