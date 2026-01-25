@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -59,7 +59,7 @@ public class ClientProfile extends BaseEntity {
     private String phone;
 
     @Column(name = "birth_date")
-    private LocalDateTime birthdate;
+    private LocalDate birthdate;
 
     @Column(name = "height", nullable = false)
     private double height;
