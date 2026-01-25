@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -18,8 +19,8 @@ public class ClientProfileResponse {
     private String firstname;
     private String lastname;
     private String phone;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime birthdate;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate birthdate;
     private Double height;
     private Double weight;
     private boolean active;
