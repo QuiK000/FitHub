@@ -18,7 +18,6 @@ public class ClientWorkoutPlanMapper {
         return ClientWorkoutPlan.builder()
                 .assignedDate(LocalDateTime.now())
                 .startDate(request.getStartDate())
-                .endDate(request.getEndDate())
                 .status(ClientWorkoutStatus.ASSIGNED)
                 .completionPercentage(0.0)
                 .client(client)
