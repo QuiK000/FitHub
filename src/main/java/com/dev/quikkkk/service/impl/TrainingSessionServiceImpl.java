@@ -90,8 +90,6 @@ public class TrainingSessionServiceImpl implements ITrainingSessionService {
         );
 
         if (hasOverlap) throw new BusinessException(TRAINER_SESSION_OVERLAP);
-        if (!trainer.isActive()) throw new BusinessException(TRAINER_PROFILE_DEACTIVATED);
-
         TrainingSession session = trainingSessionMapper.toEntity(request, trainer);
 
         if (session.getStartTime().isBefore(LocalDateTime.now()))
@@ -158,7 +156,8 @@ public class TrainingSessionServiceImpl implements ITrainingSessionService {
             TrainingSession session = trainingSessionRepository.findByIdWithPessimisticLock(sessionId)
                     .orElseThrow(() -> new BusinessException(SESSION_NOT_FOUND));
 
-            if (!session.getStatus().equals(TrainingStatus.SCHEDULED)) throw new BusinessException(SESSION_NOT_JOINABLE);
+            if (!session.getStatus().equals(TrainingStatus.SCHEDULED))
+                throw new BusinessException(SESSION_NOT_JOINABLE);
             if (session.getStartTime().isBefore(LocalDateTime.now())) throw new BusinessException(START_TIME_IN_PAST);
             if (!session.getTrainer().isActive()) throw new BusinessException(TRAINER_PROFILE_DEACTIVATED);
 
@@ -180,6 +179,17 @@ public class TrainingSessionServiceImpl implements ITrainingSessionService {
             if (activeMembership.getType() == MembershipType.VISITS) {
                 if (activeMembership.getVisitsLeft() == null || activeMembership.getVisitsLeft() <= 0) {
                     throw new BusinessException(VISITS_LIMIT_REACHED);
+                }
+
+                long futureBookings = trainingSessionRepository.countFutureBookings(client.getId(), LocalDateTime.now());
+                if (activeMembership.getVisitsLeft() <= futureBookings) {
+                    throw new BusinessException(VISITS_LIMIT_REACHED);
+                }
+            } else {
+                if (activeMembership.getEndDate() != null
+                        && activeMembership.getEndDate().isBefore(session.getStartTime())
+                ) {
+                    throw new BusinessException(MEMBERSHIP_EXPIRED);
                 }
             }
 
