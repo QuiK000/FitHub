@@ -22,6 +22,12 @@ services:
       - redis_data:/data
     command: redis-server --requirepass password123 --appendonly yes
     restart: unless-stopped
+  mail-dev:
+    container_name: mail-dev
+    image: maildev/maildev
+    ports:
+      - "1080:1080"
+      - "1025:1025"
 
 volumes:
   pgdata:
