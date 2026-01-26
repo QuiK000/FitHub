@@ -93,6 +93,7 @@ public enum ErrorCode {
     PLAN_EXERCISE_ORDER_DUPLICATED("PLAN_EXERCISE_ORDER_DUPLICATED", "Plan Exercise Order Duplicated", BAD_REQUEST),
     TRAINER_SESSION_OVERLAP("TRAINER_SESSION_OVERLAP", "You already have a session scheduled at this time", BAD_REQUEST),
     CLIENT_ASSIGNMENT_NOT_FOUND("CLIENT_ASSIGNMENT_NOT_FOUND", "Client Assignment Not Found", NOT_FOUND),
+    INVALID_ASSIGNMENT_STATUS("INVALID_ASSIGNMENT_STATUS", "Invalid Assignment Status", BAD_REQUEST),
     ;
 
     private final String code;
