@@ -173,6 +173,24 @@ public class WorkoutPlanController {
         return ResponseEntity.ok(workoutPlanExerciseService.reorderExercises(workoutPlanId, request));
     }
 
+    @PatchMapping("/assignments/{assignment-id}/start")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TRAINER')")
+    public ResponseEntity<MessageResponse> startAssignment(@PathVariable("assignment-id") String assignmentId) {
+        return ResponseEntity.ok(clientWorkoutPlanService.startAssignment(assignmentId));
+    }
+
+    @PatchMapping("/assignments/{assignment-id}/complete")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TRAINER')")
+    public ResponseEntity<MessageResponse> completeAssignment(@PathVariable("assignment-id") String assignmentId) {
+        return ResponseEntity.ok(clientWorkoutPlanService.completeAssignment(assignmentId));
+    }
+
+    @PatchMapping("/assignments/{assignment-id}/cancel")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TRAINER')")
+    public ResponseEntity<MessageResponse> cancelAssignment(@PathVariable("assignment-id") String assignmentId) {
+        return ResponseEntity.ok(clientWorkoutPlanService.cancelAssignment(assignmentId));
+    }
+
     @DeleteMapping("/{workout-plan-id}/exercises/{exercise-id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'TRAINER')")
     public ResponseEntity<MessageResponse> deletePlanExercise(
