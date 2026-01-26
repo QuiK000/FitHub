@@ -2,12 +2,14 @@ package com.dev.quikkkk.service.impl;
 
 import com.dev.quikkkk.dto.request.AssignWorkoutPlanRequest;
 import com.dev.quikkkk.dto.response.ClientWorkoutPlanResponse;
+import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.entity.ClientProfile;
 import com.dev.quikkkk.entity.ClientWorkoutPlan;
 import com.dev.quikkkk.entity.WorkoutPlan;
 import com.dev.quikkkk.exception.BusinessException;
 import com.dev.quikkkk.mapper.ClientWorkoutPlanMapper;
+import com.dev.quikkkk.mapper.MessageMapper;
 import com.dev.quikkkk.repository.IClientProfileRepository;
 import com.dev.quikkkk.repository.IClientWorkoutPlanRepository;
 import com.dev.quikkkk.repository.IWorkoutPlanRepository;
@@ -35,6 +37,7 @@ public class ClientWorkoutPlanServiceImpl implements IClientWorkoutPlanService {
     private final IClientProfileRepository clientProfileRepository;
     private final IWorkoutPlanRepository workoutPlanRepository;
     private final ClientWorkoutPlanMapper clientWorkoutPlanMapper;
+    private final MessageMapper messageMapper;
 
     @Override
     @Transactional
@@ -85,6 +88,7 @@ public class ClientWorkoutPlanServiceImpl implements IClientWorkoutPlanService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ClientWorkoutPlanResponse getMyAssignmentById(String assignmentId) {
         ClientProfile profile = getCurrentClientProfile();
         return clientWorkoutPlanRepository.findAssignmentByClientIdAndAssignmentId(profile.getId(), assignmentId)
@@ -92,9 +96,41 @@ public class ClientWorkoutPlanServiceImpl implements IClientWorkoutPlanService {
                 .orElseThrow(() -> new BusinessException(CLIENT_ASSIGNMENT_NOT_FOUND));
     }
 
+    @Override
+    @Transactional
+    public MessageResponse startAssignment(String assignmentId) {
+        ClientWorkoutPlan assignment = getAssignmentOrThrow(assignmentId);
+        assignment.start();
+
+        return messageMapper.message("Assignment started");
+    }
+
+    @Override
+    @Transactional
+    public MessageResponse completeAssignment(String assignmentId) {
+        ClientWorkoutPlan assignment = getAssignmentOrThrow(assignmentId);
+        assignment.complete();
+
+        return messageMapper.message("Assignment completed");
+    }
+
+    @Override
+    @Transactional
+    public MessageResponse cancelAssignment(String assignmentId) {
+        ClientWorkoutPlan assignment = getAssignmentOrThrow(assignmentId);
+        assignment.cancel();
+
+        return messageMapper.message("Assignment cancelled");
+    }
+
     private ClientProfile getCurrentClientProfile() {
         String userId = SecurityUtils.getCurrentUserId();
         return clientProfileRepository.findByUserId(userId)
                 .orElseThrow(() -> new BusinessException(CLIENT_PROFILE_NOT_FOUND));
+    }
+
+    private ClientWorkoutPlan getAssignmentOrThrow(String assignmentId) {
+        return clientWorkoutPlanRepository.findById(assignmentId)
+                .orElseThrow(() -> new BusinessException(CLIENT_ASSIGNMENT_NOT_FOUND));
     }
 }
