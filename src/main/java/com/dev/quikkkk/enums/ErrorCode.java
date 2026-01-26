@@ -94,6 +94,7 @@ public enum ErrorCode {
     TRAINER_SESSION_OVERLAP("TRAINER_SESSION_OVERLAP", "You already have a session scheduled at this time", BAD_REQUEST),
     CLIENT_ASSIGNMENT_NOT_FOUND("CLIENT_ASSIGNMENT_NOT_FOUND", "Client Assignment Not Found", NOT_FOUND),
     INVALID_ASSIGNMENT_STATUS("INVALID_ASSIGNMENT_STATUS", "Invalid Assignment Status", BAD_REQUEST),
+    SESSION_CLOSED("SESSION_CLOSED", "Session closed", FORBIDDEN),
     ;
 
     private final String code;
