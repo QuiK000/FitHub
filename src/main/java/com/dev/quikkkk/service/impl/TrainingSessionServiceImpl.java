@@ -51,6 +51,7 @@ import static com.dev.quikkkk.enums.ErrorCode.NO_ACTIVE_MEMBERSHIP;
 import static com.dev.quikkkk.enums.ErrorCode.PERSONAL_TRAINING_MAX_ONE_PARTICIPANT;
 import static com.dev.quikkkk.enums.ErrorCode.SESSION_ALREADY_FINISHED;
 import static com.dev.quikkkk.enums.ErrorCode.SESSION_CHECKIN_TOO_EARLY;
+import static com.dev.quikkkk.enums.ErrorCode.SESSION_CLOSED;
 import static com.dev.quikkkk.enums.ErrorCode.SESSION_IS_FULL;
 import static com.dev.quikkkk.enums.ErrorCode.SESSION_NOT_FOUND;
 import static com.dev.quikkkk.enums.ErrorCode.SESSION_NOT_JOINABLE;
@@ -80,6 +81,8 @@ public class TrainingSessionServiceImpl implements ITrainingSessionService {
     public TrainingSessionResponse createSession(CreateTrainingSessionRequest request) {
         log.info("Create session request: {}", request);
         TrainerProfile trainer = findTrainerProfileByUserId();
+
+        if (!trainer.isActive()) throw new BusinessException(TRAINER_PROFILE_DEACTIVATED);
         boolean hasOverlap = trainingSessionRepository.hasOverlappingSession(
                 trainer.getId(),
                 request.getStartTime(),
@@ -130,6 +133,9 @@ public class TrainingSessionServiceImpl implements ITrainingSessionService {
         TrainingSession session = findSessionById(sessionId);
 
         if (!session.getTrainer().equals(trainer)) throw new BusinessException(UNAUTHORIZED_USER);
+        if (session.getStatus() == TrainingStatus.CANCELLED || session.getStatus() == TrainingStatus.COMPLETED)
+            throw new BusinessException(SESSION_CLOSED);
+
         if (session.getType().equals(TrainingType.PERSONAL) && request.getMaxParticipants() > 1)
             throw new BusinessException(PERSONAL_TRAINING_MAX_ONE_PARTICIPANT);
 
@@ -140,7 +146,7 @@ public class TrainingSessionServiceImpl implements ITrainingSessionService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.SERIALIZABLE)
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     @Caching(evict = {
             @CacheEvict(value = "trainingSessions", key = "#sessionId"),
             @CacheEvict(value = "lists", allEntries = true)
@@ -152,13 +158,30 @@ public class TrainingSessionServiceImpl implements ITrainingSessionService {
             TrainingSession session = trainingSessionRepository.findByIdWithPessimisticLock(sessionId)
                     .orElseThrow(() -> new BusinessException(SESSION_NOT_FOUND));
 
-            if (!session.getStatus().equals(TrainingStatus.SCHEDULED))
-                throw new BusinessException(SESSION_NOT_JOINABLE);
+            if (!session.getStatus().equals(TrainingStatus.SCHEDULED)) throw new BusinessException(SESSION_NOT_JOINABLE);
             if (session.getStartTime().isBefore(LocalDateTime.now())) throw new BusinessException(START_TIME_IN_PAST);
+            if (!session.getTrainer().isActive()) throw new BusinessException(TRAINER_PROFILE_DEACTIVATED);
 
-            ClientProfile client = clientProfileRepository
-                    .findByUserIdAndActiveMembership(userId, MembershipStatus.ACTIVE)
+            ClientProfile client = clientProfileRepository.findByUserId(userId)
+                    .orElseThrow(() -> new BusinessException(CLIENT_PROFILE_NOT_FOUND));
+
+            Membership activeMembership = membershipRepository
+                    .findMembershipByClientIdAndStatus(client.getId(), MembershipStatus.ACTIVE)
                     .orElseThrow(() -> new BusinessException(NO_ACTIVE_MEMBERSHIP));
+
+            if (activeMembership.getStatus() == MembershipStatus.FROZEN) throw new BusinessException(MEMBERSHIP_FROZEN);
+
+            if (activeMembership.getType() != MembershipType.VISITS && activeMembership.getEndDate() != null) {
+                if (activeMembership.getEndDate().isBefore(session.getStartTime())) {
+                    throw new BusinessException(MEMBERSHIP_EXPIRED);
+                }
+            }
+
+            if (activeMembership.getType() == MembershipType.VISITS) {
+                if (activeMembership.getVisitsLeft() == null || activeMembership.getVisitsLeft() <= 0) {
+                    throw new BusinessException(VISITS_LIMIT_REACHED);
+                }
+            }
 
             if (session.getClients().contains(client)) throw new BusinessException(CLIENT_ALREADY_JOINED_SESSION);
             if (session.getClients().size() >= session.getMaxParticipants())
@@ -183,7 +206,7 @@ public class TrainingSessionServiceImpl implements ITrainingSessionService {
         if (!session.getTrainer().getId().equals(trainer.getId())) throw new BusinessException(UNAUTHORIZED_USER);
         if (!session.getStatus().equals(TrainingStatus.SCHEDULED)) throw new BusinessException(SESSION_NOT_JOINABLE);
 
-        if (now.isBefore(session.getStartTime().minusMinutes(10)))
+        if (now.isBefore(session.getStartTime().minusMinutes(30)))
             throw new BusinessException(SESSION_CHECKIN_TOO_EARLY);
         if (now.isAfter(session.getEndTime())) throw new BusinessException(SESSION_ALREADY_FINISHED);
 
@@ -216,6 +239,16 @@ public class TrainingSessionServiceImpl implements ITrainingSessionService {
         }
 
         if (membership.getType() != MembershipType.VISITS) {
+            if (membership.getEndDate() != null && membership.getEndDate().isBefore(now)) {
+                throw new BusinessException(MEMBERSHIP_EXPIRED);
+            }
+        }
+
+        if (membership.getType() == MembershipType.VISITS) {
+            int updatedRows = membershipRepository.decrementVisits(membership.getId());
+            if (updatedRows == 0) throw new BusinessException(VISITS_LIMIT_REACHED);
+            membership.setVisitsLeft(membership.getVisitsLeft() - 1);
+        } else {
             if (membership.getEndDate() != null && membership.getEndDate().isBefore(now)) {
                 throw new BusinessException(MEMBERSHIP_EXPIRED);
             }
