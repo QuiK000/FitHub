@@ -5,7 +5,9 @@ import com.dev.quikkkk.enums.MembershipStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -26,4 +28,8 @@ public interface IMembershipRepository extends JpaRepository<Membership, String>
 
     @Query("SELECT COUNT(m) FROM Membership m WHERE m.status = 'ACTIVE'")
     Integer findAllActiveMemberships();
+
+    @Modifying
+    @Query("UPDATE Membership m SET m.visitsLeft = m.visitsLeft - 1 WHERE m.id = :id AND m.visitsLeft > 0")
+    int decrementVisits(@Param("id") String id);
 }
