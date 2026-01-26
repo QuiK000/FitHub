@@ -2,6 +2,7 @@ package com.dev.quikkkk.service;
 
 import com.dev.quikkkk.dto.request.AssignWorkoutPlanRequest;
 import com.dev.quikkkk.dto.response.ClientWorkoutPlanResponse;
+import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.dto.response.PageResponse;
 
 import java.util.List;
@@ -18,4 +19,10 @@ public interface IClientWorkoutPlanService {
     List<ClientWorkoutPlanResponse> getMyActiveAssignments();
 
     ClientWorkoutPlanResponse getMyAssignmentById(String assignmentId);
+
+    MessageResponse startAssignment(String assignmentId);
+
+    MessageResponse completeAssignment(String assignmentId);
+
+    MessageResponse cancelAssignment(String assignmentId);
 }
