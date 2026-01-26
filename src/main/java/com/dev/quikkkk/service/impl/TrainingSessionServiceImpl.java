@@ -229,15 +229,6 @@ public class TrainingSessionServiceImpl implements ITrainingSessionService {
 
         if (membership.getStatus() == MembershipStatus.FROZEN) throw new BusinessException(MEMBERSHIP_FROZEN);
 
-        if (membership.getType() == MembershipType.VISITS) {
-            if (membership.getVisitsLeft() == null || membership.getVisitsLeft() <= 0) {
-                throw new BusinessException(VISITS_LIMIT_REACHED);
-            }
-
-            membership.setVisitsLeft(membership.getVisitsLeft() - 1);
-            membershipRepository.save(membership);
-        }
-
         if (membership.getType() != MembershipType.VISITS) {
             if (membership.getEndDate() != null && membership.getEndDate().isBefore(now)) {
                 throw new BusinessException(MEMBERSHIP_EXPIRED);
