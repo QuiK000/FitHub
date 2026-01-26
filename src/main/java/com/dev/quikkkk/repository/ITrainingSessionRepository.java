@@ -78,4 +78,12 @@ public interface ITrainingSessionRepository extends JpaRepository<TrainingSessio
             TrainingStatus trainingStatus,
             LocalDateTime now
     );
+
+    @Query("""
+            SELECT COUNT(ts) FROM TrainingSession ts JOIN ts.clients c
+            WHERE c.id = :clientId
+            AND ts.startTime > :now
+            AND ts.status = 'SCHEDULED'
+            """)
+    long countFutureBookings(@Param("clientId") String clientId, @Param("now") LocalDateTime now);
 }
