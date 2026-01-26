@@ -23,7 +23,4 @@ public class AssignWorkoutPlanRequest {
     @Future(message = "VALIDATION.WORKOUT_PLAN.START_DATE.FUTURE")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime startDate;
-
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime endDate;
 }
