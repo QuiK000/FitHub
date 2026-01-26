@@ -1,6 +1,7 @@
 package com.dev.quikkkk.entity;
 
 import com.dev.quikkkk.enums.ClientWorkoutStatus;
+import com.dev.quikkkk.exception.BusinessException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,6 +21,8 @@ import lombok.experimental.SuperBuilder;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+
+import static com.dev.quikkkk.enums.ErrorCode.INVALID_ASSIGNMENT_STATUS;
 
 @Entity
 @Table(name = "client_workout_plans")
@@ -55,4 +58,29 @@ public class ClientWorkoutPlan extends BaseEntity {
 
     @OneToMany(mappedBy = "clientWorkoutPlan", cascade = CascadeType.ALL)
     private Set<WorkoutLog> workoutLogs = new HashSet<>();
+
+    public void start() {
+        ensureStatus(ClientWorkoutStatus.ASSIGNED);
+        status = ClientWorkoutStatus.IN_PROGRESS;
+        startDate = LocalDateTime.now();
+    }
+
+    public void complete() {
+        ensureStatus(ClientWorkoutStatus.IN_PROGRESS);
+        status = ClientWorkoutStatus.COMPLETED;
+        endDate = LocalDateTime.now();
+        completionPercentage = 100.0;
+    }
+
+    public void cancel() {
+        if (status == ClientWorkoutStatus.COMPLETED) throw new BusinessException(INVALID_ASSIGNMENT_STATUS);
+        status = ClientWorkoutStatus.CANCELLED;
+        endDate = LocalDateTime.now();
+    }
+
+    private void ensureStatus(ClientWorkoutStatus expected) {
+        if (status != expected) {
+            throw new BusinessException(INVALID_ASSIGNMENT_STATUS);
+        }
+    }
 }
