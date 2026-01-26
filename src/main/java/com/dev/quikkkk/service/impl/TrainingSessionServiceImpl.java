@@ -152,51 +152,18 @@ public class TrainingSessionServiceImpl implements ITrainingSessionService {
     public MessageResponse joinToSession(String sessionId) {
         log.info("Join session with id: {}", sessionId);
         return sessionLockService.executeWithLock(sessionId, () -> {
-            String userId = SecurityUtils.getCurrentUserId();
             TrainingSession session = trainingSessionRepository.findByIdWithPessimisticLock(sessionId)
                     .orElseThrow(() -> new BusinessException(SESSION_NOT_FOUND));
 
-            if (!session.getStatus().equals(TrainingStatus.SCHEDULED))
-                throw new BusinessException(SESSION_NOT_JOINABLE);
+            if (!session.getStatus().equals(TrainingStatus.SCHEDULED)) throw new BusinessException(SESSION_NOT_JOINABLE);
             if (session.getStartTime().isBefore(LocalDateTime.now())) throw new BusinessException(START_TIME_IN_PAST);
             if (!session.getTrainer().isActive()) throw new BusinessException(TRAINER_PROFILE_DEACTIVATED);
+            if (session.getClients().size() >= session.getMaxParticipants()) throw new BusinessException(SESSION_IS_FULL);
 
-            ClientProfile client = clientProfileRepository.findByUserId(userId)
-                    .orElseThrow(() -> new BusinessException(CLIENT_PROFILE_NOT_FOUND));
-
-            Membership activeMembership = membershipRepository
-                    .findMembershipByClientIdAndStatus(client.getId(), MembershipStatus.ACTIVE)
-                    .orElseThrow(() -> new BusinessException(NO_ACTIVE_MEMBERSHIP));
-
-            if (activeMembership.getStatus() == MembershipStatus.FROZEN) throw new BusinessException(MEMBERSHIP_FROZEN);
-
-            if (activeMembership.getType() != MembershipType.VISITS && activeMembership.getEndDate() != null) {
-                if (activeMembership.getEndDate().isBefore(session.getStartTime())) {
-                    throw new BusinessException(MEMBERSHIP_EXPIRED);
-                }
-            }
-
-            if (activeMembership.getType() == MembershipType.VISITS) {
-                if (activeMembership.getVisitsLeft() == null || activeMembership.getVisitsLeft() <= 0) {
-                    throw new BusinessException(VISITS_LIMIT_REACHED);
-                }
-
-                long futureBookings = trainingSessionRepository.countFutureBookings(client.getId(), LocalDateTime.now());
-                if (activeMembership.getVisitsLeft() <= futureBookings) {
-                    throw new BusinessException(VISITS_LIMIT_REACHED);
-                }
-            } else {
-                if (activeMembership.getEndDate() != null
-                        && activeMembership.getEndDate().isBefore(session.getStartTime())
-                ) {
-                    throw new BusinessException(MEMBERSHIP_EXPIRED);
-                }
-            }
-
+            ClientProfile client = getCurrentClientProfile();
             if (session.getClients().contains(client)) throw new BusinessException(CLIENT_ALREADY_JOINED_SESSION);
-            if (session.getClients().size() >= session.getMaxParticipants())
-                throw new BusinessException(SESSION_IS_FULL);
 
+            validateClientMembership(client, session);
             session.getClients().add(client);
             trainingSessionRepository.save(session);
 
@@ -285,5 +252,33 @@ public class TrainingSessionServiceImpl implements ITrainingSessionService {
     private TrainingSession findSessionById(String sessionId) {
         return trainingSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new BusinessException(SESSION_NOT_FOUND));
+    }
+
+    private void validateClientMembership(ClientProfile client, TrainingSession session) {
+        Membership membership = membershipRepository
+                .findMembershipByClientIdAndStatus(client.getId(), MembershipStatus.ACTIVE)
+                .orElseThrow(() -> new BusinessException(NO_ACTIVE_MEMBERSHIP));
+
+        if (membership.getStatus() == MembershipStatus.FROZEN) throw new BusinessException(MEMBERSHIP_FROZEN);
+
+        if (membership.getType() == MembershipType.VISITS) {
+            long futureBookings = trainingSessionRepository.countFutureBookings(client.getId(), LocalDateTime.now());
+
+            if (membership.getVisitsLeft() == null || membership.getVisitsLeft() <= futureBookings) {
+                throw new BusinessException(VISITS_LIMIT_REACHED);
+            }
+        } else {
+            if (membership.getEndDate() != null &&
+                    membership.getEndDate().isBefore(session.getStartTime())
+            ) {
+                throw new BusinessException(MEMBERSHIP_EXPIRED);
+            }
+        }
+    }
+
+    private ClientProfile getCurrentClientProfile() {
+        String userId = SecurityUtils.getCurrentUserId();
+        return clientProfileRepository.findByUserId(userId)
+                .orElseThrow(() -> new BusinessException(CLIENT_PROFILE_NOT_FOUND));
     }
 }
