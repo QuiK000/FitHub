@@ -31,6 +31,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/workout-plans")
 @RequiredArgsConstructor
@@ -113,6 +115,23 @@ public class WorkoutPlanController {
             @PathVariable("assignment-id") String assignmentId
     ) {
         return ResponseEntity.ok(clientWorkoutPlanService.getAssignedPlanById(assignmentId));
+    }
+
+    @GetMapping("/my-assignments")
+    public ResponseEntity<List<ClientWorkoutPlanResponse>> getMyAssignments() {
+        return ResponseEntity.ok(clientWorkoutPlanService.getMyAssignments());
+    }
+
+    @GetMapping("/my-assignments/active")
+    public ResponseEntity<List<ClientWorkoutPlanResponse>> getMyActiveAssignments() {
+        return ResponseEntity.ok(clientWorkoutPlanService.getMyActiveAssignments());
+    }
+
+    @GetMapping("/my-assignments/{assignment-id}")
+    public ResponseEntity<ClientWorkoutPlanResponse> getMyAssignmentById(
+            @PathVariable("assignment-id") String assignmentId
+    ) {
+        return ResponseEntity.ok(clientWorkoutPlanService.getMyAssignmentById(assignmentId));
     }
 
     @PutMapping("/{workout-plan-id}")
