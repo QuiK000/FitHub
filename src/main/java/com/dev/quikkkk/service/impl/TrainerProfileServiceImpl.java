@@ -7,12 +7,15 @@ import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.dto.response.TrainerProfileResponse;
 import com.dev.quikkkk.entity.Specialization;
 import com.dev.quikkkk.entity.TrainerProfile;
+import com.dev.quikkkk.entity.TrainingSession;
 import com.dev.quikkkk.entity.User;
+import com.dev.quikkkk.enums.TrainingStatus;
 import com.dev.quikkkk.exception.BusinessException;
 import com.dev.quikkkk.mapper.MessageMapper;
 import com.dev.quikkkk.mapper.TrainerProfileMapper;
 import com.dev.quikkkk.repository.ISpecializationRepository;
 import com.dev.quikkkk.repository.ITrainerProfileRepository;
+import com.dev.quikkkk.repository.ITrainingSessionRepository;
 import com.dev.quikkkk.service.ITrainerProfileService;
 import com.dev.quikkkk.utils.PaginationUtils;
 import com.dev.quikkkk.utils.SecurityUtils;
@@ -27,6 +30,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 import static com.dev.quikkkk.enums.ErrorCode.SPECIALIZATION_NOT_FOUND_OR_INACTIVE;
@@ -40,6 +45,7 @@ import static com.dev.quikkkk.enums.ErrorCode.TRAINER_PROFILE_NOT_FOUND;
 public class TrainerProfileServiceImpl implements ITrainerProfileService {
     private final ITrainerProfileRepository trainerProfileRepository;
     private final ISpecializationRepository specializationRepository;
+    private final ITrainingSessionRepository trainingSessionRepository;
     private final TrainerProfileMapper trainerProfileMapper;
     private final MessageMapper messageMapper;
     private final ServiceUtils serviceUtils;
@@ -151,8 +157,17 @@ public class TrainerProfileServiceImpl implements ITrainerProfileService {
         profile.setActive(false);
         trainerProfileRepository.save(profile);
 
-        log.info("Trainer profile deactivated: {}", profile.getId());
-        return messageMapper.message("Trainer profile deactivated");
+        List<TrainingSession> scheduledSessions = trainingSessionRepository.findAllByTrainerIdAndStatusAndStartTimeAfter(
+                profile.getId(),
+                TrainingStatus.SCHEDULED,
+                LocalDateTime.now()
+        );
+
+        for (TrainingSession session : scheduledSessions) session.setStatus(TrainingStatus.CANCELLED);
+        trainingSessionRepository.saveAll(scheduledSessions);
+
+        log.info("Trainer profile deactivated and {} future sessions cancelled", scheduledSessions.size());
+        return messageMapper.message("Trainer profile deactivated, future sessions cancelled");
     }
 
     @Override
