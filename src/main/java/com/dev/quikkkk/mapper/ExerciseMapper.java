@@ -6,6 +6,9 @@ import com.dev.quikkkk.dto.response.ExerciseResponse;
 import com.dev.quikkkk.entity.Exercise;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Service
 public class ExerciseMapper {
     public Exercise toEntity(CreateExerciseRequest request, String userId) {
@@ -14,7 +17,10 @@ public class ExerciseMapper {
                 .description(request.getDescription())
                 .category(request.getCategory())
                 .primaryMuscleGroup(request.getPrimaryMuscleGroup())
-                .secondaryMuscleGroups(request.getSecondaryMuscleGroups())
+                .secondaryMuscleGroups(request.getSecondaryMuscleGroups() == null
+                        ? new HashSet<>()
+                        : new HashSet<>(request.getSecondaryMuscleGroups())
+                )
                 .videoUrl(request.getVideoUrl())
                 .imageUrl(request.getImageUrl())
                 .instructions(request.getInstructions())
@@ -30,7 +36,10 @@ public class ExerciseMapper {
                 .description(exercise.getDescription())
                 .category(exercise.getCategory())
                 .primaryMuscleGroup(exercise.getPrimaryMuscleGroup())
-                .secondaryMuscleGroups(exercise.getSecondaryMuscleGroups())
+                .secondaryMuscleGroups(exercise.getSecondaryMuscleGroups() == null
+                        ? Set.of()
+                        : new HashSet<>(exercise.getSecondaryMuscleGroups())
+                )
                 .videoUrl(exercise.getVideoUrl())
                 .imageUrl(exercise.getImageUrl())
                 .instructions(exercise.getInstructions())
@@ -45,7 +54,7 @@ public class ExerciseMapper {
         if (request.getCategory() != null) exercise.setCategory(request.getCategory());
         if (request.getPrimaryMuscleGroup() != null) exercise.setPrimaryMuscleGroup(request.getPrimaryMuscleGroup());
         if (request.getSecondaryMuscleGroups() != null)
-            exercise.setSecondaryMuscleGroups(request.getSecondaryMuscleGroups());
+            exercise.setSecondaryMuscleGroups(new HashSet<>(request.getSecondaryMuscleGroups()));
         if (request.getVideoUrl() != null) exercise.setVideoUrl(request.getVideoUrl());
         if (request.getImageUrl() != null) exercise.setImageUrl(request.getImageUrl());
         if (request.getInstructions() != null) exercise.setInstructions(request.getInstructions());
