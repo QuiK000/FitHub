@@ -135,7 +135,7 @@ public class WorkoutPlanController {
     }
 
     @PutMapping("/{workout-plan-id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'TRAINER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'TRAINER') && @securityUtils.isPlanOwner(#workoutPlanId)")
     public ResponseEntity<WorkoutPlanResponse> updateWorkoutPlanById(
             @PathVariable("workout-plan-id") String workoutPlanId,
             @RequestBody @Valid UpdateWorkoutPlanRequest request
