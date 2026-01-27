@@ -30,4 +30,14 @@ public class SecurityUtils {
         UserPrincipal user = currentUserOrNull();
         return user != null ? user.id() : null;
     }
+
+    public boolean canAccessUser(String userId) {
+        UserPrincipal currentUser = SecurityUtils.currentUserOrNull();
+        if (currentUser == null) return false;
+
+        boolean isAdmin = currentUser.roles().contains("ROLE_ADMIN");
+        boolean isOwner = currentUser.id().equals(userId);
+
+        return isAdmin || isOwner;
+    }
 }
