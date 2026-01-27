@@ -25,7 +25,14 @@ public class SecurityConfig {
             "/api/v1/account-action/verify-email",
             "/api/v1/account-action/resend-verification",
             "/api/v1/account-action/forgot-password",
-            "/api/v1/account-action/reset-password"
+            "/api/v1/account-action/reset-password",
+
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+
+            "/swagger-resources/**",
+            "/webjars/**"
     };
 
     private final JwtFilter filter;
