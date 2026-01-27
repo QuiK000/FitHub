@@ -18,6 +18,9 @@ import com.dev.quikkkk.utils.PaginationUtils;
 import com.dev.quikkkk.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -41,6 +44,7 @@ public class WorkoutPlanServiceImpl implements IWorkoutPlanService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "lists", allEntries = true)
     public WorkoutPlanResponse createWorkoutPlan(CreateWorkoutPlanRequest request) {
         TrainerProfile trainer = getTrainerProfile();
         WorkoutPlan plan = workoutPlanMapper.toEntity(request, trainer);
@@ -51,6 +55,10 @@ public class WorkoutPlanServiceImpl implements IWorkoutPlanService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(
+            value = "lists",
+            key = "'workoutPlans:difficulty:' + #difficulty + ':' + #page + ':' + #size"
+    )
     public PageResponse<WorkoutPlanResponse> getAllWorkoutPlans(int page, int size, DifficultyLevel difficulty) {
         Pageable pageable = PaginationUtils.createPageRequest(page, size, "createdDate");
         Page<WorkoutPlan> workoutPlanPage = workoutPlanRepository.findWorkoutPlanByDifficulty(pageable, difficulty);
@@ -60,6 +68,7 @@ public class WorkoutPlanServiceImpl implements IWorkoutPlanService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "workoutPlans", key = "'byId:' + #workoutPlanId")
     public WorkoutPlanResponse getWorkoutPlanById(String workoutPlanId) {
         return workoutPlanRepository.findById(workoutPlanId)
                 .map(workoutPlanMapper::toResponse)
@@ -68,6 +77,10 @@ public class WorkoutPlanServiceImpl implements IWorkoutPlanService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "workoutPlans", key = "'byId:' + #workoutPlanId"),
+            @CacheEvict(value = "lists", allEntries = true)
+    })
     public WorkoutPlanResponse updateWorkoutById(String workoutPlanId, UpdateWorkoutPlanRequest request) {
         TrainerProfile trainer = getTrainerProfile();
         WorkoutPlan plan = findWorkoutPlanById(workoutPlanId);
@@ -81,6 +94,10 @@ public class WorkoutPlanServiceImpl implements IWorkoutPlanService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(
+            value = "lists",
+            key = "'workoutPlans:trainer:' + T(com.dev.quikkkk.utils.SecurityUtils).getCurrentUserId() + ':' + #page + ':' + #size"
+    )
     public PageResponse<WorkoutPlanResponse> getMyPlans(int page, int size) {
         TrainerProfile trainer = getTrainerProfile();
         Pageable pageable = PaginationUtils.createPageRequest(page, size, "createdDate");
@@ -91,6 +108,10 @@ public class WorkoutPlanServiceImpl implements IWorkoutPlanService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(
+            value = "lists",
+            key = "'workoutPlans:trainer:' + #trainerId + ':' + #page + ':' + #size"
+    )
     public PageResponse<WorkoutPlanResponse> getTrainerPlans(int page, int size, String trainerId) {
         TrainerProfile trainer = trainerProfileRepository.findById(trainerId)
                 .orElseThrow(() -> new BusinessException(TRAINER_PROFILE_NOT_FOUND));
@@ -102,6 +123,10 @@ public class WorkoutPlanServiceImpl implements IWorkoutPlanService {
 
     @Override
     @Transactional(readOnly = true)
+    @Caching(evict = {
+            @CacheEvict(value = "workoutPlans", key = "'byId:' + #workoutPlanId"),
+            @CacheEvict(value = "lists", allEntries = true)
+    })
     public MessageResponse activateWorkoutPlan(String workoutPlanId) {
         String userId = SecurityUtils.getCurrentUserId();
         WorkoutPlan plan = findWorkoutPlanById(workoutPlanId);
@@ -116,6 +141,10 @@ public class WorkoutPlanServiceImpl implements IWorkoutPlanService {
 
     @Override
     @Transactional(readOnly = true)
+    @Caching(evict = {
+            @CacheEvict(value = "workoutPlans", key = "'byId:' + #workoutPlanId"),
+            @CacheEvict(value = "lists", allEntries = true)
+    })
     public MessageResponse deactivateWorkoutPlan(String workoutPlanId) {
         String userId = SecurityUtils.getCurrentUserId();
         WorkoutPlan plan = findWorkoutPlanById(workoutPlanId);
