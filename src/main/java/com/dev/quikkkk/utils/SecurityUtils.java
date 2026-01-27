@@ -1,12 +1,23 @@
 package com.dev.quikkkk.utils;
 
+import com.dev.quikkkk.entity.WorkoutPlan;
 import com.dev.quikkkk.enums.ErrorCode;
 import com.dev.quikkkk.exception.BusinessException;
+import com.dev.quikkkk.repository.IWorkoutPlanRepository;
 import com.dev.quikkkk.security.UserPrincipal;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
+@Component("securityUtils")
+@RequiredArgsConstructor
 public class SecurityUtils {
+    private final IWorkoutPlanRepository workoutPlanRepository;
+
     public static UserPrincipal currentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
@@ -31,13 +42,23 @@ public class SecurityUtils {
         return user != null ? user.id() : null;
     }
 
-    public boolean canAccessUser(String userId) {
-        UserPrincipal currentUser = SecurityUtils.currentUserOrNull();
-        if (currentUser == null) return false;
+    public static boolean isAdmin() {
+        return currentUser().roles().contains("ROLE_ADMIN");
+    }
 
-        boolean isAdmin = currentUser.roles().contains("ROLE_ADMIN");
-        boolean isOwner = currentUser.id().equals(userId);
+    public boolean canAccessUser(String targetUserId) {
+        if (isAdmin()) return true;
+        return getCurrentUserId().equals(targetUserId);
+    }
 
-        return isAdmin || isOwner;
+    @Transactional(readOnly = true)
+    public boolean isPlanOwner(String planId) {
+        if (isAdmin()) return true;
+        Optional<WorkoutPlan> plan = workoutPlanRepository.findById(planId);
+
+        if (plan.isEmpty()) return true;
+
+        String planOwnerId = plan.get().getTrainer().getUser().getId();
+        return planOwnerId.equals(getCurrentUserId());
     }
 }
