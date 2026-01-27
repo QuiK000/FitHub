@@ -35,3 +35,11 @@ build/
 
 ### VS Code ###
 .vscode/
+/docker/prometheus/wal/00000000
+/docker/prometheus/wal/00000001
+/docker/config/grafana/provisioning/dashboards/all.yaml
+/docker/config/grafana/provisioning/datasources/all.yaml
+/docker/config/grafana/provisioning/dashboards/jvm-micrometer_rev9.json
+/docker/prometheus/lock
+/docker/config/grafana/provisioning/dashboards/micrometer-spring-throughput_rev2.json
+/docker/prometheus/queries.active
