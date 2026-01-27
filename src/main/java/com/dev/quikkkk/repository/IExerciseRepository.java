@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface IExerciseRepository extends JpaRepository<Exercise, String> {
     @Query("""
@@ -39,4 +41,12 @@ public interface IExerciseRepository extends JpaRepository<Exercise, String> {
             ) ORDER BY e.createdDate DESC
             """)
     Page<Exercise> findAllExercisesByActiveTrueAndMuscleGroup(@Param("muscleGroup") MuscleGroup muscleGroup, Pageable pageable);
+
+    @Query("""
+            SELECT DISTINCT e
+            FROM Exercise e
+            LEFT JOIN FETCH e.secondaryMuscleGroups
+            WHERE e.id = :id
+            """)
+    Optional<Exercise> findByIdWithSecondaryMuscles(String id);
 }
