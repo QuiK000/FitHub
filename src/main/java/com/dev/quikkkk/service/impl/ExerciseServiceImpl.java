@@ -17,6 +17,9 @@ import com.dev.quikkkk.utils.PaginationUtils;
 import com.dev.quikkkk.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -37,6 +40,7 @@ public class ExerciseServiceImpl implements IExerciseService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "lists", allEntries = true)
     public ExerciseResponse createExercise(CreateExerciseRequest request) {
         String userId = SecurityUtils.getCurrentUserId();
         Exercise exercise = exerciseMapper.toEntity(request, userId);
@@ -47,12 +51,19 @@ public class ExerciseServiceImpl implements IExerciseService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "exercises", key = "'byId:' + #exerciseId")
     public ExerciseResponse findExerciseById(String exerciseId) {
-        return exerciseMapper.toResponse(findExerciseOrThrow(exerciseId));
+        return exerciseRepository.findByIdWithSecondaryMuscles(exerciseId)
+                .map(exerciseMapper::toResponse)
+                .orElseThrow(() -> new BusinessException(EXERCISE_NOT_FOUND));
     }
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(
+            value = "lists",
+            key = "'exercises:' + #page + ':' + #size + ':' + (#search != null ? #search : 'all')"
+    )
     public PageResponse<ExerciseResponse> findAllExercises(int page, int size, String search) {
         Pageable pageable = PaginationUtils.createPageRequest(page, size);
         Page<Exercise> exercisePage = exerciseRepository.findActiveWithOptionalSearch(search, pageable);
@@ -62,6 +73,10 @@ public class ExerciseServiceImpl implements IExerciseService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(
+            value = "lists",
+            key = "'exercises:active:' + #page + ':' + #size"
+    )
     public PageResponse<ExerciseResponse> findAllActiveExercises(int page, int size) {
         Pageable pageable = PaginationUtils.createPageRequest(page, size, "createdDate");
         Page<Exercise> exercisePage = exerciseRepository.findAllExercisesByActiveTrue(pageable);
@@ -71,6 +86,10 @@ public class ExerciseServiceImpl implements IExerciseService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(
+            value = "lists",
+            key = "'exercises:category:' + #category + ':' + #page + ':' + #size"
+    )
     public PageResponse<ExerciseResponse> findAllExercisesByCategory(ExerciseCategory category, int page, int size) {
         Pageable pageable = PaginationUtils.createPageRequest(page, size, "createdDate");
         Page<Exercise> exercisePage = exerciseRepository.findAllExercisesByActiveTrueAndCategory(category, pageable);
@@ -80,6 +99,10 @@ public class ExerciseServiceImpl implements IExerciseService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(
+            value = "lists",
+            key = "'exercises:muscle:' + #muscleGroup + ':' + #page + ':' + #size"
+    )
     public PageResponse<ExerciseResponse> findAllExercisesByMuscleGroup(MuscleGroup muscleGroup, int page, int size) {
         Pageable pageable = PaginationUtils.createPageRequest(page, size);
         Page<Exercise> exercisePage = exerciseRepository.findAllExercisesByActiveTrueAndMuscleGroup(
@@ -92,6 +115,10 @@ public class ExerciseServiceImpl implements IExerciseService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "exercises", key = "'byId:' + #exerciseId"),
+            @CacheEvict(value = "lists", allEntries = true)
+    })
     public ExerciseResponse updateExercise(String exerciseId, UpdateExerciseRequest request) {
         Exercise exercise = findActiveExerciseOrThrow(exerciseId);
         String userId = SecurityUtils.getCurrentUserId();
@@ -102,6 +129,10 @@ public class ExerciseServiceImpl implements IExerciseService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "exercises", key = "'byId:' + #exerciseId"),
+            @CacheEvict(value = "lists", allEntries = true)
+    })
     public MessageResponse activateExercise(String exerciseId) {
         String userId = SecurityUtils.getCurrentUserId();
         Exercise exercise = findExerciseOrThrow(exerciseId);
@@ -117,6 +148,10 @@ public class ExerciseServiceImpl implements IExerciseService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "exercises", key = "'byId:' + #exerciseId"),
+            @CacheEvict(value = "lists", allEntries = true)
+    })
     public MessageResponse deactivateExercise(String exerciseId) {
         String userId = SecurityUtils.getCurrentUserId();
         Exercise exercise = findExerciseOrThrow(exerciseId);
