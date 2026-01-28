@@ -3,6 +3,7 @@ package com.dev.quikkkk.mapper;
 import com.dev.quikkkk.dto.request.LogWorkoutRequest;
 import com.dev.quikkkk.dto.response.ExerciseShortResponse;
 import com.dev.quikkkk.dto.response.WorkoutLogResponse;
+import com.dev.quikkkk.entity.ClientWorkoutPlan;
 import com.dev.quikkkk.entity.Exercise;
 import com.dev.quikkkk.entity.WorkoutLog;
 import org.springframework.stereotype.Service;
@@ -11,9 +12,10 @@ import java.time.LocalDateTime;
 
 @Service
 public class WorkoutLogMapper {
-    public WorkoutLog toEntity(LogWorkoutRequest request, Exercise exercise, String userId) {
+    public WorkoutLog toEntity(LogWorkoutRequest request, Exercise exercise, ClientWorkoutPlan activeWorkoutPlan, String userId) {
         return WorkoutLog.builder()
                 .exercise(exercise)
+                .clientWorkoutPlan(activeWorkoutPlan)
                 .setsCompleted(request.getSetsCompleted())
                 .repsCompleted(request.getRepsCompleted())
                 .weightUsed(request.getWeightUsed())
