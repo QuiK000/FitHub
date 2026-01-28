@@ -19,6 +19,9 @@ public class LogWorkoutRequest {
     @NotBlank(message = "VALIDATION.WORKOUT_LOG.EXERCISE_ID.NOT_BLANK")
     private String exerciseId;
 
+    @NotBlank(message = "VALIDATION.WORKOUT_LOG.CLIENT_WROKOUT_PLAN_ID.NOT_BLANK")
+    private String clientWorkoutPlanId;
+
     @Min(value = 1, message = "VALIDATION.WORKOUT_LOG.SETS.MIN")
     private Integer setsCompleted;
 
