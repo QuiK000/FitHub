@@ -26,6 +26,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+
 import static com.dev.quikkkk.enums.ErrorCode.CLIENT_ASSIGNMENT_NOT_FOUND;
 import static com.dev.quikkkk.enums.ErrorCode.CLIENT_PROFILE_NOT_FOUND;
 import static com.dev.quikkkk.enums.ErrorCode.EXERCISE_NOT_FOUND;
@@ -108,6 +110,40 @@ public class WorkoutLogServiceImpl implements IWorkoutLogService {
         Page<WorkoutLog> workoutLogPageable = workoutLogRepository.findAllByCreatedBy(currentUserId, pageable);
 
         return PaginationUtils.toPageResponse(workoutLogPageable, workoutLogMapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<WorkoutLogResponse> getLogsByAssignment(String assignmentId, int page, int size) {
+        log.info("Fetching logs for assignment: {}, page: {}, size: {}", assignmentId, page, size);
+        ClientWorkoutPlan assignment = clientWorkoutPlanRepository.findById(assignmentId)
+                .orElseThrow(() -> new BusinessException(CLIENT_ASSIGNMENT_NOT_FOUND));
+
+        if (SecurityUtils.isTrainer()) {
+            String userId = SecurityUtils.getCurrentUserId();
+            TrainerProfile trainer = trainerProfileRepository.findTrainerProfileByUserId(userId)
+                    .orElseThrow(() -> new BusinessException(TRAINER_PROFILE_NOT_FOUND));
+
+            String assignmentTrainerId = assignment.getWorkoutPlan().getTrainer().getId();
+            if (!assignmentTrainerId.equals(trainer.getId())) {
+                throw new BusinessException(WORKOUT_LOG_ACCESS_DENIED);
+            }
+        }
+
+        Pageable pageable = PaginationUtils.createPageRequest(page, size, "workoutDate");
+        Page<WorkoutLog> workoutLogPage = workoutLogRepository.findByAssignmentId(assignmentId, pageable);
+
+        return PaginationUtils.toPageResponse(workoutLogPage, workoutLogMapper::toResponse);
+    }
+
+    @Override
+    public PageResponse<WorkoutLogResponse> getLogsByExercise(String exerciseId, int page, int size) {
+        return null;
+    }
+
+    @Override
+    public PageResponse<WorkoutLogResponse> getLogsByDateRange(LocalDate from, LocalDate to, int page, int size) {
+        return null;
     }
 
     private ClientProfile getCurrentClientProfile() {
