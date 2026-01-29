@@ -8,6 +8,7 @@ import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -21,7 +22,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "exercises")
+@Table(
+        name = "exercises",
+        indexes = {
+                @Index(name = "idx_exercise_category", columnList = "category"),
+                @Index(name = "idx_exercise_muscle", columnList = "primary_muscle_group"),
+                @Index(name = "idx_exercise_active", columnList = "active")
+        }
+)
 @Getter
 @Setter
 @AllArgsConstructor
