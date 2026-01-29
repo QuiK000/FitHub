@@ -2,18 +2,17 @@ package com.dev.quikkkk.service;
 
 import com.dev.quikkkk.dto.request.LogWorkoutRequest;
 import com.dev.quikkkk.dto.request.UpdateLogWorkoutRequest;
+import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.dto.response.WorkoutLogResponse;
-
-import java.util.List;
 
 public interface IWorkoutLogService {
     WorkoutLogResponse createWorkoutLog(LogWorkoutRequest request);
 
-    List<WorkoutLogResponse> getAllWorkoutLogs();
+    PageResponse<WorkoutLogResponse> getAllWorkoutLogs(int page, int size);
 
     WorkoutLogResponse getWorkoutLogById(String id);
 
     WorkoutLogResponse updateWorkoutLogById(String id, UpdateLogWorkoutRequest request);
 
-    List<WorkoutLogResponse> getMyWorkoutLogs();
+    PageResponse<WorkoutLogResponse> getMyWorkoutLogs(int page, int size);
 }
