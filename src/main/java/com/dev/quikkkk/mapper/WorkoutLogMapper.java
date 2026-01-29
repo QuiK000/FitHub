@@ -1,6 +1,7 @@
 package com.dev.quikkkk.mapper;
 
 import com.dev.quikkkk.dto.request.LogWorkoutRequest;
+import com.dev.quikkkk.dto.request.UpdateLogWorkoutRequest;
 import com.dev.quikkkk.dto.response.ExerciseShortResponse;
 import com.dev.quikkkk.dto.response.WorkoutLogResponse;
 import com.dev.quikkkk.entity.ClientWorkoutPlan;
@@ -45,5 +46,15 @@ public class WorkoutLogMapper {
                 .difficultyRating(workoutLog.getDifficultyRating())
                 .notes(workoutLog.getNotes())
                 .build();
+    }
+
+    public void update(UpdateLogWorkoutRequest request, WorkoutLog workoutLog, String userId) {
+        if (request.getSetsCompleted() != null) workoutLog.setSetsCompleted(request.getSetsCompleted());
+        if (request.getRepsCompleted() != null) workoutLog.setRepsCompleted(request.getRepsCompleted());
+        if (request.getWeightUsed() != null) workoutLog.setWeightUsed(request.getWeightUsed());
+        if (request.getDurationSeconds() != null) workoutLog.setDurationSeconds(request.getDurationSeconds());
+        if (request.getDifficultRating() != null) workoutLog.setDifficultyRating(request.getDifficultRating());
+        if (request.getNotes() != null) workoutLog.setNotes(request.getNotes());
+        workoutLog.setLastModifiedBy(userId);
     }
 }
