@@ -85,6 +85,15 @@ public class WorkoutLogServiceImpl implements IWorkoutLogService {
         return workoutLogMapper.toResponse(workoutLog);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<WorkoutLogResponse> getMyWorkoutLogs() {
+        String currentUserId = SecurityUtils.getCurrentUserId();
+        return workoutLogRepository.findAllByCreatedBy(currentUserId).stream()
+                .map(workoutLogMapper::toResponse)
+                .toList();
+    }
+
     private ClientProfile getCurrentClientProfile() {
         String userId = SecurityUtils.getCurrentUserId();
         return clientProfileRepository.findByUserId(userId)
