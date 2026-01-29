@@ -54,6 +54,16 @@ public class WorkoutLogController {
         return ResponseEntity.ok(workoutLogService.getMyWorkoutLogs(page, size));
     }
 
+    @GetMapping("/assignment/{assignment-id}")
+    @PreAuthorize("hasAnyRole('TRAINER', 'ADMIN')")
+    public ResponseEntity<PageResponse<WorkoutLogResponse>> getLogsByAssignment(
+            @PathVariable("assignment-id") String assignmentId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(workoutLogService.getLogsByAssignment(assignmentId, page, size));
+    }
+
     @PutMapping("/{workout-log-id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'TRAINER')")
     public ResponseEntity<WorkoutLogResponse> updateWorkoutLogById(
