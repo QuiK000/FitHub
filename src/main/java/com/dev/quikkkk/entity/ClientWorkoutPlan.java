@@ -8,6 +8,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -25,7 +26,14 @@ import java.util.Set;
 import static com.dev.quikkkk.enums.ErrorCode.INVALID_ASSIGNMENT_STATUS;
 
 @Entity
-@Table(name = "client_workout_plans")
+@Table(
+        name = "client_workout_plans",
+        indexes = {
+                @Index(name = "idx_cwp_client", columnList = "client_id"),
+                @Index(name = "idx_cwp_plan", columnList = "workout_plan_id"),
+                @Index(name = "idx_cwp_plan", columnList = "status")
+        }
+)
 @Getter
 @Setter
 @AllArgsConstructor
