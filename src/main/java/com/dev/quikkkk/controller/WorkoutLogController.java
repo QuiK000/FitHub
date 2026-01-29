@@ -2,6 +2,7 @@ package com.dev.quikkkk.controller;
 
 import com.dev.quikkkk.dto.request.LogWorkoutRequest;
 import com.dev.quikkkk.dto.request.UpdateLogWorkoutRequest;
+import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.dto.response.WorkoutLogResponse;
 import com.dev.quikkkk.service.IWorkoutLogService;
 import jakarta.validation.Valid;
@@ -14,9 +15,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/workout-logs")
@@ -31,9 +31,12 @@ public class WorkoutLogController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'TRAINER')")
-    public ResponseEntity<List<WorkoutLogResponse>> getAllWorkoutLogs() {
-        return ResponseEntity.ok(workoutLogService.getAllWorkoutLogs());
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public ResponseEntity<PageResponse<WorkoutLogResponse>> getAllWorkoutLogs(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(workoutLogService.getAllWorkoutLogs(page, size));
     }
 
     @GetMapping("/{workout-log-id}")
@@ -43,8 +46,12 @@ public class WorkoutLogController {
     }
 
     @GetMapping("/my-logs")
-    public ResponseEntity<List<WorkoutLogResponse>> getMyWorkoutLogs() {
-        return ResponseEntity.ok(workoutLogService.getMyWorkoutLogs());
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<PageResponse<WorkoutLogResponse>> getMyWorkoutLogs(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(workoutLogService.getMyWorkoutLogs(page, size));
     }
 
     @PutMapping("/{workout-log-id}")
