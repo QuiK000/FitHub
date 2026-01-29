@@ -14,4 +14,6 @@ public interface IWorkoutLogService {
     WorkoutLogResponse getWorkoutLogById(String id);
 
     WorkoutLogResponse updateWorkoutLogById(String id, UpdateLogWorkoutRequest request);
+
+    List<WorkoutLogResponse> getMyWorkoutLogs();
 }
