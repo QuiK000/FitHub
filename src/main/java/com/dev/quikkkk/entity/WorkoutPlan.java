@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -22,7 +23,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "workout_plans")
+@Table(
+        name = "workout_plans",
+        indexes = {
+                @Index(name = "idx_workout_trainer", columnList = "trainer_id"),
+                @Index(name = "idx_workout_difficulty", columnList = "difficulty_level"),
+                @Index(name = "idx_workout_active", columnList = "active")
+        }
+)
 @Getter
 @Setter
 @SuperBuilder
