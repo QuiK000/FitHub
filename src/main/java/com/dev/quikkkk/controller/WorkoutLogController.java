@@ -42,6 +42,11 @@ public class WorkoutLogController {
         return ResponseEntity.ok(workoutLogService.getWorkoutLogById(workoutLogId));
     }
 
+    @GetMapping("/my-logs")
+    public ResponseEntity<List<WorkoutLogResponse>> getMyWorkoutLogs() {
+        return ResponseEntity.ok(workoutLogService.getMyWorkoutLogs());
+    }
+
     @PutMapping("/{workout-log-id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'TRAINER')")
     public ResponseEntity<WorkoutLogResponse> updateWorkoutLogById(
