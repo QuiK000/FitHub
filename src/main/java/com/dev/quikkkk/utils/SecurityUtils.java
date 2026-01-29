@@ -46,9 +46,8 @@ public class SecurityUtils {
         return currentUser().roles().contains("ROLE_ADMIN");
     }
 
-    public boolean canAccessUser(String targetUserId) {
-        if (isAdmin()) return true;
-        return getCurrentUserId().equals(targetUserId);
+    public static boolean isTrainer() {
+        return currentUser().roles().contains("ROLE_TRAINER");
     }
 
     @Transactional(readOnly = true)
