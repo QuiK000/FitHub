@@ -3,6 +3,7 @@ package com.dev.quikkkk.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -15,7 +16,14 @@ import lombok.experimental.SuperBuilder;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "workout_logs")
+@Table(
+        name = "workout_logs",
+        indexes = {
+                @Index(name = "idx_wlog_client_plan", columnList = "client_workout_plan_id"),
+                @Index(name = "idx_wlog_exercise", columnList = "exercise_id"),
+                @Index(name = "idx_wlog_date", columnList = "workout_date DESC")
+        }
+)
 @Getter
 @Setter
 @AllArgsConstructor
