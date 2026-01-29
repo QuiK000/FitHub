@@ -1,6 +1,7 @@
 package com.dev.quikkkk.service.impl;
 
 import com.dev.quikkkk.dto.request.LogWorkoutRequest;
+import com.dev.quikkkk.dto.request.UpdateLogWorkoutRequest;
 import com.dev.quikkkk.dto.response.WorkoutLogResponse;
 import com.dev.quikkkk.entity.ClientProfile;
 import com.dev.quikkkk.entity.ClientWorkoutPlan;
@@ -71,6 +72,17 @@ public class WorkoutLogServiceImpl implements IWorkoutLogService {
     public WorkoutLogResponse getWorkoutLogById(String id) {
         return workoutLogRepository.findById(id).map(workoutLogMapper::toResponse)
                 .orElseThrow(() -> new BusinessException(WORKOUT_LOG_NOT_FOUND));
+    }
+
+    @Override
+    @Transactional
+    public WorkoutLogResponse updateWorkoutLogById(String id, UpdateLogWorkoutRequest request) {
+        String userId = SecurityUtils.getCurrentUserId();
+        WorkoutLog workoutLog = workoutLogRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(WORKOUT_LOG_NOT_FOUND));
+
+        workoutLogMapper.update(request, workoutLog, userId);
+        return workoutLogMapper.toResponse(workoutLog);
     }
 
     private ClientProfile getCurrentClientProfile() {
