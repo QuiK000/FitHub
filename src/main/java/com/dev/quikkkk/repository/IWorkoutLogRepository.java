@@ -18,4 +18,11 @@ public interface IWorkoutLogRepository extends JpaRepository<WorkoutLog, String>
             ORDER BY wl.workoutDate DESC
             """)
     Page<WorkoutLog> findByAssignmentId(@Param("assignmentId") String assignmentId, Pageable pageable);
+
+    @Query("""
+            SELECT wl FROM WorkoutLog wl
+            WHERE wl.exercise.id = :exerciseId
+            ORDER BY wl.workoutDate DESC
+            """)
+    Page<WorkoutLog> findByExerciseId(@Param("exerciseId") String exerciseId, Pageable pageable);
 }
