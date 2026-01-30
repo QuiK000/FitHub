@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
+
 @RestController
 @RequestMapping("/api/v1/workout-logs")
 @RequiredArgsConstructor
@@ -72,6 +74,16 @@ public class WorkoutLogController {
             @RequestParam(defaultValue = "10") int size
     ) {
         return ResponseEntity.ok(workoutLogService.getLogsByExercise(exerciseId, page, size));
+    }
+
+    @GetMapping("/date-range")
+    public ResponseEntity<PageResponse<WorkoutLogResponse>> getLogsByDateRange(
+            @RequestParam LocalDate from,
+            @RequestParam LocalDate to,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(workoutLogService.getLogsByDateRange(from, to, page, size));
     }
 
     @PutMapping("/{workout-log-id}")
