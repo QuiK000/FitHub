@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static com.dev.quikkkk.enums.ErrorCode.CLIENT_ASSIGNMENT_NOT_FOUND;
 import static com.dev.quikkkk.enums.ErrorCode.CLIENT_PROFILE_NOT_FOUND;
@@ -137,6 +138,7 @@ public class WorkoutLogServiceImpl implements IWorkoutLogService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<WorkoutLogResponse> getLogsByExercise(String exerciseId, int page, int size) {
         log.info("Fetching logs for exercise: {}, page: {}, size: {}", exerciseId, page, size);
 
@@ -150,8 +152,36 @@ public class WorkoutLogServiceImpl implements IWorkoutLogService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PageResponse<WorkoutLogResponse> getLogsByDateRange(LocalDate from, LocalDate to, int page, int size) {
-        return null;
+        log.info("Fetching logs by date range: {} to {}, page: {}, size: {}", from, to, page, size);
+
+        LocalDateTime fromDateTime = from.atStartOfDay();
+        LocalDateTime toDateTime = to.plusDays(1).atStartOfDay();
+
+        Pageable pageable = PaginationUtils.createPageRequest(page, size, "workoutDate");
+        Page<WorkoutLog> workoutLogPage;
+
+        if (SecurityUtils.isAdmin()) {
+            workoutLogPage = workoutLogRepository.findByDateRangeForAdmin(fromDateTime, toDateTime, pageable);
+        } else if (SecurityUtils.isTrainer()) {
+            String userId = SecurityUtils.getCurrentUserId();
+            TrainerProfile trainer = trainerProfileRepository.findTrainerProfileByUserId(userId)
+                    .orElseThrow(() -> new BusinessException(TRAINER_PROFILE_NOT_FOUND));
+            workoutLogPage = workoutLogRepository.findByDateRangeForTrainer(
+                    fromDateTime,
+                    toDateTime,
+                    trainer.getId(),
+                    pageable
+            );
+        } else {
+            String userId = SecurityUtils.getCurrentUserId();
+            workoutLogPage = workoutLogRepository.findByDateRangeAndUserId(
+                    fromDateTime, toDateTime, userId, pageable
+            );
+        }
+
+        return PaginationUtils.toPageResponse(workoutLogPage, workoutLogMapper::toResponse);
     }
 
     private ClientProfile getCurrentClientProfile() {
