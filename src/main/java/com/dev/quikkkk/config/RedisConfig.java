@@ -66,6 +66,9 @@ public class RedisConfig {
         cacheConfigs.put("memberships", defaultConfig.entryTtl(Duration.ofMinutes(10)));
         cacheConfigs.put("attendance", defaultConfig.entryTtl(Duration.ofMinutes(30)));
         cacheConfigs.put("statistics", defaultConfig.entryTtl(Duration.ofHours(1)));
+        cacheConfigs.put("workoutLogs", defaultConfig.entryTtl(Duration.ofMinutes(15)));
+        cacheConfigs.put("workoutPlans", defaultConfig.entryTtl(Duration.ofMinutes(30)));
+        cacheConfigs.put("exercises", defaultConfig.entryTtl(Duration.ofHours(2)));
         cacheConfigs.put("lists", defaultConfig.entryTtl(Duration.ofMinutes(5)));
 
         return RedisCacheManager.builder(factory)
