@@ -21,6 +21,9 @@ import com.dev.quikkkk.utils.PaginationUtils;
 import com.dev.quikkkk.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -49,6 +52,10 @@ public class WorkoutLogServiceImpl implements IWorkoutLogService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "workoutLogs", allEntries = true),
+            @CacheEvict(value = "lists", allEntries = true)
+    })
     public WorkoutLogResponse createWorkoutLog(LogWorkoutRequest request) {
         Exercise exercise = exerciseRepository.findById(request.getExerciseId())
                 .orElseThrow(() -> new BusinessException(EXERCISE_NOT_FOUND));
@@ -73,6 +80,10 @@ public class WorkoutLogServiceImpl implements IWorkoutLogService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(
+            value = "lists",
+            key = "'workoutLogs:all' + #page + ':' + #size"
+    )
     public PageResponse<WorkoutLogResponse> getAllWorkoutLogs(int page, int size) {
         log.info("Admin fetching all workout logs, page: {}, size: {}", page, size);
         Pageable pageable = PaginationUtils.createPageRequest(page, size, "workoutDate");
@@ -83,6 +94,10 @@ public class WorkoutLogServiceImpl implements IWorkoutLogService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(
+            value = "workoutLogs",
+            key = "'byId:' + #id"
+    )
     public WorkoutLogResponse getWorkoutLogById(String id) {
         WorkoutLog workoutLog = getWorkoutLogByIdOrThrow(id);
         validateTrainerAccessToWorkoutLog(workoutLog);
@@ -92,6 +107,10 @@ public class WorkoutLogServiceImpl implements IWorkoutLogService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "workoutLogs", key = "'byId:' + #id"),
+            @CacheEvict(value = "lists", allEntries = true)
+    })
     public WorkoutLogResponse updateWorkoutLogById(String id, UpdateLogWorkoutRequest request) {
         WorkoutLog workoutLog = getWorkoutLogByIdOrThrow(id);
         validateTrainerAccessToWorkoutLog(workoutLog);
@@ -102,6 +121,10 @@ public class WorkoutLogServiceImpl implements IWorkoutLogService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(
+            value = "lists",
+            key = "'workoutLogs:user:' + T(com.dev.quikkkk.utils.SecurityUtils).getCurrentUserId() + ':' + #page + ':' + #size"
+    )
     public PageResponse<WorkoutLogResponse> getMyWorkoutLogs(int page, int size) {
         String currentUserId = SecurityUtils.getCurrentUserId();
         log.info("Client fetching own workout logs, userId: {}, page: {}, size: {}", currentUserId, page, size);
@@ -114,6 +137,10 @@ public class WorkoutLogServiceImpl implements IWorkoutLogService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(
+            value = "lists",
+            key = "'workoutLogs:assignment:' + #assignmentId + ':' + #page + ':' + #size"
+    )
     public PageResponse<WorkoutLogResponse> getLogsByAssignment(String assignmentId, int page, int size) {
         log.info("Fetching logs for assignment: {}, page: {}, size: {}", assignmentId, page, size);
         ClientWorkoutPlan assignment = clientWorkoutPlanRepository.findById(assignmentId)
@@ -129,6 +156,10 @@ public class WorkoutLogServiceImpl implements IWorkoutLogService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(
+            value = "lists",
+            key = "'workoutLogs:exercise:' + #exerciseId + ':' + #page + ':' + #size"
+    )
     public PageResponse<WorkoutLogResponse> getLogsByExercise(String exerciseId, int page, int size) {
         log.info("Fetching logs for exercise: {}, page: {}, size: {}", exerciseId, page, size);
 
@@ -143,6 +174,10 @@ public class WorkoutLogServiceImpl implements IWorkoutLogService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(
+            value = "lists",
+            key = "'workoutLogs:dateRange:' + #from + ':' + #to + ':' + #page + ':' + #size + ':' + T(com.dev.quikkkk.utils.SecurityUtils).getCurrentUserId()"
+    )
     public PageResponse<WorkoutLogResponse> getLogsByDateRange(LocalDate from, LocalDate to, int page, int size) {
         log.info("Fetching logs by date range: {} to {}, page: {}, size: {}", from, to, page, size);
 
