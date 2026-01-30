@@ -93,11 +93,10 @@ public class WorkoutLogServiceImpl implements IWorkoutLogService {
     @Override
     @Transactional
     public WorkoutLogResponse updateWorkoutLogById(String id, UpdateLogWorkoutRequest request) {
-        String userId = SecurityUtils.getCurrentUserId();
         WorkoutLog workoutLog = getWorkoutLogByIdOrThrow(id);
         validateTrainerAccessToWorkoutLog(workoutLog);
 
-        workoutLogMapper.update(request, workoutLog, userId);
+        workoutLogMapper.update(request, workoutLog, SecurityUtils.getCurrentUserId());
         return workoutLogMapper.toResponse(workoutLog);
     }
 
@@ -120,16 +119,7 @@ public class WorkoutLogServiceImpl implements IWorkoutLogService {
         ClientWorkoutPlan assignment = clientWorkoutPlanRepository.findById(assignmentId)
                 .orElseThrow(() -> new BusinessException(CLIENT_ASSIGNMENT_NOT_FOUND));
 
-        if (SecurityUtils.isTrainer()) {
-            String userId = SecurityUtils.getCurrentUserId();
-            TrainerProfile trainer = trainerProfileRepository.findTrainerProfileByUserId(userId)
-                    .orElseThrow(() -> new BusinessException(TRAINER_PROFILE_NOT_FOUND));
-
-            String assignmentTrainerId = assignment.getWorkoutPlan().getTrainer().getId();
-            if (!assignmentTrainerId.equals(trainer.getId())) {
-                throw new BusinessException(WORKOUT_LOG_ACCESS_DENIED);
-            }
-        }
+        validateTrainerAccessToAssignment(assignment);
 
         Pageable pageable = PaginationUtils.createPageRequest(page, size, "workoutDate");
         Page<WorkoutLog> workoutLogPage = workoutLogRepository.findByAssignmentId(assignmentId, pageable);
@@ -165,9 +155,7 @@ public class WorkoutLogServiceImpl implements IWorkoutLogService {
         if (SecurityUtils.isAdmin()) {
             workoutLogPage = workoutLogRepository.findByDateRangeForAdmin(fromDateTime, toDateTime, pageable);
         } else if (SecurityUtils.isTrainer()) {
-            String userId = SecurityUtils.getCurrentUserId();
-            TrainerProfile trainer = trainerProfileRepository.findTrainerProfileByUserId(userId)
-                    .orElseThrow(() -> new BusinessException(TRAINER_PROFILE_NOT_FOUND));
+            TrainerProfile trainer = getCurrentTrainerProfile();
             workoutLogPage = workoutLogRepository.findByDateRangeForTrainer(
                     fromDateTime,
                     toDateTime,
@@ -203,13 +191,21 @@ public class WorkoutLogServiceImpl implements IWorkoutLogService {
 
     private void validateTrainerAccessToWorkoutLog(WorkoutLog workoutLog) {
         if (!SecurityUtils.isTrainer()) return;
-        TrainerProfile trainer = getCurrentTrainerProfile();
+        if (workoutLog.getClientWorkoutPlan() == null) throw new BusinessException(WORKOUT_LOG_ACCESS_DENIED);
 
-        if (workoutLog.getClientWorkoutPlan() != null) {
-            String logTrainerId = workoutLog.getClientWorkoutPlan().getWorkoutPlan().getTrainer().getId();
-            if (!logTrainerId.equals(trainer.getId())) {
-                throw new BusinessException(WORKOUT_LOG_ACCESS_DENIED);
-            }
+        TrainerProfile trainer = getCurrentTrainerProfile();
+        String logTrainerId = workoutLog.getClientWorkoutPlan().getWorkoutPlan().getTrainer().getId();
+
+        if (!logTrainerId.equals(trainer.getId())) {
+            throw new BusinessException(WORKOUT_LOG_ACCESS_DENIED);
         }
+    }
+
+    private void validateTrainerAccessToAssignment(ClientWorkoutPlan assignment) {
+        if (!SecurityUtils.isTrainer()) return;
+        TrainerProfile trainer = getCurrentTrainerProfile();
+        String assignmentTrainerId = assignment.getWorkoutPlan().getTrainer().getId();
+
+        if (!assignmentTrainerId.equals(trainer.getId())) throw new BusinessException(WORKOUT_LOG_ACCESS_DENIED);
     }
 }
