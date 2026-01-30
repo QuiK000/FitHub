@@ -138,7 +138,15 @@ public class WorkoutLogServiceImpl implements IWorkoutLogService {
 
     @Override
     public PageResponse<WorkoutLogResponse> getLogsByExercise(String exerciseId, int page, int size) {
-        return null;
+        log.info("Fetching logs for exercise: {}, page: {}, size: {}", exerciseId, page, size);
+
+        exerciseRepository.findById(exerciseId)
+                .orElseThrow(() -> new BusinessException(EXERCISE_NOT_FOUND));
+
+        Pageable pageable = PaginationUtils.createPageRequest(page, size, "workoutDate");
+        Page<WorkoutLog> workoutLogPage = workoutLogRepository.findByExerciseId(exerciseId, pageable);
+
+        return PaginationUtils.toPageResponse(workoutLogPage, workoutLogMapper::toResponse);
     }
 
     @Override
