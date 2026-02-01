@@ -89,6 +89,12 @@ public class ClientProfile extends BaseEntity {
     @OneToMany(mappedBy = "client")
     private Set<ClientWorkoutPlan> workoutPlans = new HashSet<>();
 
+    @OneToMany(mappedBy = "client")
+    private Set<MealPlan> mealPlans = new HashSet<>();
+
+    @OneToMany(mappedBy = "client")
+    private Set<WaterIntake> waterIntakes = new HashSet<>();
+
     public void clearPersonalData() {
         this.firstname = null;
         this.lastname = null;
