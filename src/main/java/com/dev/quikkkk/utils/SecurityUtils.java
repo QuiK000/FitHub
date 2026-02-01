@@ -50,6 +50,10 @@ public class SecurityUtils {
         return currentUser().roles().contains("ROLE_TRAINER");
     }
 
+    public static boolean isClient() {
+        return currentUser().roles().contains("ROLE_CLIENT");
+    }
+
     @Transactional(readOnly = true)
     public boolean isPlanOwner(String planId) {
         if (isAdmin()) return true;
