@@ -19,7 +19,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
+import static com.dev.quikkkk.enums.ErrorCode.DUPLICATE_RESOURCE;
 import static com.dev.quikkkk.enums.ErrorCode.FOOD_NOT_FOUND;
 
 @Service
@@ -33,6 +35,13 @@ public class FoodServiceImpl implements IFoodService {
     @Override
     @Transactional
     public FoodResponse createFood(CreateFoodRequest request) {
+        if (StringUtils.hasText(request.getBarcode())
+                && foodRepository.existsByBarcodeAndActiveIsTrue(request.getBarcode())
+        ) throw new BusinessException(DUPLICATE_RESOURCE);
+
+        if (foodRepository.existsByNameAndBrandAndActiveIsTrue(request.getName(), request.getBrand()))
+            throw new BusinessException(DUPLICATE_RESOURCE);
+
         String userId = SecurityUtils.getCurrentUserId();
         Food food = foodMapper.toEntity(request, userId);
 
@@ -68,10 +77,12 @@ public class FoodServiceImpl implements IFoodService {
 
     @Override
     @Transactional(readOnly = true)
-    public FoodResponse searchFoodByQuery(String query) {
-        return foodRepository.findFoodByQuery(query)
-                .map(foodMapper::toResponse)
-                .orElseThrow(() -> new BusinessException(FOOD_NOT_FOUND));
+    public PageResponse<FoodResponse> searchFoodByQuery(String query, int page, int size) {
+        Pageable pageable = PaginationUtils.createPageRequest(page, size, "createdDate");
+        Page<Food> foodPage = foodRepository.findFoodByQuery(query, pageable);
+
+        foodPage.isEmpty();
+        return PaginationUtils.toPageResponse(foodPage, foodMapper::toResponse);
     }
 
     @Override
