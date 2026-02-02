@@ -80,8 +80,6 @@ public class FoodServiceImpl implements IFoodService {
     public PageResponse<FoodResponse> searchFoodByQuery(String query, int page, int size) {
         Pageable pageable = PaginationUtils.createPageRequest(page, size, "createdDate");
         Page<Food> foodPage = foodRepository.findFoodByQuery(query, pageable);
-
-        foodPage.isEmpty();
         return PaginationUtils.toPageResponse(foodPage, foodMapper::toResponse);
     }
 
