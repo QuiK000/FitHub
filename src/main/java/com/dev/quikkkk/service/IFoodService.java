@@ -15,7 +15,7 @@ public interface IFoodService {
 
     FoodResponse updateFoodById(String id, UpdateFoodRequest request);
 
-    FoodResponse searchFoodByQuery(String query);
+    PageResponse<FoodResponse> searchFoodByQuery(String query, int page, int size);
 
     FoodResponse getFoodByBarcode(String barcode);
 
