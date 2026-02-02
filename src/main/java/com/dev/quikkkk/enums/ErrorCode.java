@@ -98,6 +98,8 @@ public enum ErrorCode {
     WORKOUT_LOG_NOT_FOUND("WORKOUT_LOG_NOT_FOUND", "Workout Log Not Found", NOT_FOUND),
     WORKOUT_LOG_ACCESS_DENIED("WORKOUT_LOG_ACCESS_DENIED", "Access to this workout log is denied", FORBIDDEN),
     FOOD_NOT_FOUND("FOOD_NOT_FOUND", "Food Not Found", NOT_FOUND),
+    DUPLICATE_RESOURCE("DUPLICATE_RESOURCE", "Duplicate Resource", CONFLICT),
+    FORBIDDEN_ACCESS("FORBIDDEN_ACCESS", "Forbidden", FORBIDDEN),
     ;
 
     private final String code;
