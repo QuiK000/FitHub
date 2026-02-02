@@ -2,6 +2,7 @@ package com.dev.quikkkk.mapper;
 
 import com.dev.quikkkk.dto.request.CreateFoodRequest;
 import com.dev.quikkkk.dto.request.MacroNutrientsDto;
+import com.dev.quikkkk.dto.request.UpdateFoodRequest;
 import com.dev.quikkkk.dto.response.FoodResponse;
 import com.dev.quikkkk.entity.Food;
 import com.dev.quikkkk.entity.MacroNutrients;
@@ -51,5 +52,24 @@ public class FoodMapper {
                 .barcode(food.getBarcode())
                 .active(food.isActive())
                 .build();
+    }
+
+    public void update(Food food, String userId, UpdateFoodRequest request) {
+        if (request.getName() != null) food.setName(request.getName());
+        if (request.getBrand() != null) food.setBrand(request.getBrand());
+        if (request.getServingSize() != null) food.setServingSize(request.getServingSize());
+        if (request.getServingUnit() != null) food.setServingUnit(request.getServingUnit());
+        if (request.getCaloriesPerServing() != null) food.setCaloriesPerServing(request.getCaloriesPerServing());
+        if (request.getMacrosPerServing() != null) food.setMacrosPerServing(
+                MacroNutrients.builder()
+                        .protein(request.getMacrosPerServing().getProtein())
+                        .sugar(request.getMacrosPerServing().getSugar())
+                        .carbs(request.getMacrosPerServing().getCarbs())
+                        .fats(request.getMacrosPerServing().getFats())
+                        .fiber(request.getMacrosPerServing().getFiber())
+                        .build()
+        );
+        if (request.getBarcode() != null) food.setBarcode(request.getBarcode());
+        food.setLastModifiedBy(userId);
     }
 }
