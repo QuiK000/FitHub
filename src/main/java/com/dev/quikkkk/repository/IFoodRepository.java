@@ -25,7 +25,11 @@ public interface IFoodRepository extends JpaRepository<Food, String> {
                         OR LOWER(f.brand) LIKE LOWER(CONCAT('%', :query, '%'))
                 ) ORDER BY f.createdDate DESC
             """)
-    Optional<Food> findFoodByQuery(@Param("query") String query);
+    Page<Food> findFoodByQuery(@Param("query") String query, Pageable pageable);
 
     Optional<Food> findFoodByBarcodeAndActiveIsTrue(String barcode);
+
+    boolean existsByBarcodeAndActiveIsTrue(String barcode);
+
+    boolean existsByNameAndBrandAndActiveIsTrue(String name, String brand);
 }
