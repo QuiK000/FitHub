@@ -97,6 +97,7 @@ public enum ErrorCode {
     SESSION_CLOSED("SESSION_CLOSED", "Session closed", FORBIDDEN),
     WORKOUT_LOG_NOT_FOUND("WORKOUT_LOG_NOT_FOUND", "Workout Log Not Found", NOT_FOUND),
     WORKOUT_LOG_ACCESS_DENIED("WORKOUT_LOG_ACCESS_DENIED", "Access to this workout log is denied", FORBIDDEN),
+    FOOD_NOT_FOUND("FOOD_NOT_FOUND", "Food Not Found", NOT_FOUND),
     ;
 
     private final String code;
