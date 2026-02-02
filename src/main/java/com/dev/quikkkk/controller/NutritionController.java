@@ -46,8 +46,12 @@ public class NutritionController {
     }
 
     @GetMapping("/foods/search")
-    public ResponseEntity<FoodResponse> searchFood(@RequestParam String q) {
-        return ResponseEntity.ok(foodService.searchFoodByQuery(q));
+    public ResponseEntity<PageResponse<FoodResponse>> searchFood(
+            @RequestParam String q,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(foodService.searchFoodByQuery(q, page, size));
     }
 
     @GetMapping("/foods/barcode/{barcode}")
