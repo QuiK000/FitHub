@@ -14,49 +14,79 @@ public class MealPlanMapper {
         return MealPlan.builder()
                 .planDate(request.getPlanDate())
                 .targetCalories(request.getTargetCalories())
-                .targetMacros(request.getTargetMacros() != null
-                        ? MacroNutrients.builder()
-                        .protein(request.getTargetMacros().getProtein())
-                        .sugar(request.getTargetMacros().getSugar())
-                        .carbs(request.getTargetMacros().getCarbs())
-                        .fiber(request.getTargetMacros().getFiber())
-                        .fats(request.getTargetMacros().getFats())
-                        .build()
-                        : null
-                )
+                .targetMacros(mapToMacroNutrients(request.getTargetMacros()))
                 .notes(request.getNotes())
+                .totalCalories(0)
+                .macros(MacroNutrients.builder()
+                        .protein(0.0)
+                        .carbs(0.0)
+                        .fats(0.0)
+                        .fiber(0.0)
+                        .sugar(0.0)
+                        .build())
                 .client(client)
                 .createdBy(client.getId())
                 .build();
     }
 
     public MealPlanResponse toResponse(MealPlan mealPlan) {
+        Integer targetCalories = mealPlan.getTargetCalories();
+
+        int totalCalories = mealPlan.getTotalCalories() != null ? mealPlan.getTotalCalories() : 0;
+        double caloriesPercentage = 0.0;
+
+        if (targetCalories != null && targetCalories > 0)
+            caloriesPercentage = ((double) totalCalories / targetCalories) * 100;
+
         return MealPlanResponse.builder()
                 .id(mealPlan.getId())
                 .planDate(mealPlan.getPlanDate())
-                .totalCalories(mealPlan.getTotalCalories())
-                .targetCalories(mealPlan.getTargetCalories())
-                .macros(
-                        MacroNutrientsDto.builder()
-                                .protein(mealPlan.getMacros().getProtein() != null ? mealPlan.getMacros().getProtein() : null)
-                                .carbs(mealPlan.getMacros().getCarbs() != null ? mealPlan.getMacros().getCarbs() : null)
-                                .fiber(mealPlan.getMacros().getFiber() != null ? mealPlan.getMacros().getFiber() : null)
-                                .fats(mealPlan.getMacros().getFats() != null ? mealPlan.getMacros().getFats() : null)
-                                .sugar(mealPlan.getMacros().getSugar() != null ? mealPlan.getMacros().getSugar() : null)
-                                .build()
-                )
-                .targetMacros(
-                        MacroNutrientsDto.builder()
-                                .protein(mealPlan.getTargetMacros().getProtein() != null ? mealPlan.getTargetMacros().getProtein() : null)
-                                .carbs(mealPlan.getTargetMacros().getCarbs() != null ? mealPlan.getTargetMacros().getCarbs() : null)
-                                .fiber(mealPlan.getTargetMacros().getFiber() != null ? mealPlan.getTargetMacros().getFiber() : null)
-                                .fats(mealPlan.getTargetMacros().getFats() != null ? mealPlan.getTargetMacros().getFats() : null)
-                                .sugar(mealPlan.getTargetMacros().getSugar() != null ? mealPlan.getTargetMacros().getSugar() : null)
-                                .build())
+                .totalCalories(totalCalories)
+                .targetCalories(targetCalories)
+                .macros(mapToMacroNutrientsDto(mealPlan.getMacros()))
+                .targetMacros(mapToMacroNutrientsDto(mealPlan.getTargetMacros()))
                 .meals(null)
                 .notes(mealPlan.getNotes())
-                .caloriesPercentage(0.0)
-                .completed(false)
+                .caloriesPercentage(caloriesPercentage)
+                .completed(totalCalories >= (targetCalories != null ? targetCalories : Integer.MAX_VALUE))
+                .build();
+    }
+
+    private MacroNutrients mapToMacroNutrients(MacroNutrientsDto dto) {
+        if (dto == null)
+            return MacroNutrients.builder()
+                    .protein(0.0)
+                    .carbs(0.0)
+                    .fats(0.0)
+                    .fiber(0.0)
+                    .sugar(0.0)
+                    .build();
+
+        return MacroNutrients.builder()
+                .protein(dto.getProtein() != null ? dto.getProtein() : 0.0)
+                .carbs(dto.getCarbs() != null ? dto.getCarbs() : 0.0)
+                .fats(dto.getFats() != null ? dto.getFats() : 0.0)
+                .fiber(dto.getFiber() != null ? dto.getFiber() : 0.0)
+                .sugar(dto.getSugar() != null ? dto.getSugar() : 0.0)
+                .build();
+    }
+
+    private MacroNutrientsDto mapToMacroNutrientsDto(MacroNutrients macros) {
+        if (macros == null)
+            return MacroNutrientsDto.builder()
+                    .protein(0.0)
+                    .carbs(0.0)
+                    .fats(0.0)
+                    .fiber(0.0)
+                    .sugar(0.0)
+                    .build();
+
+        return MacroNutrientsDto.builder()
+                .protein(macros.getProtein() != null ? macros.getProtein() : 0.0)
+                .carbs(macros.getCarbs() != null ? macros.getCarbs() : 0.0)
+                .fats(macros.getFats() != null ? macros.getFats() : 0.0)
+                .fiber(macros.getFiber() != null ? macros.getFiber() : 0.0)
+                .sugar(macros.getSugar() != null ? macros.getSugar() : 0.0)
                 .build();
     }
 }
