@@ -17,13 +17,7 @@ public class MealPlanMapper {
                 .targetMacros(mapToMacroNutrients(request.getTargetMacros()))
                 .notes(request.getNotes())
                 .totalCalories(0)
-                .macros(MacroNutrients.builder()
-                        .protein(0.0)
-                        .carbs(0.0)
-                        .fats(0.0)
-                        .fiber(0.0)
-                        .sugar(0.0)
-                        .build())
+                .macros(createEmptyMacros())
                 .client(client)
                 .createdBy(client.getId())
                 .build();
@@ -38,6 +32,9 @@ public class MealPlanMapper {
         if (targetCalories != null && targetCalories > 0)
             caloriesPercentage = ((double) totalCalories / targetCalories) * 100;
 
+        boolean isCompleted = false;
+        if (targetCalories != null && targetCalories > 0)  isCompleted = totalCalories >= targetCalories;
+
         return MealPlanResponse.builder()
                 .id(mealPlan.getId())
                 .planDate(mealPlan.getPlanDate())
@@ -45,22 +42,15 @@ public class MealPlanMapper {
                 .targetCalories(targetCalories)
                 .macros(mapToMacroNutrientsDto(mealPlan.getMacros()))
                 .targetMacros(mapToMacroNutrientsDto(mealPlan.getTargetMacros()))
-                .meals(null)
+                .meals(null) // TODO
                 .notes(mealPlan.getNotes())
                 .caloriesPercentage(caloriesPercentage)
-                .completed(totalCalories >= (targetCalories != null ? targetCalories : Integer.MAX_VALUE))
+                .completed(isCompleted)
                 .build();
     }
 
     private MacroNutrients mapToMacroNutrients(MacroNutrientsDto dto) {
-        if (dto == null)
-            return MacroNutrients.builder()
-                    .protein(0.0)
-                    .carbs(0.0)
-                    .fats(0.0)
-                    .fiber(0.0)
-                    .sugar(0.0)
-                    .build();
+        if (dto == null) return createEmptyMacros();
 
         return MacroNutrients.builder()
                 .protein(dto.getProtein() != null ? dto.getProtein() : 0.0)
@@ -87,6 +77,16 @@ public class MealPlanMapper {
                 .fats(macros.getFats() != null ? macros.getFats() : 0.0)
                 .fiber(macros.getFiber() != null ? macros.getFiber() : 0.0)
                 .sugar(macros.getSugar() != null ? macros.getSugar() : 0.0)
+                .build();
+    }
+
+    private MacroNutrients createEmptyMacros() {
+        return MacroNutrients.builder()
+                .protein(0.0)
+                .carbs(0.0)
+                .fats(0.0)
+                .fiber(0.0)
+                .sugar(0.0)
                 .build();
     }
 }
