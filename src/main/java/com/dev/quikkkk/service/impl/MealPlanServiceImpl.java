@@ -41,8 +41,11 @@ public class MealPlanServiceImpl implements IMealPlanService {
 
         MealPlan mealPlan = mealPlanMapper.toEntity(request, client);
         mealPlanRepository.save(mealPlan);
+        log.info(
+                "Meal plan created: {} for client: {} for date: {}",
+                mealPlan.getId(), client.getId(), mealPlan.getPlanDate()
+        );
 
-        log.info("Meal plan created: {} for date: {}", mealPlan.getId(), mealPlan.getPlanDate());
         return mealPlanMapper.toResponse(mealPlan);
     }
 
