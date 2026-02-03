@@ -69,6 +69,15 @@ public class NutritionController {
         return ResponseEntity.ok(foodService.getFoodByBarcode(barcode));
     }
 
+    @GetMapping("/meal-plans")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<PageResponse<MealPlanResponse>> getMyMealPlans(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(mealPlanService.getMyMealPlans(page, size));
+    }
+
     @PutMapping("/foods/{food-id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<FoodResponse> updateFoodById(
