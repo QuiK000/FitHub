@@ -1,11 +1,14 @@
 package com.dev.quikkkk.controller;
 
 import com.dev.quikkkk.dto.request.CreateFoodRequest;
+import com.dev.quikkkk.dto.request.CreateMealPlanRequest;
 import com.dev.quikkkk.dto.request.UpdateFoodRequest;
 import com.dev.quikkkk.dto.response.FoodResponse;
+import com.dev.quikkkk.dto.response.MealPlanResponse;
 import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.service.IFoodService;
+import com.dev.quikkkk.service.IMealPlanService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -25,11 +28,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class NutritionController {
     private final IFoodService foodService;
+    private final IMealPlanService mealPlanService;
 
     @PostMapping("/foods")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<FoodResponse> createFood(@Valid @RequestBody CreateFoodRequest request) {
         return ResponseEntity.ok(foodService.createFood(request));
+    }
+
+    @PostMapping("/meal-plans")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<MealPlanResponse> createMealPlan(@Valid @RequestBody CreateMealPlanRequest request) {
+        return ResponseEntity.ok(mealPlanService.createMealPlan(request));
     }
 
     @GetMapping("/foods")
