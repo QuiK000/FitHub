@@ -15,7 +15,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 import static com.dev.quikkkk.enums.ErrorCode.CLIENT_PROFILE_NOT_FOUND;
+import static com.dev.quikkkk.enums.ErrorCode.DUPLICATE_RESOURCE;
 
 @Service
 @RequiredArgsConstructor
@@ -28,12 +31,24 @@ public class MealPlanServiceImpl implements IMealPlanService {
     @Override
     @Transactional
     public MealPlanResponse createMealPlan(CreateMealPlanRequest request) {
-        String userId = SecurityUtils.getCurrentUserId();
-        ClientProfile client = clientProfileRepository.findByUserId(userId)
-                .orElseThrow(() -> new BusinessException(CLIENT_PROFILE_NOT_FOUND));
-        MealPlan mealPlan = mealPlanMapper.toEntity(request, client);
+        ClientProfile client = getCurrentClientProfile();
+        Optional<MealPlan> existing = mealPlanRepository.findByClientIdAndPlanDate(client.getId(), request.getPlanDate());
 
+        if (existing.isPresent()) {
+            log.warn("Meal plan already exists for date: {}", request.getPlanDate());
+            throw new BusinessException(DUPLICATE_RESOURCE);
+        }
+
+        MealPlan mealPlan = mealPlanMapper.toEntity(request, client);
         mealPlanRepository.save(mealPlan);
+
+        log.info("Meal plan created: {} for date: {}", mealPlan.getId(), mealPlan.getPlanDate());
         return mealPlanMapper.toResponse(mealPlan);
+    }
+
+    private ClientProfile getCurrentClientProfile() {
+        String userId = SecurityUtils.getCurrentUserId();
+        return clientProfileRepository.findByUserId(userId)
+                .orElseThrow(() -> new BusinessException(CLIENT_PROFILE_NOT_FOUND));
     }
 }
