@@ -1,6 +1,8 @@
 package com.dev.quikkkk.repository;
 
 import com.dev.quikkkk.entity.MealPlan;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,4 +18,6 @@ public interface IMealPlanRepository extends JpaRepository<MealPlan, String> {
             @Param("clientId") String clientId,
             @Param("planDate") LocalDate planDate
     );
+
+    Page<MealPlan> findByClientIdOrderByPlanDateDesc(String id, Pageable pageable);
 }
