@@ -91,6 +91,16 @@ public class MealPlanServiceImpl implements IMealPlanService {
 
     @Override
     @Transactional(readOnly = true)
+    public MealPlanResponse getMealPlanByDate(LocalDate date) {
+        ClientProfile client = getCurrentClientProfile();
+
+        return mealPlanRepository.findByClientIdAndPlanDate(client.getId(), date)
+                .map(mealPlanMapper::toResponse)
+                .orElseThrow(() -> new BusinessException(MEAL_PLAN_NOT_FOUND));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public MealPlanResponse getMealPlanById(String mealPlanId) {
         MealPlan mealPlan = getMealPlanOrThrow(mealPlanId);
         validateAccess(mealPlan);
