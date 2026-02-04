@@ -2,6 +2,7 @@ package com.dev.quikkkk.mapper;
 
 import com.dev.quikkkk.dto.request.CreateMealPlanRequest;
 import com.dev.quikkkk.dto.request.MacroNutrientsDto;
+import com.dev.quikkkk.dto.request.UpdateMealPlanRequest;
 import com.dev.quikkkk.dto.response.MealPlanResponse;
 import com.dev.quikkkk.entity.ClientProfile;
 import com.dev.quikkkk.entity.MacroNutrients;
@@ -47,6 +48,12 @@ public class MealPlanMapper {
                 .caloriesPercentage(caloriesPercentage)
                 .completed(isCompleted)
                 .build();
+    }
+
+    public void update(MealPlan mealPlan, UpdateMealPlanRequest request) {
+        if (request.getTargetCalories() != null) mealPlan.setTargetCalories(request.getTargetCalories());
+        if (request.getTargetMacros() != null) mealPlan.setTargetMacros(mapToMacroNutrients(request.getTargetMacros()));
+        if (request.getNotes() != null) mealPlan.setNotes(request.getNotes());
     }
 
     private MacroNutrients mapToMacroNutrients(MacroNutrientsDto dto) {
