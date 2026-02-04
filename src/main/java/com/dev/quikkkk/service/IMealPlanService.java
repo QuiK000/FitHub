@@ -14,6 +14,8 @@ public interface IMealPlanService {
 
     PageResponse<MealPlanResponse> getMealPlansByDateRange(LocalDate startDate, LocalDate endDate);
 
+    MealPlanResponse getMealPlanByDate(LocalDate date);
+
     MealPlanResponse getMealPlanById(String mealPlanId);
 
     MealPlanResponse updateMealPlan(UpdateMealPlanRequest request, String mealPlanId);
