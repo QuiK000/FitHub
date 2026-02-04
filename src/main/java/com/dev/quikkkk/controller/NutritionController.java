@@ -12,6 +12,7 @@ import com.dev.quikkkk.service.IFoodService;
 import com.dev.quikkkk.service.IMealPlanService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -87,13 +88,21 @@ public class NutritionController {
         return ResponseEntity.ok(mealPlanService.getMealPlanById(mealPlanId));
     }
 
-    @GetMapping("/meal-plans/date")
+    @GetMapping("/meal-plans/weekly")
     @PreAuthorize("hasRole('CLIENT')")
-    public ResponseEntity<PageResponse<MealPlanResponse>> getMealPlanByDate(
-            @RequestParam LocalDate start,
-            @RequestParam LocalDate end
+    public ResponseEntity<PageResponse<MealPlanResponse>> getWeeklyMealPlans(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate
     ) {
-        return ResponseEntity.ok(mealPlanService.getMealPlansByDateRange(start, end));
+        LocalDate endDate = startDate.plusDays(6);
+        return ResponseEntity.ok(mealPlanService.getMealPlansByDateRange(startDate, endDate));
+    }
+
+    @GetMapping("/meal-plans/date/{date}")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<MealPlanResponse> getMealPlanByDate(
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+    ) {
+        return ResponseEntity.ok(mealPlanService.getMealPlanByDate(date));
     }
 
     @PutMapping("/foods/{food-id}")
