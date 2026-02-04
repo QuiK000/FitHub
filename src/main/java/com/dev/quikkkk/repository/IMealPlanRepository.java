@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -20,4 +21,15 @@ public interface IMealPlanRepository extends JpaRepository<MealPlan, String> {
     );
 
     Page<MealPlan> findByClientIdOrderByPlanDateDesc(String id, Pageable pageable);
+
+    @Query("""
+            FROM MealPlan mp WHERE mp.client.id = :clientId
+            AND mp.planDate BETWEEN :startDate AND :endDate
+            ORDER BY mp.planDate ASC
+            """)
+    List<MealPlan> findByClientIdAndDateRange(
+            @Param("clientId") String clientId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
 }
