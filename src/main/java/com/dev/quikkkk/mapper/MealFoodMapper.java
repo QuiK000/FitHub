@@ -9,18 +9,31 @@ import org.springframework.stereotype.Service;
 @Service
 public class MealFoodMapper {
     public MealFood toEntity(Food food, MealFoodRequest request) {
+        MacroNutrients foodMacros = food.getMacrosPerServing() != null
+                ? food.getMacrosPerServing()
+                : new MacroNutrients();
+
+        Integer calories = food.getCaloriesPerServing() != null ? food.getCaloriesPerServing() : 0;
+
         return MealFood.builder()
                 .food(food)
-                .totalCalories(food.getCaloriesPerServing() * request.getServings())
+                .servings(request.getServings())
+                .totalCalories((int) (calories * request.getServings()))
                 .totalMacros(
                         MacroNutrients.builder()
-                                .protein(food.getMacrosPerServing().getProtein() * request.getServings())
-                                .carbs(food.getMacrosPerServing().getCarbs() * request.getServings())
-                                .fats(food.getMacrosPerServing().getFats() * request.getServings())
-                                .sugar(food.getMacrosPerServing().getSugar() * request.getServings())
-                                .fiber(food.getMacrosPerServing().getFiber() * request.getServings())
+                                .protein(safeMultiply(foodMacros.getProtein(), request.getServings()))
+                                .carbs(safeMultiply(foodMacros.getCarbs(), request.getServings()))
+                                .fats(safeMultiply(foodMacros.getFats(), request.getServings()))
+                                .sugar(safeMultiply(foodMacros.getSugar(), request.getServings()))
+                                .fiber(safeMultiply(foodMacros.getFiber(), request.getServings()))
                                 .build()
                 )
                 .build();
+    }
+
+    private Double safeMultiply(Double value, Double multiplier) {
+        if (value == null) return 0.0;
+        if (multiplier == null) return 0.0;
+        return value * multiplier;
     }
 }
