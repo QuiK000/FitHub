@@ -14,11 +14,11 @@ public class MealFoodMapper {
                 .totalCalories(food.getCaloriesPerServing() * request.getServings())
                 .totalMacros(
                         MacroNutrients.builder()
-                                .protein(food.getMacrosPerServing().getProtein() *  request.getServings())
-                                .carbs(food.getMacrosPerServing().getCarbs() *  request.getServings())
-                                .fats(food.getMacrosPerServing().getFats() *  request.getServings())
-                                .sugar(food.getMacrosPerServing().getSugar() *  request.getServings())
-                                .fiber(food.getMacrosPerServing().getFiber() *  request.getServings())
+                                .protein(food.getMacrosPerServing().getProtein() * request.getServings())
+                                .carbs(food.getMacrosPerServing().getCarbs() * request.getServings())
+                                .fats(food.getMacrosPerServing().getFats() * request.getServings())
+                                .sugar(food.getMacrosPerServing().getSugar() * request.getServings())
+                                .fiber(food.getMacrosPerServing().getFiber() * request.getServings())
                                 .build()
                 )
                 .build();
