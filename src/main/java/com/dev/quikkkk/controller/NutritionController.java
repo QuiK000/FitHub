@@ -50,11 +50,11 @@ public class NutritionController {
         return ResponseEntity.ok(mealPlanService.createMealPlan(request));
     }
 
-    @PostMapping("/meal-plans/{plan-id}/meals")
+    @PostMapping("/meal-plans/{meal-plan-id}/meals")
     @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<MealResponse> createMeal(
             @Valid @RequestBody CreateMealRequest request,
-            @PathVariable("plan-id") String planId
+            @PathVariable("meal-plan-id") String planId
     ) {
         return ResponseEntity.ok(mealService.createMeal(request, planId));
     }
