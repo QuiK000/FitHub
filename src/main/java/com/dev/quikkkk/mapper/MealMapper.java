@@ -8,12 +8,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class MealMapper {
-    public Meal toEntity(CreateMealRequest request) {
+    public Meal toEntity(CreateMealRequest request, String userId) {
         return Meal.builder()
                 .name(request.getName())
                 .description(request.getDescription())
                 .type(request.getMealType())
                 .mealTime(request.getMealTime())
+                .createdBy(userId)
                 .build();
     }
 
