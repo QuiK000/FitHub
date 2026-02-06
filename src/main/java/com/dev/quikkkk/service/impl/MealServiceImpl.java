@@ -14,7 +14,6 @@ import com.dev.quikkkk.mapper.MealFoodMapper;
 import com.dev.quikkkk.mapper.MealMapper;
 import com.dev.quikkkk.repository.IClientProfileRepository;
 import com.dev.quikkkk.repository.IFoodRepository;
-import com.dev.quikkkk.repository.IMealFoodRepository;
 import com.dev.quikkkk.repository.IMealPlanRepository;
 import com.dev.quikkkk.repository.IMealRepository;
 import com.dev.quikkkk.service.IMealService;
@@ -39,17 +38,17 @@ public class MealServiceImpl implements IMealService {
     private final IMealPlanRepository mealPlanRepository;
     private final IClientProfileRepository clientProfileRepository;
     private final IFoodRepository foodRepository;
-    private final IMealFoodRepository mealFoodRepository;
     private final MealMapper mealMapper;
     private final MealFoodMapper mealFoodMapper;
 
     @Override
     @Transactional
     public MealResponse createMeal(CreateMealRequest request, String mealPlanId) {
+        String userId = SecurityUtils.getCurrentUserId();
         MealPlan mealPlan = getMealPlanOrThrow(mealPlanId);
         validateAccess(mealPlan);
 
-        Meal meal = mealMapper.toEntity(request);
+        Meal meal = mealMapper.toEntity(request, userId);
 
         meal.setMealPlan(mealPlan);
         meal.setCompleted(false);
@@ -61,12 +60,14 @@ public class MealServiceImpl implements IMealService {
             MealFood mealFood = mealFoodMapper.toEntity(food, foodRequest);
 
             mealFood.setMeal(meal);
+            mealFood.setCreatedBy(userId);
             meal.getFoods().add(mealFood);
         }
 
         calculateMealNutrition(meal);
         Meal savedMeal = mealRepository.save(meal);
 
+        mealPlan.getMeals().add(meal);
         updateMealPlanStatistics(mealPlan);
         mealPlanRepository.save(mealPlan);
 
