@@ -2,14 +2,17 @@ package com.dev.quikkkk.controller;
 
 import com.dev.quikkkk.dto.request.CreateFoodRequest;
 import com.dev.quikkkk.dto.request.CreateMealPlanRequest;
+import com.dev.quikkkk.dto.request.CreateMealRequest;
 import com.dev.quikkkk.dto.request.UpdateFoodRequest;
 import com.dev.quikkkk.dto.request.UpdateMealPlanRequest;
 import com.dev.quikkkk.dto.response.FoodResponse;
 import com.dev.quikkkk.dto.response.MealPlanResponse;
+import com.dev.quikkkk.dto.response.MealResponse;
 import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.service.IFoodService;
 import com.dev.quikkkk.service.IMealPlanService;
+import com.dev.quikkkk.service.IMealService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -33,6 +36,7 @@ import java.time.LocalDate;
 public class NutritionController {
     private final IFoodService foodService;
     private final IMealPlanService mealPlanService;
+    private final IMealService mealService;
 
     @PostMapping("/foods")
     @PreAuthorize("hasRole('ADMIN')")
@@ -44,6 +48,15 @@ public class NutritionController {
     @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<MealPlanResponse> createMealPlan(@Valid @RequestBody CreateMealPlanRequest request) {
         return ResponseEntity.ok(mealPlanService.createMealPlan(request));
+    }
+
+    @PostMapping("/meal-plans/{plan-id}/meals")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<MealResponse> createMeal(
+            @Valid @RequestBody CreateMealRequest request,
+            @PathVariable("plan-id") String planId
+    ) {
+        return ResponseEntity.ok(mealService.createMeal(request, planId));
     }
 
     @GetMapping("/foods")
