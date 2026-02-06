@@ -18,5 +18,5 @@ public class MealFoodRequest {
     private String foodId;
 
     @Positive(message = "VALIDATION.MEAL_FOOD.SERVINGS.POSITIVE")
-    private Integer servings;
+    private Double servings;
 }
