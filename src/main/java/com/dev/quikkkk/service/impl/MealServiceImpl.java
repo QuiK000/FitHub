@@ -31,6 +31,7 @@ import java.util.Set;
 import static com.dev.quikkkk.enums.ErrorCode.CLIENT_PROFILE_NOT_FOUND;
 import static com.dev.quikkkk.enums.ErrorCode.FOOD_NOT_FOUND;
 import static com.dev.quikkkk.enums.ErrorCode.FORBIDDEN_ACCESS;
+import static com.dev.quikkkk.enums.ErrorCode.MEAL_ALREADY_COMPLETED;
 import static com.dev.quikkkk.enums.ErrorCode.MEAL_NOT_FOUND;
 import static com.dev.quikkkk.enums.ErrorCode.MEAL_PLAN_NOT_FOUND;
 
@@ -94,6 +95,8 @@ public class MealServiceImpl implements IMealService {
     public MessageResponse completeMealById(String mealId) {
         Meal meal = getMealOrThrow(mealId);
         validateAccess(meal);
+
+        if (meal.isCompleted()) throw new BusinessException(MEAL_ALREADY_COMPLETED);
 
         meal.setCompleted(true);
         meal.setLastModifiedBy(meal.getCreatedBy());
