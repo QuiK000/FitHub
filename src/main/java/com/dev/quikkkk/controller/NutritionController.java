@@ -5,6 +5,7 @@ import com.dev.quikkkk.dto.request.CreateMealPlanRequest;
 import com.dev.quikkkk.dto.request.CreateMealRequest;
 import com.dev.quikkkk.dto.request.UpdateFoodRequest;
 import com.dev.quikkkk.dto.request.UpdateMealPlanRequest;
+import com.dev.quikkkk.dto.request.UpdateMealRequest;
 import com.dev.quikkkk.dto.response.FoodResponse;
 import com.dev.quikkkk.dto.response.MealPlanResponse;
 import com.dev.quikkkk.dto.response.MealResponse;
@@ -134,6 +135,15 @@ public class NutritionController {
             @Valid @RequestBody UpdateMealPlanRequest request
     ) {
         return ResponseEntity.ok(mealPlanService.updateMealPlan(request, mealPlanId));
+    }
+
+    @PutMapping("/meals/{meal-id}")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<MealResponse> updateMealById(
+            @PathVariable("meal-id") String mealId,
+            @Valid @RequestBody UpdateMealRequest request
+    ) {
+        return ResponseEntity.ok(mealService.updateMeal(mealId, request));
     }
 
     @PatchMapping("/foods/{food-id}/deactivate")
