@@ -2,7 +2,9 @@ package com.dev.quikkkk.service.impl;
 
 import com.dev.quikkkk.dto.request.CreateMealRequest;
 import com.dev.quikkkk.dto.request.MealFoodRequest;
+import com.dev.quikkkk.dto.request.UpdateMealRequest;
 import com.dev.quikkkk.dto.response.MealResponse;
+import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.entity.ClientProfile;
 import com.dev.quikkkk.entity.Food;
 import com.dev.quikkkk.entity.MacroNutrients;
@@ -12,6 +14,7 @@ import com.dev.quikkkk.entity.MealPlan;
 import com.dev.quikkkk.exception.BusinessException;
 import com.dev.quikkkk.mapper.MealFoodMapper;
 import com.dev.quikkkk.mapper.MealMapper;
+import com.dev.quikkkk.mapper.MessageMapper;
 import com.dev.quikkkk.repository.IClientProfileRepository;
 import com.dev.quikkkk.repository.IFoodRepository;
 import com.dev.quikkkk.repository.IMealPlanRepository;
@@ -28,6 +31,7 @@ import java.util.Set;
 import static com.dev.quikkkk.enums.ErrorCode.CLIENT_PROFILE_NOT_FOUND;
 import static com.dev.quikkkk.enums.ErrorCode.FOOD_NOT_FOUND;
 import static com.dev.quikkkk.enums.ErrorCode.FORBIDDEN_ACCESS;
+import static com.dev.quikkkk.enums.ErrorCode.MEAL_NOT_FOUND;
 import static com.dev.quikkkk.enums.ErrorCode.MEAL_PLAN_NOT_FOUND;
 
 @Service
@@ -40,6 +44,7 @@ public class MealServiceImpl implements IMealService {
     private final IFoodRepository foodRepository;
     private final MealMapper mealMapper;
     private final MealFoodMapper mealFoodMapper;
+    private final MessageMapper messageMapper;
 
     @Override
     @Transactional
@@ -74,6 +79,29 @@ public class MealServiceImpl implements IMealService {
         return mealMapper.toResponse(savedMeal);
     }
 
+    @Override
+    @Transactional // TODO
+    public MealResponse updateMeal(String mealId, UpdateMealRequest request) {
+        String userId = SecurityUtils.getCurrentUserId();
+        Meal meal = getMealOrThrow(mealId);
+
+
+        return null;
+    }
+
+    @Override
+    @Transactional
+    public MessageResponse completeMealById(String mealId) {
+        Meal meal = getMealOrThrow(mealId);
+        validateAccess(meal);
+
+        meal.setCompleted(true);
+        meal.setLastModifiedBy(meal.getCreatedBy());
+
+        mealRepository.save(meal);
+        return messageMapper.message("Meal was successfully completed");
+    }
+
     private ClientProfile getCurrentClientProfile() {
         String userId = SecurityUtils.getCurrentUserId();
         return clientProfileRepository.findByUserId(userId)
@@ -85,10 +113,22 @@ public class MealServiceImpl implements IMealService {
                 .orElseThrow(() -> new BusinessException(MEAL_PLAN_NOT_FOUND));
     }
 
+    private Meal getMealOrThrow(String id) {
+        return mealRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(MEAL_NOT_FOUND));
+    }
+
     private void validateAccess(MealPlan mealPlan) {
         ClientProfile client = getCurrentClientProfile();
         if (!mealPlan.getClient().getId().equals(client.getId())) {
             log.warn("Access denied for meal plan: {} for user: {}", mealPlan.getId(), client.getId());
+            throw new BusinessException(FORBIDDEN_ACCESS);
+        }
+    }
+
+    private void validateAccess(Meal meal) {
+        String userId = SecurityUtils.getCurrentUserId();
+        if (!meal.getCreatedBy().equals(userId)) {
             throw new BusinessException(FORBIDDEN_ACCESS);
         }
     }
