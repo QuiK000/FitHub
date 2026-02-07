@@ -100,7 +100,9 @@ public enum ErrorCode {
     FOOD_NOT_FOUND("FOOD_NOT_FOUND", "Food Not Found", NOT_FOUND),
     DUPLICATE_RESOURCE("DUPLICATE_RESOURCE", "Duplicate Resource", CONFLICT),
     FORBIDDEN_ACCESS("FORBIDDEN_ACCESS", "Forbidden", FORBIDDEN),
-    MEAL_PLAN_NOT_FOUND("MEAL_PLAN_NOT_FOUND", "Meal plan Not Found", NOT_FOUND),;
+    MEAL_PLAN_NOT_FOUND("MEAL_PLAN_NOT_FOUND", "Meal plan Not Found", NOT_FOUND),
+    MEAL_NOT_FOUND("MEAL_NOT_FOUND", "Meal not Found", NOT_FOUND),
+    ;
 
     private final String code;
     private final String defaultMessage;
