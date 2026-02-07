@@ -41,7 +41,7 @@ public class MealPlanMapper {
             caloriesPercentage = ((double) totalCalories / targetCalories) * 100;
 
         boolean isCompleted = false;
-        if (targetCalories != null && targetCalories > 0)  isCompleted = totalCalories >= targetCalories;
+        if (targetCalories != null && targetCalories > 0) isCompleted = totalCalories >= targetCalories;
 
         return MealPlanResponse.builder()
                 .id(mealPlan.getId())
@@ -92,7 +92,13 @@ public class MealPlanMapper {
                         .build())
                 .servings(mealFood.getServings())
                 .totalCalories(mealFood.getTotalCalories())
-                .totalMacros(null) // TODO
+                .totalMacros(MacroNutrientsDto.builder()
+                        .protein(mealFood.getTotalMacros().getProtein())
+                        .fats(mealFood.getTotalMacros().getFats())
+                        .fiber(mealFood.getTotalMacros().getFiber())
+                        .sugar(mealFood.getTotalMacros().getSugar())
+                        .carbs(mealFood.getTotalMacros().getCarbs())
+                        .build())
                 .build();
     }
 
