@@ -1,5 +1,6 @@
 package com.dev.quikkkk.dto.response;
 
+import com.dev.quikkkk.dto.request.MacroNutrientsDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,5 +17,5 @@ public class MealFoodResponse {
     private FoodShortResponse food;
     private Double servings;
     private Integer totalCalories;
-    private Integer totalMacros;
+    private MacroNutrientsDto totalMacros;
 }
