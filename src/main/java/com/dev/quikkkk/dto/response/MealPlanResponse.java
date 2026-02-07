@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -22,7 +22,7 @@ public class MealPlanResponse {
     private Integer targetCalories;
     private MacroNutrientsDto macros;
     private MacroNutrientsDto targetMacros;
-    private List<MealResponse> meals;
+    private Set<MealResponse> meals;
     private String notes;
     private Double caloriesPercentage;
     private boolean completed;
