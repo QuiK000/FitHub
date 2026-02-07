@@ -102,6 +102,7 @@ public enum ErrorCode {
     FORBIDDEN_ACCESS("FORBIDDEN_ACCESS", "Forbidden", FORBIDDEN),
     MEAL_PLAN_NOT_FOUND("MEAL_PLAN_NOT_FOUND", "Meal plan Not Found", NOT_FOUND),
     MEAL_NOT_FOUND("MEAL_NOT_FOUND", "Meal not Found", NOT_FOUND),
+    MEAL_ALREADY_COMPLETED("MEAL_ALREADY_COMPLETED", "Meal Already Completed", BAD_REQUEST),
     ;
 
     private final String code;
