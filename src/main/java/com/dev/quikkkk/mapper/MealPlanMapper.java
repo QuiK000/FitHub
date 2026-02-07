@@ -3,11 +3,18 @@ package com.dev.quikkkk.mapper;
 import com.dev.quikkkk.dto.request.CreateMealPlanRequest;
 import com.dev.quikkkk.dto.request.MacroNutrientsDto;
 import com.dev.quikkkk.dto.request.UpdateMealPlanRequest;
+import com.dev.quikkkk.dto.response.FoodShortResponse;
+import com.dev.quikkkk.dto.response.MealFoodResponse;
 import com.dev.quikkkk.dto.response.MealPlanResponse;
+import com.dev.quikkkk.dto.response.MealResponse;
 import com.dev.quikkkk.entity.ClientProfile;
 import com.dev.quikkkk.entity.MacroNutrients;
+import com.dev.quikkkk.entity.Meal;
+import com.dev.quikkkk.entity.MealFood;
 import com.dev.quikkkk.entity.MealPlan;
 import org.springframework.stereotype.Service;
+
+import java.util.stream.Collectors;
 
 @Service
 public class MealPlanMapper {
@@ -43,7 +50,9 @@ public class MealPlanMapper {
                 .targetCalories(targetCalories)
                 .macros(mapToMacroNutrientsDto(mealPlan.getMacros()))
                 .targetMacros(mapToMacroNutrientsDto(mealPlan.getTargetMacros()))
-                .meals(null) // TODO
+                .meals(mealPlan.getMeals().stream()
+                        .map(this::toMealResponse)
+                        .collect(Collectors.toSet()))
                 .notes(mealPlan.getNotes())
                 .caloriesPercentage(caloriesPercentage)
                 .completed(isCompleted)
@@ -54,6 +63,37 @@ public class MealPlanMapper {
         if (request.getTargetCalories() != null) mealPlan.setTargetCalories(request.getTargetCalories());
         if (request.getTargetMacros() != null) mealPlan.setTargetMacros(mapToMacroNutrients(request.getTargetMacros()));
         if (request.getNotes() != null) mealPlan.setNotes(request.getNotes());
+    }
+
+    private MealResponse toMealResponse(Meal meal) {
+        return MealResponse.builder()
+                .id(meal.getId())
+                .mealType(meal.getType())
+                .mealTime(meal.getMealTime())
+                .name(meal.getName())
+                .description(meal.getDescription())
+                .calories(meal.getCalories())
+                .macros(mapToMacroNutrientsDto(meal.getMacros()))
+                .foods(meal.getFoods().stream()
+                        .map(this::toMealFoodResponse)
+                        .toList())
+                .completed(meal.isCompleted())
+                .build();
+    }
+
+    private MealFoodResponse toMealFoodResponse(MealFood mealFood) {
+        return MealFoodResponse.builder()
+                .id(mealFood.getId())
+                .food(FoodShortResponse.builder()
+                        .id(mealFood.getFood().getId())
+                        .name(mealFood.getFood().getName())
+                        .brand(mealFood.getFood().getBrand())
+                        .servingUnit(mealFood.getFood().getServingUnit())
+                        .build())
+                .servings(mealFood.getServings())
+                .totalCalories(mealFood.getTotalCalories())
+                .totalMacros(null) // TODO
+                .build();
     }
 
     private MacroNutrients mapToMacroNutrients(MacroNutrientsDto dto) {
