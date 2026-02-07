@@ -81,13 +81,24 @@ public class MealServiceImpl implements IMealService {
     }
 
     @Override
-    @Transactional // TODO
+    @Transactional
     public MealResponse updateMeal(String mealId, UpdateMealRequest request) {
         String userId = SecurityUtils.getCurrentUserId();
         Meal meal = getMealOrThrow(mealId);
+        validateAccess(meal);
 
+        if (meal.isCompleted()) throw new BusinessException(MEAL_ALREADY_COMPLETED);
 
-        return null;
+        mealMapper.update(request, meal, userId);
+        calculateMealNutrition(meal);
+
+        Meal savedMeal = mealRepository.save(meal);
+        MealPlan mealPlan = meal.getMealPlan();
+
+        updateMealPlanStatistics(mealPlan);
+        mealPlanRepository.save(mealPlan);
+
+        return mealMapper.toResponse(savedMeal);
     }
 
     @Override
