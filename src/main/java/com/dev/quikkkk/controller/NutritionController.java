@@ -141,4 +141,10 @@ public class NutritionController {
     public ResponseEntity<MessageResponse> deactivateFoodById(@PathVariable("food-id") String foodId) {
         return ResponseEntity.ok(foodService.deactivateFood(foodId));
     }
+
+    @PatchMapping("/meals/{meal-id}/complete")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<MessageResponse> completeMealById(@PathVariable("meal-id") String mealId) {
+        return ResponseEntity.ok(mealService.completeMealById(mealId));
+    }
 }
