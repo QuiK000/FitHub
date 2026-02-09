@@ -3,6 +3,7 @@ package com.dev.quikkkk.controller;
 import com.dev.quikkkk.dto.request.CreateFoodRequest;
 import com.dev.quikkkk.dto.request.CreateMealPlanRequest;
 import com.dev.quikkkk.dto.request.CreateMealRequest;
+import com.dev.quikkkk.dto.request.LogWaterIntakeRequest;
 import com.dev.quikkkk.dto.request.UpdateFoodRequest;
 import com.dev.quikkkk.dto.request.UpdateMealPlanRequest;
 import com.dev.quikkkk.dto.request.UpdateMealRequest;
@@ -11,9 +12,11 @@ import com.dev.quikkkk.dto.response.MealPlanResponse;
 import com.dev.quikkkk.dto.response.MealResponse;
 import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.dto.response.PageResponse;
+import com.dev.quikkkk.dto.response.WaterIntakeResponse;
 import com.dev.quikkkk.service.IFoodService;
 import com.dev.quikkkk.service.IMealPlanService;
 import com.dev.quikkkk.service.IMealService;
+import com.dev.quikkkk.service.IWaterIntakeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -38,6 +41,7 @@ public class NutritionController {
     private final IFoodService foodService;
     private final IMealPlanService mealPlanService;
     private final IMealService mealService;
+    private final IWaterIntakeService waterIntakeService;
 
     @PostMapping("/foods")
     @PreAuthorize("hasRole('ADMIN')")
@@ -58,6 +62,12 @@ public class NutritionController {
             @PathVariable("meal-plan-id") String planId
     ) {
         return ResponseEntity.ok(mealService.createMeal(request, planId));
+    }
+
+    @PostMapping("/water-intake")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<WaterIntakeResponse> createWaterIntake(@Valid @RequestBody LogWaterIntakeRequest request) {
+        return ResponseEntity.ok(waterIntakeService.createWaterIntake(request));
     }
 
     @GetMapping("/foods")
