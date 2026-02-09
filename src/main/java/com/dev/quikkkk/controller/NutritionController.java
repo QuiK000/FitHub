@@ -7,6 +7,7 @@ import com.dev.quikkkk.dto.request.LogWaterIntakeRequest;
 import com.dev.quikkkk.dto.request.UpdateFoodRequest;
 import com.dev.quikkkk.dto.request.UpdateMealPlanRequest;
 import com.dev.quikkkk.dto.request.UpdateMealRequest;
+import com.dev.quikkkk.dto.response.DailyWaterIntakeResponse;
 import com.dev.quikkkk.dto.response.FoodResponse;
 import com.dev.quikkkk.dto.response.MealPlanResponse;
 import com.dev.quikkkk.dto.response.MealResponse;
@@ -127,6 +128,12 @@ public class NutritionController {
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
         return ResponseEntity.ok(mealPlanService.getMealPlanByDate(date));
+    }
+
+    @GetMapping("/water-intake/today")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<DailyWaterIntakeResponse> getTodayWaterIntake() {
+        return ResponseEntity.ok(waterIntakeService.getTodayWaterIntake());
     }
 
     @PutMapping("/foods/{food-id}")
