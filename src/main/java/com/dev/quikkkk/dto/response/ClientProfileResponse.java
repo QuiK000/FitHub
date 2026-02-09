@@ -23,6 +23,7 @@ public class ClientProfileResponse {
     private LocalDate birthdate;
     private Double height;
     private Double weight;
+    private Integer dailyWaterTarget;
     private boolean active;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
