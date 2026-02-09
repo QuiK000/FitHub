@@ -3,7 +3,6 @@ package com.dev.quikkkk.dto.request;
 import com.dev.quikkkk.validation.ValidationPatterns;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
@@ -33,15 +32,15 @@ public class CreateClientProfileRequest {
     )
     private String phone;
 
-    @NotNull(message = "VALIDATION.CREATE.CLIENT.PROFILE.BIRTHDATE.NOT_NULL")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthdate;
 
-    @NotNull(message = "VALIDATION.CREATE.CLIENT.PROFILE.HEIGHT.NOT_NULL")
-    @Positive(message = "HEIGHT_MUST_BE_POSITIVE")
+    @Positive(message = "VALIDATION.CREATE.CLIENT.PROFILE.HEIGHT.POSITIVE")
     private Double height;
 
-    @NotNull(message = "VALIDATION.CREATE.CLIENT.PROFILE.WEIGHT.NOT_NULL")
-    @Positive(message = "WEIGHT_MUST_BE_POSITIVE")
+    @Positive(message = "VALIDATION.CREATE.CLIENT.PROFILE.WEIGHT.POSITIVE")
     private Double weight;
+
+    @Positive(message = "VALIDATION.CREATE.CLIENT.PROFILE.DAILY_WATER_TARGET.POSITIVE")
+    private Integer dailyWaterTarget;
 }
