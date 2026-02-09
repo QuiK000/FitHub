@@ -1,6 +1,7 @@
 package com.dev.quikkkk.service.impl;
 
 import com.dev.quikkkk.dto.request.LogWaterIntakeRequest;
+import com.dev.quikkkk.dto.response.DailyWaterIntakeResponse;
 import com.dev.quikkkk.dto.response.WaterIntakeResponse;
 import com.dev.quikkkk.entity.ClientProfile;
 import com.dev.quikkkk.entity.WaterIntake;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static com.dev.quikkkk.enums.ErrorCode.USER_NOT_FOUND;
 
@@ -31,32 +33,57 @@ public class WaterIntakeServiceImpl implements IWaterIntakeService {
     @Override
     @Transactional
     public WaterIntakeResponse createWaterIntake(LogWaterIntakeRequest request) {
-        String userId = SecurityUtils.getCurrentUserId();
-        ClientProfile client = clientProfileRepository.findByUserId(userId)
-                .orElseThrow(() -> new BusinessException(USER_NOT_FOUND));
-        Integer dailyTarget = client.getDailyWaterTarget();
+        ClientProfile client = getCurrentClientProfile();
+        int dailyTarget = client.resolveDailyWaterTarget();
 
-        if (dailyTarget == null) {
-            if (client.getWeight() > 0) {
-                dailyTarget = (int) (client.getWeight() * 35);
-            } else {
-                dailyTarget = 2500;
-            }
-        }
-
-        WaterIntake intake = waterIntakeMapper.toEntity(request, client, dailyTarget, userId);
+        WaterIntake intake = waterIntakeMapper.toEntity(request, client, dailyTarget, client.getUser().getId());
         waterIntakeRepository.save(intake);
 
-        List<WaterIntake> todayIntakes = waterIntakeRepository.findALlByClientIdAndIntakeDate(
-                client.getId(),
-                LocalDate.now()
-        );
-
-        int totalConsumedToday = todayIntakes.stream()
-                .mapToInt(WaterIntake::getAmountMl)
-                .sum();
+        int totalConsumedToday = Optional.ofNullable(
+                waterIntakeRepository.sumAmountByClientIdAndIntakeDate(
+                        client.getId(),
+                        LocalDate.now()
+                )
+        ).orElse(0);
 
         double progress = (double) totalConsumedToday / dailyTarget * 100;
         return waterIntakeMapper.toResponse(intake, progress);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public DailyWaterIntakeResponse getTodayWaterIntake() {
+        ClientProfile client = getCurrentClientProfile();
+        LocalDate today = LocalDate.now();
+
+        List<WaterIntake> intakes = waterIntakeRepository.findAllByClientIdAndIntakeDateBetweenOrderByIntakeTimeAsc(
+                client.getId(),
+                today,
+                today
+        );
+
+        return buildDailyResponse(intakes, today, client);
+    }
+
+    private ClientProfile getCurrentClientProfile() {
+        String userId = SecurityUtils.getCurrentUserId();
+        return clientProfileRepository.findByUserId(userId)
+                .orElseThrow(() -> new BusinessException(USER_NOT_FOUND));
+    }
+
+    private DailyWaterIntakeResponse buildDailyResponse(
+            List<WaterIntake> intakes,
+            LocalDate date,
+            ClientProfile client
+    ) {
+        int currentTotal = intakes.stream().mapToInt(WaterIntake::getAmountMl).sum();
+        int target = client.getDailyWaterTarget() != null ? client.getDailyWaterTarget() : 2500;
+        double progress = (target > 0) ? ((double) currentTotal / target) * 100 : 0;
+
+        List<WaterIntakeResponse> intakeDto = intakes.stream()
+                .map(intake -> waterIntakeMapper.toResponse(intake, null)) // TODO
+                .toList();
+
+        return waterIntakeMapper.toResponse(date, currentTotal, target, progress, intakeDto);
     }
 }
