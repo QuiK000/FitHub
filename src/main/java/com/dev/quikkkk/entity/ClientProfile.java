@@ -104,4 +104,10 @@ public class ClientProfile extends BaseEntity {
         this.phone = null;
         this.birthdate = null;
     }
+
+    public int resolveDailyWaterTarget() {
+        if (dailyWaterTarget != null) return dailyWaterTarget;
+        if (weight > 0) return (int) (weight * 35);
+        return 2500;
+    }
 }
