@@ -61,11 +61,14 @@ public class ClientProfile extends BaseEntity {
     @Column(name = "birth_date")
     private LocalDate birthdate;
 
-    @Column(name = "height", nullable = false)
+    @Column(name = "height")
     private double height;
 
-    @Column(name = "weight", nullable = false)
+    @Column(name = "weight")
     private double weight;
+
+    @Column(name = "daily_water_target")
+    private Integer dailyWaterTarget;
 
     @Column(name = "active", nullable = false)
     private boolean active;
