@@ -17,6 +17,7 @@ public class ClientProfileMapper {
                 .birthdate(request.getBirthdate())
                 .height(request.getHeight())
                 .weight(request.getWeight())
+                .dailyWaterTarget(request.getDailyWaterTarget())
                 .user(user)
                 .createdBy("SYSTEM")
                 .active(true)
@@ -31,6 +32,7 @@ public class ClientProfileMapper {
                 .birthdate(profile.getBirthdate())
                 .height(profile.getHeight())
                 .weight(profile.getWeight())
+                .dailyWaterTarget(profile.getDailyWaterTarget())
                 .active(profile.isActive())
                 .createdAt(profile.getCreatedDate())
                 .build();
@@ -43,5 +45,6 @@ public class ClientProfileMapper {
         if (request.getBirthdate() != null) profile.setBirthdate(request.getBirthdate());
         if (request.getHeight() != null) profile.setHeight(request.getHeight());
         if (request.getWeight() != null) profile.setWeight(request.getWeight());
+        if (request.getDailyWaterTarget() != null) profile.setDailyWaterTarget(request.getDailyWaterTarget());
     }
 }
