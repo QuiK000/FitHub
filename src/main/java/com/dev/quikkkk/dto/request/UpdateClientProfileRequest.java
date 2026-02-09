@@ -30,9 +30,12 @@ public class UpdateClientProfileRequest {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthdate;
 
-    @Positive(message = "HEIGHT_MUST_BE_POSITIVE")
+    @Positive(message = "VALIDATION.UPDATE.CLIENT.PROFILE.HEIGHT.POSITIVE")
     private Double height;
 
-    @Positive(message = "WEIGHT_MUST_BE_POSITIVE")
+    @Positive(message = "VALIDATION.UPDATE.CLIENT.PROFILE.WEIGHT.POSITIVE")
     private Double weight;
+
+    @Positive(message = "VALIDATION.UPDATE.CLIENT.PROFILE.DAILY_WATER_TARGET.POSITIVE")
+    private Integer dailyWaterTarget;
 }
