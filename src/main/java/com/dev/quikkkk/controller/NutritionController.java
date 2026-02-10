@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/nutrition")
@@ -134,6 +135,12 @@ public class NutritionController {
     @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<DailyWaterIntakeResponse> getTodayWaterIntake() {
         return ResponseEntity.ok(waterIntakeService.getTodayWaterIntake());
+    }
+
+    @GetMapping("/water-intake/weekly")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<List<DailyWaterIntakeResponse>> getWeeklyWaterIntake() {
+        return ResponseEntity.ok(waterIntakeService.getWeeklyWaterIntake());
     }
 
     @PutMapping("/foods/{food-id}")
