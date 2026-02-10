@@ -31,6 +31,12 @@ public class BodyMeasurementServiceImpl implements IBodyMeasurementService {
         ClientProfile client = getCurrentClientProfile();
         BodyMeasurement bodyMeasurement = bodyMeasurementMapper.toEntity(request, client);
 
+        if (bodyMeasurement.getBmi() == null && client.getHeight() != null && client.getHeight() > 0) {
+            double heightInMeters = client.getHeight() / 100.0;
+            double bmi = bodyMeasurement.getWeight() / (heightInMeters * heightInMeters);
+            bodyMeasurement.setBmi(Math.round(bmi * 100.0) / 100.0);
+        }
+
         bodyMeasurementRepository.save(bodyMeasurement);
         return bodyMeasurementMapper.toResponse(bodyMeasurement);
     }
