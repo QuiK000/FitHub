@@ -5,12 +5,10 @@ import com.dev.quikkkk.dto.response.DailyWaterIntakeResponse;
 import com.dev.quikkkk.dto.response.WaterIntakeResponse;
 import com.dev.quikkkk.entity.ClientProfile;
 import com.dev.quikkkk.entity.WaterIntake;
-import com.dev.quikkkk.exception.BusinessException;
 import com.dev.quikkkk.mapper.WaterIntakeMapper;
-import com.dev.quikkkk.repository.IClientProfileRepository;
 import com.dev.quikkkk.repository.IWaterIntakeRepository;
 import com.dev.quikkkk.service.IWaterIntakeService;
-import com.dev.quikkkk.utils.SecurityUtils;
+import com.dev.quikkkk.utils.ClientProfileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,20 +22,19 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.dev.quikkkk.enums.ErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class WaterIntakeServiceImpl implements IWaterIntakeService {
     private final IWaterIntakeRepository waterIntakeRepository;
-    private final IClientProfileRepository clientProfileRepository;
     private final WaterIntakeMapper waterIntakeMapper;
+    private final ClientProfileUtils clientProfileUtils;
 
     @Override
     @Transactional
     public WaterIntakeResponse createWaterIntake(LogWaterIntakeRequest request) {
-        ClientProfile client = getCurrentClientProfile();
+        ClientProfile client = clientProfileUtils.getCurrentClientProfile();
         int dailyTarget = client.resolveDailyWaterTarget();
 
         WaterIntake intake = waterIntakeMapper.toEntity(request, client, dailyTarget, client.getUser().getId());
@@ -57,7 +54,7 @@ public class WaterIntakeServiceImpl implements IWaterIntakeService {
     @Override
     @Transactional(readOnly = true)
     public DailyWaterIntakeResponse getTodayWaterIntake() {
-        ClientProfile client = getCurrentClientProfile();
+        ClientProfile client = clientProfileUtils.getCurrentClientProfile();
         LocalDate today = LocalDate.now();
 
         List<WaterIntake> intakes = waterIntakeRepository.findAllByClientIdAndIntakeDateBetweenOrderByIntakeTimeAsc(
@@ -72,7 +69,7 @@ public class WaterIntakeServiceImpl implements IWaterIntakeService {
     @Override
     @Transactional(readOnly = true)
     public List<DailyWaterIntakeResponse> getWeeklyWaterIntake() {
-        ClientProfile client = getCurrentClientProfile();
+        ClientProfile client = clientProfileUtils.getCurrentClientProfile();
 
         LocalDate end = LocalDate.now();
         LocalDate start = end.minusDays(6);
@@ -95,12 +92,6 @@ public class WaterIntakeServiceImpl implements IWaterIntakeService {
 
 
         return weeklyResponse;
-    }
-
-    private ClientProfile getCurrentClientProfile() {
-        String userId = SecurityUtils.getCurrentUserId();
-        return clientProfileRepository.findByUserId(userId)
-                .orElseThrow(() -> new BusinessException(USER_NOT_FOUND));
     }
 
     private DailyWaterIntakeResponse buildDailyResponse(

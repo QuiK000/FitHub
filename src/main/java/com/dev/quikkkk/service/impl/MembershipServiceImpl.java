@@ -15,8 +15,8 @@ import com.dev.quikkkk.mapper.MembershipMapper;
 import com.dev.quikkkk.repository.IClientProfileRepository;
 import com.dev.quikkkk.repository.IMembershipRepository;
 import com.dev.quikkkk.service.IMembershipService;
+import com.dev.quikkkk.utils.ClientProfileUtils;
 import com.dev.quikkkk.utils.PaginationUtils;
-import com.dev.quikkkk.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -51,6 +51,7 @@ public class MembershipServiceImpl implements IMembershipService {
     private final IMembershipRepository membershipRepository;
     private final IClientProfileRepository clientProfileRepository;
     private final MembershipMapper membershipMapper;
+    private final ClientProfileUtils clientProfileUtils;
 
     @Override
     @Transactional
@@ -214,7 +215,7 @@ public class MembershipServiceImpl implements IMembershipService {
     @Override
     @Transactional(readOnly = true)
     public MembershipResponse getMembershipByClientIdAndActive() {
-        ClientProfile client = getClientProfile();
+        ClientProfile client = clientProfileUtils.getCurrentClientProfile();
 
         return membershipRepository.findMembershipByClientIdAndStatus(client.getId(), MembershipStatus.ACTIVE)
                 .map(membershipMapper::toResponse)
@@ -224,7 +225,7 @@ public class MembershipServiceImpl implements IMembershipService {
     @Override
     @Transactional(readOnly = true)
     public MembershipHistoryResponse getMembershipClientHistory() {
-        ClientProfile client = getClientProfile();
+        ClientProfile client = clientProfileUtils.getCurrentClientProfile();
         List<Membership> memberships = membershipRepository.findAllByClientIdOrderByCreatedDateDesc(client.getId());
 
         return membershipMapper.toHistoryResponse(memberships);
@@ -289,11 +290,5 @@ public class MembershipServiceImpl implements IMembershipService {
     private Membership findMembershipById(String membershipId) {
         log.info("Finding membership by id: {}", membershipId);
         return membershipRepository.findById(membershipId).orElseThrow(() -> new BusinessException(MEMBERSHIP_NOT_FOUND));
-    }
-
-    private ClientProfile getClientProfile() {
-        String userId = SecurityUtils.getCurrentUserId();
-        return clientProfileRepository.findByUserId(userId)
-                .orElseThrow(() -> new BusinessException(CLIENT_PROFILE_NOT_FOUND));
     }
 }

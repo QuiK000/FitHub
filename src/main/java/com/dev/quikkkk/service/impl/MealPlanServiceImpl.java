@@ -8,11 +8,10 @@ import com.dev.quikkkk.entity.ClientProfile;
 import com.dev.quikkkk.entity.MealPlan;
 import com.dev.quikkkk.exception.BusinessException;
 import com.dev.quikkkk.mapper.MealPlanMapper;
-import com.dev.quikkkk.repository.IClientProfileRepository;
 import com.dev.quikkkk.repository.IMealPlanRepository;
 import com.dev.quikkkk.service.IMealPlanService;
+import com.dev.quikkkk.utils.ClientProfileUtils;
 import com.dev.quikkkk.utils.PaginationUtils;
-import com.dev.quikkkk.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -24,7 +23,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static com.dev.quikkkk.enums.ErrorCode.CLIENT_PROFILE_NOT_FOUND;
 import static com.dev.quikkkk.enums.ErrorCode.DUPLICATE_RESOURCE;
 import static com.dev.quikkkk.enums.ErrorCode.FORBIDDEN_ACCESS;
 import static com.dev.quikkkk.enums.ErrorCode.MEAL_PLAN_NOT_FOUND;
@@ -34,13 +32,13 @@ import static com.dev.quikkkk.enums.ErrorCode.MEAL_PLAN_NOT_FOUND;
 @Slf4j
 public class MealPlanServiceImpl implements IMealPlanService {
     private final IMealPlanRepository mealPlanRepository;
-    private final IClientProfileRepository clientProfileRepository;
     private final MealPlanMapper mealPlanMapper;
+    private final ClientProfileUtils clientProfileUtils;
 
     @Override
     @Transactional
     public MealPlanResponse createMealPlan(CreateMealPlanRequest request) {
-        ClientProfile client = getCurrentClientProfile();
+        ClientProfile client = clientProfileUtils.getCurrentClientProfile();
         Optional<MealPlan> existing = mealPlanRepository.findByClientIdAndPlanDate(client.getId(), request.getPlanDate());
 
         if (existing.isPresent()) {
@@ -61,7 +59,7 @@ public class MealPlanServiceImpl implements IMealPlanService {
     @Override
     @Transactional(readOnly = true)
     public PageResponse<MealPlanResponse> getMyMealPlans(int page, int size) {
-        ClientProfile client = getCurrentClientProfile();
+        ClientProfile client = clientProfileUtils.getCurrentClientProfile();
         Pageable pageable = PaginationUtils.createPageRequest(page, size, "planDate");
         Page<MealPlan> mealPlanPage = mealPlanRepository.findByClientIdOrderByPlanDateDesc(client.getId(), pageable);
 
@@ -71,7 +69,7 @@ public class MealPlanServiceImpl implements IMealPlanService {
     @Override
     @Transactional(readOnly = true)
     public PageResponse<MealPlanResponse> getMealPlansByDateRange(LocalDate startDate, LocalDate endDate) {
-        ClientProfile client = getCurrentClientProfile();
+        ClientProfile client = clientProfileUtils.getCurrentClientProfile();
         List<MealPlan> mealPlans = mealPlanRepository.findByClientIdAndDateRange(
                 client.getId(),
                 startDate,
@@ -92,7 +90,7 @@ public class MealPlanServiceImpl implements IMealPlanService {
     @Override
     @Transactional(readOnly = true)
     public MealPlanResponse getMealPlanByDate(LocalDate date) {
-        ClientProfile client = getCurrentClientProfile();
+        ClientProfile client = clientProfileUtils.getCurrentClientProfile();
 
         return mealPlanRepository.findByClientIdAndPlanDate(client.getId(), date)
                 .map(mealPlanMapper::toResponse)
@@ -120,19 +118,13 @@ public class MealPlanServiceImpl implements IMealPlanService {
         return mealPlanMapper.toResponse(mealPlan);
     }
 
-    private ClientProfile getCurrentClientProfile() {
-        String userId = SecurityUtils.getCurrentUserId();
-        return clientProfileRepository.findByUserId(userId)
-                .orElseThrow(() -> new BusinessException(CLIENT_PROFILE_NOT_FOUND));
-    }
-
     private MealPlan getMealPlanOrThrow(String id) {
         return mealPlanRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(MEAL_PLAN_NOT_FOUND));
     }
 
     private void validateAccess(MealPlan mealPlan) {
-        ClientProfile client = getCurrentClientProfile();
+        ClientProfile client = clientProfileUtils.getCurrentClientProfile();
         if (!mealPlan.getClient().getId().equals(client.getId())) {
             log.warn("Access denied for meal plan: {} for user: {}", mealPlan.getId(), client.getId());
             throw new BusinessException(FORBIDDEN_ACCESS);

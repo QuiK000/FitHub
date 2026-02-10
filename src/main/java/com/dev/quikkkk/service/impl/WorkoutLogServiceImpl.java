@@ -11,12 +11,12 @@ import com.dev.quikkkk.entity.TrainerProfile;
 import com.dev.quikkkk.entity.WorkoutLog;
 import com.dev.quikkkk.exception.BusinessException;
 import com.dev.quikkkk.mapper.WorkoutLogMapper;
-import com.dev.quikkkk.repository.IClientProfileRepository;
 import com.dev.quikkkk.repository.IClientWorkoutPlanRepository;
 import com.dev.quikkkk.repository.IExerciseRepository;
 import com.dev.quikkkk.repository.ITrainerProfileRepository;
 import com.dev.quikkkk.repository.IWorkoutLogRepository;
 import com.dev.quikkkk.service.IWorkoutLogService;
+import com.dev.quikkkk.utils.ClientProfileUtils;
 import com.dev.quikkkk.utils.PaginationUtils;
 import com.dev.quikkkk.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +33,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static com.dev.quikkkk.enums.ErrorCode.CLIENT_ASSIGNMENT_NOT_FOUND;
-import static com.dev.quikkkk.enums.ErrorCode.CLIENT_PROFILE_NOT_FOUND;
 import static com.dev.quikkkk.enums.ErrorCode.EXERCISE_NOT_FOUND;
 import static com.dev.quikkkk.enums.ErrorCode.TRAINER_PROFILE_NOT_FOUND;
 import static com.dev.quikkkk.enums.ErrorCode.WORKOUT_LOG_ACCESS_DENIED;
@@ -45,10 +44,10 @@ import static com.dev.quikkkk.enums.ErrorCode.WORKOUT_LOG_NOT_FOUND;
 public class WorkoutLogServiceImpl implements IWorkoutLogService {
     private final IWorkoutLogRepository workoutLogRepository;
     private final IExerciseRepository exerciseRepository;
-    private final IClientProfileRepository clientProfileRepository;
     private final IClientWorkoutPlanRepository clientWorkoutPlanRepository;
     private final ITrainerProfileRepository trainerProfileRepository;
     private final WorkoutLogMapper workoutLogMapper;
+    private final ClientProfileUtils clientProfileUtils;
 
     @Override
     @Transactional
@@ -59,7 +58,7 @@ public class WorkoutLogServiceImpl implements IWorkoutLogService {
     public WorkoutLogResponse createWorkoutLog(LogWorkoutRequest request) {
         Exercise exercise = exerciseRepository.findById(request.getExerciseId())
                 .orElseThrow(() -> new BusinessException(EXERCISE_NOT_FOUND));
-        ClientProfile client = getCurrentClientProfile();
+        ClientProfile client = clientProfileUtils.getCurrentClientProfile();
         String userId = SecurityUtils.getCurrentUserId();
         ClientWorkoutPlan activeWorkoutPlan = null;
 
@@ -205,12 +204,6 @@ public class WorkoutLogServiceImpl implements IWorkoutLogService {
         }
 
         return PaginationUtils.toPageResponse(workoutLogPage, workoutLogMapper::toResponse);
-    }
-
-    private ClientProfile getCurrentClientProfile() {
-        String userId = SecurityUtils.getCurrentUserId();
-        return clientProfileRepository.findByUserId(userId)
-                .orElseThrow(() -> new BusinessException(CLIENT_PROFILE_NOT_FOUND));
     }
 
     private TrainerProfile getCurrentTrainerProfile() {

@@ -14,8 +14,8 @@ import com.dev.quikkkk.repository.IClientProfileRepository;
 import com.dev.quikkkk.repository.IClientWorkoutPlanRepository;
 import com.dev.quikkkk.repository.IWorkoutPlanRepository;
 import com.dev.quikkkk.service.IClientWorkoutPlanService;
+import com.dev.quikkkk.utils.ClientProfileUtils;
 import com.dev.quikkkk.utils.PaginationUtils;
-import com.dev.quikkkk.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -38,6 +38,7 @@ public class ClientWorkoutPlanServiceImpl implements IClientWorkoutPlanService {
     private final IWorkoutPlanRepository workoutPlanRepository;
     private final ClientWorkoutPlanMapper clientWorkoutPlanMapper;
     private final MessageMapper messageMapper;
+    private final ClientProfileUtils clientProfileUtils;
 
     @Override
     @Transactional
@@ -72,7 +73,7 @@ public class ClientWorkoutPlanServiceImpl implements IClientWorkoutPlanService {
     @Override
     @Transactional(readOnly = true)
     public List<ClientWorkoutPlanResponse> getMyAssignments() {
-        ClientProfile profile = getCurrentClientProfile();
+        ClientProfile profile = clientProfileUtils.getCurrentClientProfile();
         return clientWorkoutPlanRepository.findByClientId(profile.getId()).stream()
                 .map(clientWorkoutPlanMapper::toResponse)
                 .toList();
@@ -81,7 +82,7 @@ public class ClientWorkoutPlanServiceImpl implements IClientWorkoutPlanService {
     @Override
     @Transactional(readOnly = true)
     public List<ClientWorkoutPlanResponse> getMyActiveAssignments() {
-        ClientProfile profile = getCurrentClientProfile();
+        ClientProfile profile = clientProfileUtils.getCurrentClientProfile();
         return clientWorkoutPlanRepository.findByClientIdAndActiveTrue(profile.getId()).stream()
                 .map(clientWorkoutPlanMapper::toResponse)
                 .toList();
@@ -90,7 +91,7 @@ public class ClientWorkoutPlanServiceImpl implements IClientWorkoutPlanService {
     @Override
     @Transactional(readOnly = true)
     public ClientWorkoutPlanResponse getMyAssignmentById(String assignmentId) {
-        ClientProfile profile = getCurrentClientProfile();
+        ClientProfile profile = clientProfileUtils.getCurrentClientProfile();
         return clientWorkoutPlanRepository.findAssignmentByClientIdAndAssignmentId(profile.getId(), assignmentId)
                 .map(clientWorkoutPlanMapper::toResponse)
                 .orElseThrow(() -> new BusinessException(CLIENT_ASSIGNMENT_NOT_FOUND));
@@ -121,12 +122,6 @@ public class ClientWorkoutPlanServiceImpl implements IClientWorkoutPlanService {
         assignment.cancel();
 
         return messageMapper.message("Assignment cancelled");
-    }
-
-    private ClientProfile getCurrentClientProfile() {
-        String userId = SecurityUtils.getCurrentUserId();
-        return clientProfileRepository.findByUserId(userId)
-                .orElseThrow(() -> new BusinessException(CLIENT_PROFILE_NOT_FOUND));
     }
 
     private ClientWorkoutPlan getAssignmentOrThrow(String assignmentId) {

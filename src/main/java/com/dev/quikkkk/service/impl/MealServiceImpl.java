@@ -15,11 +15,11 @@ import com.dev.quikkkk.exception.BusinessException;
 import com.dev.quikkkk.mapper.MealFoodMapper;
 import com.dev.quikkkk.mapper.MealMapper;
 import com.dev.quikkkk.mapper.MessageMapper;
-import com.dev.quikkkk.repository.IClientProfileRepository;
 import com.dev.quikkkk.repository.IFoodRepository;
 import com.dev.quikkkk.repository.IMealPlanRepository;
 import com.dev.quikkkk.repository.IMealRepository;
 import com.dev.quikkkk.service.IMealService;
+import com.dev.quikkkk.utils.ClientProfileUtils;
 import com.dev.quikkkk.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
-import static com.dev.quikkkk.enums.ErrorCode.CLIENT_PROFILE_NOT_FOUND;
 import static com.dev.quikkkk.enums.ErrorCode.FOOD_NOT_FOUND;
 import static com.dev.quikkkk.enums.ErrorCode.FORBIDDEN_ACCESS;
 import static com.dev.quikkkk.enums.ErrorCode.MEAL_ALREADY_COMPLETED;
@@ -41,11 +40,11 @@ import static com.dev.quikkkk.enums.ErrorCode.MEAL_PLAN_NOT_FOUND;
 public class MealServiceImpl implements IMealService {
     private final IMealRepository mealRepository;
     private final IMealPlanRepository mealPlanRepository;
-    private final IClientProfileRepository clientProfileRepository;
     private final IFoodRepository foodRepository;
     private final MealMapper mealMapper;
     private final MealFoodMapper mealFoodMapper;
     private final MessageMapper messageMapper;
+    private final ClientProfileUtils clientProfileUtils;
 
     @Override
     @Transactional
@@ -116,12 +115,6 @@ public class MealServiceImpl implements IMealService {
         return messageMapper.message("Meal was successfully completed");
     }
 
-    private ClientProfile getCurrentClientProfile() {
-        String userId = SecurityUtils.getCurrentUserId();
-        return clientProfileRepository.findByUserId(userId)
-                .orElseThrow(() -> new BusinessException(CLIENT_PROFILE_NOT_FOUND));
-    }
-
     private MealPlan getMealPlanOrThrow(String id) {
         return mealPlanRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(MEAL_PLAN_NOT_FOUND));
@@ -133,7 +126,7 @@ public class MealServiceImpl implements IMealService {
     }
 
     private void validateAccess(MealPlan mealPlan) {
-        ClientProfile client = getCurrentClientProfile();
+        ClientProfile client = clientProfileUtils.getCurrentClientProfile();
         if (!mealPlan.getClient().getId().equals(client.getId())) {
             log.warn("Access denied for meal plan: {} for user: {}", mealPlan.getId(), client.getId());
             throw new BusinessException(FORBIDDEN_ACCESS);

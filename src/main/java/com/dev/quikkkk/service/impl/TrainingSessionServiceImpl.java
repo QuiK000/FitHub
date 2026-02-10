@@ -26,6 +26,7 @@ import com.dev.quikkkk.repository.ITrainerProfileRepository;
 import com.dev.quikkkk.repository.ITrainingSessionRepository;
 import com.dev.quikkkk.service.ISessionLockService;
 import com.dev.quikkkk.service.ITrainingSessionService;
+import com.dev.quikkkk.utils.ClientProfileUtils;
 import com.dev.quikkkk.utils.PaginationUtils;
 import com.dev.quikkkk.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
@@ -74,6 +75,7 @@ public class TrainingSessionServiceImpl implements ITrainingSessionService {
     private final TrainingSessionMapper trainingSessionMapper;
     private final MessageMapper messageMapper;
     private final ISessionLockService sessionLockService;
+    private final ClientProfileUtils clientProfileUtils;
 
     @Override
     @Transactional
@@ -160,7 +162,7 @@ public class TrainingSessionServiceImpl implements ITrainingSessionService {
             if (!session.getTrainer().isActive()) throw new BusinessException(TRAINER_PROFILE_DEACTIVATED);
             if (session.getClients().size() >= session.getMaxParticipants()) throw new BusinessException(SESSION_IS_FULL);
 
-            ClientProfile client = getCurrentClientProfile();
+            ClientProfile client = clientProfileUtils.getCurrentClientProfile();
             if (session.getClients().contains(client)) throw new BusinessException(CLIENT_ALREADY_JOINED_SESSION);
 
             validateClientMembership(client, session);
@@ -274,11 +276,5 @@ public class TrainingSessionServiceImpl implements ITrainingSessionService {
                 throw new BusinessException(MEMBERSHIP_EXPIRED);
             }
         }
-    }
-
-    private ClientProfile getCurrentClientProfile() {
-        String userId = SecurityUtils.getCurrentUserId();
-        return clientProfileRepository.findByUserId(userId)
-                .orElseThrow(() -> new BusinessException(CLIENT_PROFILE_NOT_FOUND));
     }
 }
