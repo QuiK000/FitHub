@@ -47,7 +47,7 @@ public class BodyMeasurement extends BaseEntity {
     @Column(name = "bmi")
     private Double bmi;
 
-    @Column(name = "bmw")
+    @Column(name = "bmr")
     private Integer bmr;
 
     @Column(name = "body_water_percentage")
