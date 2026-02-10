@@ -17,8 +17,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.dev.quikkkk.enums.ErrorCode.USER_NOT_FOUND;
 
@@ -63,6 +67,34 @@ public class WaterIntakeServiceImpl implements IWaterIntakeService {
         );
 
         return buildDailyResponse(intakes, today, client);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<DailyWaterIntakeResponse> getWeeklyWaterIntake() {
+        ClientProfile client = getCurrentClientProfile();
+
+        LocalDate end = LocalDate.now();
+        LocalDate start = end.minusDays(6);
+
+        List<WaterIntake> weeksIntakes = waterIntakeRepository.findAllByClientIdAndIntakeDateBetweenOrderByIntakeTimeAsc(
+                client.getId(),
+                start,
+                end
+        );
+
+        Map<LocalDate, List<WaterIntake>> groupedByDate = weeksIntakes.stream()
+                .collect(Collectors.groupingBy(WaterIntake::getIntakeDate));
+
+        List<DailyWaterIntakeResponse> weeklyResponse = new ArrayList<>();
+
+        for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
+            List<WaterIntake> dailyIntakes = groupedByDate.getOrDefault(date, Collections.emptyList());
+            weeklyResponse.add(buildDailyResponse(dailyIntakes, date, client));
+        }
+
+
+        return weeklyResponse;
     }
 
     private ClientProfile getCurrentClientProfile() {
