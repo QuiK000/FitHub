@@ -1,0 +1,28 @@
+package com.dev.quikkkk.controller;
+
+import com.dev.quikkkk.dto.request.CreateBodyMeasurementRequest;
+import com.dev.quikkkk.dto.response.BodyMeasurementResponse;
+import com.dev.quikkkk.service.IBodyMeasurementService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/v1/progress")
+@RequiredArgsConstructor
+public class ProgressTrackingController {
+    private final IBodyMeasurementService bodyMeasurementService;
+
+    @PostMapping("/measurements")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<BodyMeasurementResponse> createBodyMeasurement(
+            @RequestBody @Valid CreateBodyMeasurementRequest request
+    ) {
+        return ResponseEntity.ok(bodyMeasurementService.createBodyMeasurement(request));
+    }
+}
