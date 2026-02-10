@@ -7,6 +7,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -22,7 +23,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "meal_plans")
+@Table(
+        name = "meal_plans",
+        indexes = {
+                @Index(name = "idx_meal_plan_client", columnList = "client_id"),
+                @Index(name = "idx_meal_plan_date", columnList = "plan_date DESC")
+        }
+)
 @Getter
 @Setter
 @AllArgsConstructor
