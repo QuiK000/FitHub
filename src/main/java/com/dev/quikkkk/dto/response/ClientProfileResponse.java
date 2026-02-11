@@ -1,5 +1,6 @@
 package com.dev.quikkkk.dto.response;
 
+import com.dev.quikkkk.enums.ClientGender;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,6 +25,7 @@ public class ClientProfileResponse {
     private Double height;
     private Double weight;
     private Integer dailyWaterTarget;
+    private ClientGender gender;
     private boolean active;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
