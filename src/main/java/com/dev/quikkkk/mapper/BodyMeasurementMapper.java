@@ -44,9 +44,6 @@ public class BodyMeasurementMapper {
                 .measurements(bodyMeasurement.getMeasurements())
                 .notes(bodyMeasurement.getNotes())
                 .photoUrl(bodyMeasurement.getPhotoUrl())
-                .weightChange(0.0) // TODO
-                .bodyFatChange(0.0) // TODO
-                .muscleMassChange(0.0) // TODO
                 .build();
     }
 }
