@@ -1,7 +1,9 @@
 package com.dev.quikkkk.dto.request;
 
+import com.dev.quikkkk.enums.ClientGender;
 import com.dev.quikkkk.validation.ValidationPatterns;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
@@ -38,4 +40,7 @@ public class UpdateClientProfileRequest {
 
     @Positive(message = "VALIDATION.UPDATE.CLIENT.PROFILE.DAILY_WATER_TARGET.POSITIVE")
     private Integer dailyWaterTarget;
+
+    @NotNull(message = "VALIDATION.CREATE.CLIENT.PROFILE.GENDER.NOT_NULL")
+    private ClientGender gender;
 }
