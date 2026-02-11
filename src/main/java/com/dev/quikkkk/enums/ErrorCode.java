@@ -103,6 +103,7 @@ public enum ErrorCode {
     MEAL_PLAN_NOT_FOUND("MEAL_PLAN_NOT_FOUND", "Meal plan Not Found", NOT_FOUND),
     MEAL_NOT_FOUND("MEAL_NOT_FOUND", "Meal not Found", NOT_FOUND),
     MEAL_ALREADY_COMPLETED("MEAL_ALREADY_COMPLETED", "Meal Already Completed", BAD_REQUEST),
+    BODY_MEASUREMENT_NOT_FOUND("BODY_MEASUREMENT_NOT_FOUND", "Body measurement Not Found", NOT_FOUND),
     ;
 
     private final String code;
