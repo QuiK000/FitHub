@@ -1,7 +1,10 @@
 package com.dev.quikkkk.entity;
 
+import com.dev.quikkkk.enums.ClientGender;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
@@ -69,6 +72,10 @@ public class ClientProfile extends BaseEntity {
 
     @Column(name = "daily_water_target")
     private Integer dailyWaterTarget;
+
+    @Column(name = "client_gender")
+    @Enumerated(EnumType.STRING)
+    private ClientGender gender;
 
     @Column(name = "active", nullable = false)
     private boolean active;
