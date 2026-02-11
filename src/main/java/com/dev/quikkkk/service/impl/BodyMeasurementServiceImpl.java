@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -33,7 +35,34 @@ public class BodyMeasurementServiceImpl implements IBodyMeasurementService {
             bodyMeasurement.setBmi(Math.round(bmi * 100.0) / 100.0);
         }
 
-        bodyMeasurementRepository.save(bodyMeasurement);
-        return bodyMeasurementMapper.toResponse(bodyMeasurement);
+        BodyMeasurement savedMeasurement = bodyMeasurementRepository.save(bodyMeasurement);
+        Optional<BodyMeasurement> previousMeasurement = bodyMeasurementRepository
+                .findFirstByClient_IdAndMeasurementDateBeforeOrderByMeasurementDateDesc(
+                        client.getId(),
+                        savedMeasurement.getMeasurementDate()
+                );
+
+        BodyMeasurementResponse response = bodyMeasurementMapper.toResponse(savedMeasurement);
+
+        if (previousMeasurement.isPresent()) {
+            calculateChanges(response, savedMeasurement, previousMeasurement.get());
+        } else {
+            response.setWeightChange(0.0);
+            response.setBodyFatChange(0.0);
+            response.setMuscleMassChange(0.0);
+        }
+
+        return response;
+    }
+
+    private void calculateChanges(BodyMeasurementResponse response, BodyMeasurement current, BodyMeasurement previous) {
+        if (current.getWeight() != null && previous.getWeight() != null)
+            response.setWeightChange(current.getWeight() - previous.getWeight());
+
+        if (current.getBodyFatPercentage() != null && previous.getBodyFatPercentage() != null)
+            response.setBodyFatChange(current.getBodyFatPercentage() - previous.getBodyFatPercentage());
+
+        if (current.getMuscleMass() != null && previous.getMuscleMass() != null)
+            response.setMuscleMassChange(current.getMuscleMass() - previous.getMuscleMass());
     }
 }
