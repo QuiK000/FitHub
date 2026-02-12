@@ -6,7 +6,6 @@ import com.dev.quikkkk.dto.response.BodyMeasurementResponse;
 import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.entity.BodyMeasurement;
 import com.dev.quikkkk.entity.ClientProfile;
-import com.dev.quikkkk.enums.ClientGender;
 import com.dev.quikkkk.exception.BusinessException;
 import com.dev.quikkkk.mapper.BodyMeasurementMapper;
 import com.dev.quikkkk.repository.IBodyMeasurementRepository;
@@ -20,10 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.Period;
 import java.util.Objects;
-import java.util.Optional;
 
 import static com.dev.quikkkk.enums.ErrorCode.BODY_MEASUREMENT_NOT_FOUND;
 import static com.dev.quikkkk.enums.ErrorCode.FORBIDDEN_ACCESS;
@@ -40,28 +36,15 @@ public class BodyMeasurementServiceImpl implements IBodyMeasurementService {
     @Transactional
     public BodyMeasurementResponse createBodyMeasurement(CreateBodyMeasurementRequest request) {
         ClientProfile client = clientProfileUtils.getCurrentClientProfile();
-        BodyMeasurement bodyMeasurement = bodyMeasurementMapper.toEntity(request, client);
+        BodyMeasurement measurement = bodyMeasurementMapper.toEntity(request, client);
 
-        if (bodyMeasurement.getBmi() == null && client.getHeight() != null && client.getHeight() > 0)
-            calculateAndSetBmi(bodyMeasurement, client.getHeight());
+        measurement.calculateDerivedMetrics(client.getHeight(), client.getBirthdate(), client.getGender());
 
-        if (bodyMeasurement.getBmr() == null && client.getBirthdate() != null && client.getGender() != null)
-            calculateAndSetBmr(bodyMeasurement, client);
-
-        BodyMeasurement savedMeasurement = bodyMeasurementRepository.save(bodyMeasurement);
-        Optional<BodyMeasurement> previousMeasurement = bodyMeasurementRepository
-                .findFirstByClient_IdAndMeasurementDateBeforeOrderByMeasurementDateDesc(
-                        client.getId(),
-                        savedMeasurement.getMeasurementDate()
-                );
-
+        BodyMeasurement savedMeasurement = bodyMeasurementRepository.save(measurement);
         BodyMeasurementResponse response = bodyMeasurementMapper.toResponse(savedMeasurement);
 
-        if (previousMeasurement.isPresent()) {
-            calculateChanges(response, savedMeasurement, previousMeasurement.get());
-        } else {
-            initializeZeroChanges(response);
-        }
+        bodyMeasurementRepository.findPreviousMeasurement(client.getId(), savedMeasurement.getMeasurementDate())
+                .ifPresent(previous -> calculateChanges(response, savedMeasurement, previous));
 
         return response;
     }
@@ -82,54 +65,41 @@ public class BodyMeasurementServiceImpl implements IBodyMeasurementService {
     @Override
     @Transactional(readOnly = true)
     public BodyMeasurementResponse getBodyMeasurementById(String id) {
-        BodyMeasurement bodyMeasurement = findBodyMeasurementById(id);
-        validateAccess(bodyMeasurement);
-
+        BodyMeasurement bodyMeasurement = getEntityByIdAndValidateAccess(id);
         return bodyMeasurementMapper.toResponse(bodyMeasurement);
     }
 
     @Override
     @Transactional
     public BodyMeasurementResponse updateBodyMeasurement(UpdateBodyMeasurementRequest request, String id) {
-        BodyMeasurement bodyMeasurement = findBodyMeasurementById(id);
-        validateAccess(bodyMeasurement);
+        BodyMeasurement measurement = getEntityByIdAndValidateAccess(id);
 
-        bodyMeasurementMapper.update(request, bodyMeasurement);
-        return bodyMeasurementMapper.toResponse(bodyMeasurement);
+        bodyMeasurementMapper.update(request, measurement);
+        ClientProfile client = measurement.getClient();
+
+        measurement.calculateDerivedMetrics(client.getHeight(), client.getBirthdate(), client.getGender());
+        return bodyMeasurementMapper.toResponse(measurement);
     }
 
     @Override
     @Transactional(readOnly = true)
     public BodyMeasurementResponse getLatestBodyMeasurement() {
         ClientProfile client = clientProfileUtils.getCurrentClientProfile();
-        BodyMeasurement bodyMeasurement = bodyMeasurementRepository
+        return bodyMeasurementRepository
                 .findFirstByClientIdOrderByMeasurementDateDesc(client.getId())
+                .map(bodyMeasurementMapper::toResponse)
+                .orElseThrow(() -> new BusinessException(BODY_MEASUREMENT_NOT_FOUND));
+    }
+
+    private BodyMeasurement getEntityByIdAndValidateAccess(String id) {
+        BodyMeasurement measurement = bodyMeasurementRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(BODY_MEASUREMENT_NOT_FOUND));
 
+        ClientProfile currentClient = clientProfileUtils.getCurrentClientProfile();
+        if (!Objects.equals(currentClient.getId(), measurement.getClient().getId()))
+            throw new BusinessException(FORBIDDEN_ACCESS);
 
-        return bodyMeasurementMapper.toResponse(bodyMeasurement);
-    }
-
-    private void calculateAndSetBmi(BodyMeasurement measurement, Double heightCm) {
-        double heightInMeters = heightCm / 100.0;
-        double bmi = measurement.getWeight() / (heightInMeters * heightInMeters);
-        measurement.setBmi(round(bmi));
-    }
-
-    private void calculateAndSetBmr(BodyMeasurement measurement, ClientProfile client) {
-        int age = Period.between(client.getBirthdate(), LocalDate.now()).getYears();
-
-        double weight = measurement.getWeight();
-        double height = client.getHeight();
-        double bmr;
-
-        if (client.getGender() == ClientGender.MALE) {
-            bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
-        } else {
-            bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161;
-        }
-
-        measurement.setBmr((int) Math.round(bmr));
+        return measurement;
     }
 
     private void calculateChanges(BodyMeasurementResponse response, BodyMeasurement current, BodyMeasurement previous) {
@@ -143,24 +113,7 @@ public class BodyMeasurementServiceImpl implements IBodyMeasurementService {
             response.setMuscleMassChange(round(current.getMuscleMass() - previous.getMuscleMass()));
     }
 
-    private void validateAccess(BodyMeasurement bodyMeasurement) {
-        ClientProfile client = clientProfileUtils.getCurrentClientProfile();
-        if (!Objects.equals(client.getId(), bodyMeasurement.getClient().getId()))
-            throw new BusinessException(FORBIDDEN_ACCESS);
-    }
-
     private double round(double value) {
         return Math.round(value * 100.0) / 100.0;
-    }
-
-    private void initializeZeroChanges(BodyMeasurementResponse response) {
-        response.setWeightChange(0.0);
-        response.setBodyFatChange(0.0);
-        response.setMuscleMassChange(0.0);
-    }
-
-    private BodyMeasurement findBodyMeasurementById(String id) {
-        return bodyMeasurementRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(BODY_MEASUREMENT_NOT_FOUND));
     }
 }
