@@ -1,6 +1,7 @@
 package com.dev.quikkkk.service.impl;
 
 import com.dev.quikkkk.dto.request.CreateBodyMeasurementRequest;
+import com.dev.quikkkk.dto.request.UpdateBodyMeasurementRequest;
 import com.dev.quikkkk.dto.response.BodyMeasurementResponse;
 import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.entity.BodyMeasurement;
@@ -81,9 +82,30 @@ public class BodyMeasurementServiceImpl implements IBodyMeasurementService {
     @Override
     @Transactional(readOnly = true)
     public BodyMeasurementResponse getBodyMeasurementById(String id) {
-        BodyMeasurement bodyMeasurement = bodyMeasurementRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(BODY_MEASUREMENT_NOT_FOUND));
+        BodyMeasurement bodyMeasurement = findBodyMeasurementById(id);
         validateAccess(bodyMeasurement);
+
+        return bodyMeasurementMapper.toResponse(bodyMeasurement);
+    }
+
+    @Override
+    @Transactional
+    public BodyMeasurementResponse updateBodyMeasurement(UpdateBodyMeasurementRequest request, String id) {
+        BodyMeasurement bodyMeasurement = findBodyMeasurementById(id);
+        validateAccess(bodyMeasurement);
+
+        bodyMeasurementMapper.update(request, bodyMeasurement);
+        return bodyMeasurementMapper.toResponse(bodyMeasurement);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public BodyMeasurementResponse getLatestBodyMeasurement() {
+        ClientProfile client = clientProfileUtils.getCurrentClientProfile();
+        BodyMeasurement bodyMeasurement = bodyMeasurementRepository
+                .findFirstByClientIdOrderByMeasurementDateDesc(client.getId())
+                .orElseThrow(() -> new BusinessException(BODY_MEASUREMENT_NOT_FOUND));
+
 
         return bodyMeasurementMapper.toResponse(bodyMeasurement);
     }
@@ -135,5 +157,10 @@ public class BodyMeasurementServiceImpl implements IBodyMeasurementService {
         response.setWeightChange(0.0);
         response.setBodyFatChange(0.0);
         response.setMuscleMassChange(0.0);
+    }
+
+    private BodyMeasurement findBodyMeasurementById(String id) {
+        return bodyMeasurementRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(BODY_MEASUREMENT_NOT_FOUND));
     }
 }
