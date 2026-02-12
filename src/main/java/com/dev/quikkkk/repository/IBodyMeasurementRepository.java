@@ -16,4 +16,6 @@ public interface IBodyMeasurementRepository extends JpaRepository<BodyMeasuremen
     );
 
     Page<BodyMeasurement> findBodyMeasurementsByClientId(String clientId, Pageable pageable);
+
+    Optional<BodyMeasurement> findFirstByClientIdOrderByMeasurementDateDesc(String clientId);
 }
