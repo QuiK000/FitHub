@@ -2,6 +2,7 @@ package com.dev.quikkkk.controller;
 
 import com.dev.quikkkk.dto.request.CreateBodyMeasurementRequest;
 import com.dev.quikkkk.dto.response.BodyMeasurementResponse;
+import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.service.IBodyMeasurementService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -34,5 +36,14 @@ public class ProgressTrackingController {
             @PathVariable("measurement-id") String measurementId
     ) {
         return ResponseEntity.ok(bodyMeasurementService.getBodyMeasurementById(measurementId));
+    }
+
+    @GetMapping("/measurements")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<PageResponse<BodyMeasurementResponse>> getBodyMeasurements(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(bodyMeasurementService.getBodyMeasurements(page, size));
     }
 }
