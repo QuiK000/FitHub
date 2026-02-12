@@ -11,8 +11,11 @@ import com.dev.quikkkk.mapper.BodyMeasurementMapper;
 import com.dev.quikkkk.repository.IBodyMeasurementRepository;
 import com.dev.quikkkk.service.IBodyMeasurementService;
 import com.dev.quikkkk.utils.ClientProfileUtils;
+import com.dev.quikkkk.utils.PaginationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,8 +67,15 @@ public class BodyMeasurementServiceImpl implements IBodyMeasurementService {
 
     @Override
     @Transactional(readOnly = true)
-    public PageResponse<BodyMeasurementResponse> getBodyMeasurements() {
-        return null;
+    public PageResponse<BodyMeasurementResponse> getBodyMeasurements(int page, int size) {
+        ClientProfile client = clientProfileUtils.getCurrentClientProfile();
+        Pageable pageable = PaginationUtils.createPageRequest(page, size, "measurementDate");
+        Page<BodyMeasurement> bodyMeasurementPage = bodyMeasurementRepository.findBodyMeasurementsByClientId(
+                client.getId(),
+                pageable
+        );
+
+        return PaginationUtils.toPageResponse(bodyMeasurementPage, bodyMeasurementMapper::toResponse);
     }
 
     @Override
