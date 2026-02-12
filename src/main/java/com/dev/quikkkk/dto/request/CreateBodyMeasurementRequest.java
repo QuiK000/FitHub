@@ -3,6 +3,7 @@ package com.dev.quikkkk.dto.request;
 import com.dev.quikkkk.enums.MeasurementType;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @AllArgsConstructor
@@ -18,6 +20,9 @@ import java.util.Map;
 @Setter
 @Builder
 public class CreateBodyMeasurementRequest {
+    @PastOrPresent(message = "VALIDATION.MEASUREMENT.DATE.PAST_OR_PRESENT")
+    private LocalDateTime measurementDate;
+
     @Positive(message = "VALIDATION.MEASUREMENT.WEIGHT.POSITIVE")
     private Double weight;
 

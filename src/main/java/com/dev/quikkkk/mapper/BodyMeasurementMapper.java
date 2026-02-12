@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.Optional;
 
 @Service
 public class BodyMeasurementMapper {
@@ -16,7 +17,7 @@ public class BodyMeasurementMapper {
         return BodyMeasurement.builder()
                 .client(client)
                 .createdBy(client.getId())
-                .measurementDate(LocalDateTime.now())
+                .measurementDate(Optional.ofNullable(request.getMeasurementDate()).orElse(LocalDateTime.now()))
                 .weight(request.getWeight())
                 .bodyFatPercentage(request.getBodyFatPercentage())
                 .muscleMass(request.getMuscleMass())
