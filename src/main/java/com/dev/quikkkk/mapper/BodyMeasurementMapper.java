@@ -1,6 +1,7 @@
 package com.dev.quikkkk.mapper;
 
 import com.dev.quikkkk.dto.request.CreateBodyMeasurementRequest;
+import com.dev.quikkkk.dto.request.UpdateBodyMeasurementRequest;
 import com.dev.quikkkk.dto.response.BodyMeasurementResponse;
 import com.dev.quikkkk.entity.BodyMeasurement;
 import com.dev.quikkkk.entity.ClientProfile;
@@ -45,5 +46,22 @@ public class BodyMeasurementMapper {
                 .notes(bodyMeasurement.getNotes())
                 .photoUrl(bodyMeasurement.getPhotoUrl())
                 .build();
+    }
+
+    public void update(UpdateBodyMeasurementRequest request, BodyMeasurement bodyMeasurement) {
+        if (request.getWeight() != null) bodyMeasurement.setWeight(request.getWeight());
+        if (request.getBodyFatPercentage() != null)
+            bodyMeasurement.setBodyFatPercentage(request.getBodyFatPercentage());
+        if (request.getMuscleMass() != null) bodyMeasurement.setMuscleMass(request.getMuscleMass());
+        if (request.getBmi() != null) bodyMeasurement.setBmi(request.getBmi());
+        if (request.getBmr() != null) bodyMeasurement.setBmr(request.getBmr());
+        if (request.getBodyWaterPercentage() != null)
+            bodyMeasurement.setBodyWaterPercentage(request.getBodyWaterPercentage());
+        if (request.getBoneMass() != null) bodyMeasurement.setBoneMass(request.getBoneMass());
+        if (request.getVisceralFatLevel() != null) bodyMeasurement.setVisceralFatLevel(request.getVisceralFatLevel());
+        if (request.getMeasurements() != null) bodyMeasurement.setMeasurements(request.getMeasurements());
+        if (request.getNotes() != null) bodyMeasurement.setNotes(request.getNotes());
+        if (request.getPhotoUrl() != null) bodyMeasurement.setPhotoUrl(request.getPhotoUrl());
+        bodyMeasurement.setLastModifiedBy(bodyMeasurement.getClient().getId());
     }
 }
