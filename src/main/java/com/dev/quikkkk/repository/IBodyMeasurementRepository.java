@@ -1,6 +1,8 @@
 package com.dev.quikkkk.repository;
 
 import com.dev.quikkkk.entity.BodyMeasurement;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,4 +14,6 @@ public interface IBodyMeasurementRepository extends JpaRepository<BodyMeasuremen
     Optional<BodyMeasurement> findFirstByClient_IdAndMeasurementDateBeforeOrderByMeasurementDateDesc(
             String clientId, LocalDateTime date
     );
+
+    Page<BodyMeasurement> findBodyMeasurementsByClientId(String clientId, Pageable pageable);
 }
