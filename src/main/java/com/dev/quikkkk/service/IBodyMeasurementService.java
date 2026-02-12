@@ -7,7 +7,7 @@ import com.dev.quikkkk.dto.response.PageResponse;
 public interface IBodyMeasurementService {
     BodyMeasurementResponse createBodyMeasurement(CreateBodyMeasurementRequest request);
 
-    PageResponse<BodyMeasurementResponse> getBodyMeasurements();
+    PageResponse<BodyMeasurementResponse> getBodyMeasurements(int page, int size);
 
     BodyMeasurementResponse getBodyMeasurementById(String id);
 }
