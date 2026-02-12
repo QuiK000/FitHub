@@ -1,6 +1,7 @@
 package com.dev.quikkkk.controller;
 
 import com.dev.quikkkk.dto.request.CreateBodyMeasurementRequest;
+import com.dev.quikkkk.dto.request.UpdateBodyMeasurementRequest;
 import com.dev.quikkkk.dto.response.BodyMeasurementResponse;
 import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.service.IBodyMeasurementService;
@@ -11,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -45,5 +47,20 @@ public class ProgressTrackingController {
             @RequestParam(defaultValue = "10") int size
     ) {
         return ResponseEntity.ok(bodyMeasurementService.getBodyMeasurements(page, size));
+    }
+
+    @GetMapping("/measurements/latest")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<BodyMeasurementResponse> getLatestBodyMeasurement() {
+        return ResponseEntity.ok(bodyMeasurementService.getLatestBodyMeasurement());
+    }
+
+    @PutMapping("/measurements/{measurement-id}")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<BodyMeasurementResponse> updateBodyMeasurement(
+            @PathVariable("measurement-id") String id,
+            @Valid @RequestBody UpdateBodyMeasurementRequest request
+    ) {
+        return ResponseEntity.ok(bodyMeasurementService.updateBodyMeasurement(request, id));
     }
 }
