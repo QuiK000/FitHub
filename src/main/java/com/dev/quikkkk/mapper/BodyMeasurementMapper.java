@@ -8,6 +8,7 @@ import com.dev.quikkkk.entity.ClientProfile;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 
 @Service
 public class BodyMeasurementMapper {
@@ -26,7 +27,7 @@ public class BodyMeasurementMapper {
                 .visceralFatLevel(request.getVisceralFatLevel())
                 .notes(request.getNotes())
                 .photoUrl(request.getPhotoUrl())
-                .measurements(request.getMeasurements())
+                .measurements(request.getMeasurements() != null ? request.getMeasurements() : new HashMap<>())
                 .build();
     }
 
@@ -45,23 +46,25 @@ public class BodyMeasurementMapper {
                 .measurements(bodyMeasurement.getMeasurements())
                 .notes(bodyMeasurement.getNotes())
                 .photoUrl(bodyMeasurement.getPhotoUrl())
+                .weightChange(0.0)
+                .bodyFatChange(0.0)
+                .muscleMassChange(0.0)
                 .build();
     }
 
-    public void update(UpdateBodyMeasurementRequest request, BodyMeasurement bodyMeasurement) {
-        if (request.getWeight() != null) bodyMeasurement.setWeight(request.getWeight());
-        if (request.getBodyFatPercentage() != null)
-            bodyMeasurement.setBodyFatPercentage(request.getBodyFatPercentage());
-        if (request.getMuscleMass() != null) bodyMeasurement.setMuscleMass(request.getMuscleMass());
-        if (request.getBmi() != null) bodyMeasurement.setBmi(request.getBmi());
-        if (request.getBmr() != null) bodyMeasurement.setBmr(request.getBmr());
-        if (request.getBodyWaterPercentage() != null)
-            bodyMeasurement.setBodyWaterPercentage(request.getBodyWaterPercentage());
-        if (request.getBoneMass() != null) bodyMeasurement.setBoneMass(request.getBoneMass());
-        if (request.getVisceralFatLevel() != null) bodyMeasurement.setVisceralFatLevel(request.getVisceralFatLevel());
-        if (request.getMeasurements() != null) bodyMeasurement.setMeasurements(request.getMeasurements());
-        if (request.getNotes() != null) bodyMeasurement.setNotes(request.getNotes());
-        if (request.getPhotoUrl() != null) bodyMeasurement.setPhotoUrl(request.getPhotoUrl());
-        bodyMeasurement.setLastModifiedBy(bodyMeasurement.getClient().getId());
+    public void update(UpdateBodyMeasurementRequest request, BodyMeasurement entity) {
+        if (request.getWeight() != null) entity.setWeight(request.getWeight());
+        if (request.getBodyFatPercentage() != null) entity.setBodyFatPercentage(request.getBodyFatPercentage());
+        if (request.getMuscleMass() != null) entity.setMuscleMass(request.getMuscleMass());
+        if (request.getBmi() != null) entity.setBmi(request.getBmi());
+        if (request.getBmr() != null) entity.setBmr(request.getBmr());
+        if (request.getBodyWaterPercentage() != null) entity.setBodyWaterPercentage(request.getBodyWaterPercentage());
+        if (request.getBoneMass() != null) entity.setBoneMass(request.getBoneMass());
+        if (request.getVisceralFatLevel() != null) entity.setVisceralFatLevel(request.getVisceralFatLevel());
+        if (request.getMeasurements() != null) entity.setMeasurements(request.getMeasurements());
+        if (request.getNotes() != null) entity.setNotes(request.getNotes());
+        if (request.getPhotoUrl() != null) entity.setPhotoUrl(request.getPhotoUrl());
+
+        entity.setLastModifiedBy(entity.getClient().getId());
     }
 }
