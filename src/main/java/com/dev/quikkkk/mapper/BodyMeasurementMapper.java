@@ -3,12 +3,19 @@ package com.dev.quikkkk.mapper;
 import com.dev.quikkkk.dto.request.CreateBodyMeasurementRequest;
 import com.dev.quikkkk.dto.request.UpdateBodyMeasurementRequest;
 import com.dev.quikkkk.dto.response.BodyMeasurementResponse;
+import com.dev.quikkkk.dto.response.MeasurementHistoryResponse;
+import com.dev.quikkkk.dto.response.MeasurementTrendsDto;
 import com.dev.quikkkk.entity.BodyMeasurement;
 import com.dev.quikkkk.entity.ClientProfile;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -67,5 +74,58 @@ public class BodyMeasurementMapper {
         if (request.getPhotoUrl() != null) entity.setPhotoUrl(request.getPhotoUrl());
 
         entity.setLastModifiedBy(entity.getClient().getId());
+    }
+
+    public MeasurementHistoryResponse toResponseHistory(List<BodyMeasurement> measurements) {
+        if (measurements == null || measurements.isEmpty()) {
+            return MeasurementHistoryResponse.builder()
+                    .measurements(Collections.emptyList())
+                    .trends(MeasurementTrendsDto.builder()
+                            .measurementCount(0)
+                            .daysSinceFirst(0)
+                            .build())
+                    .build();
+        }
+
+        List<BodyMeasurement> sorted = measurements.stream()
+                .sorted(Comparator.comparing(BodyMeasurement::getMeasurementDate))
+                .toList();
+
+        List<BodyMeasurementResponse> responseList = new ArrayList<>();
+        for (int i = 0; i < sorted.size(); i++) {
+            BodyMeasurement current = sorted.get(i);
+            BodyMeasurement previous = i == 0 ? null : sorted.get(i - 1);
+
+            BodyMeasurementResponse dto = toResponse(current);
+
+            dto.setWeightChange(diff(current.getWeight(), previous != null ? previous.getWeight() : null));
+            dto.setBodyFatChange(diff(current.getBodyFatPercentage(), previous != null ? previous.getBodyFatPercentage() : null));
+            dto.setMuscleMassChange(diff(current.getMuscleMass(), previous != null ? previous.getMuscleMass() : null));
+
+            responseList.add(dto);
+        }
+
+        Collections.reverse(responseList);
+
+        BodyMeasurement oldest = sorted.getFirst();
+        BodyMeasurement newest = sorted.getLast();
+
+        MeasurementTrendsDto trends = MeasurementTrendsDto.builder()
+                .measurementCount(sorted.size())
+                .daysSinceFirst((int) ChronoUnit.DAYS.between(oldest.getMeasurementDate(), newest.getMeasurementDate()))
+                .totalWeightChange(diff(newest.getWeight(), oldest.getWeight()))
+                .totalBodyFatChange(diff(newest.getBodyFatPercentage(), oldest.getBodyFatPercentage()))
+                .totalMuscleMassChange(diff(newest.getMuscleMass(), oldest.getMuscleMass()))
+                .build();
+
+        return MeasurementHistoryResponse.builder()
+                .measurements(responseList)
+                .trends(trends)
+                .build();
+    }
+
+    private Double diff(Double current, Double previous) {
+        if (current == null || previous == null) return null;
+        return Math.round((current - previous) * 100.0) / 100.0;
     }
 }

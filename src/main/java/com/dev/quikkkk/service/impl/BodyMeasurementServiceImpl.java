@@ -3,6 +3,7 @@ package com.dev.quikkkk.service.impl;
 import com.dev.quikkkk.dto.request.CreateBodyMeasurementRequest;
 import com.dev.quikkkk.dto.request.UpdateBodyMeasurementRequest;
 import com.dev.quikkkk.dto.response.BodyMeasurementResponse;
+import com.dev.quikkkk.dto.response.MeasurementHistoryResponse;
 import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.entity.BodyMeasurement;
 import com.dev.quikkkk.entity.ClientProfile;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 
 import static com.dev.quikkkk.enums.ErrorCode.BODY_MEASUREMENT_NOT_FOUND;
@@ -89,6 +91,15 @@ public class BodyMeasurementServiceImpl implements IBodyMeasurementService {
                 .findFirstByClientIdOrderByMeasurementDateDesc(client.getId())
                 .map(bodyMeasurementMapper::toResponse)
                 .orElseThrow(() -> new BusinessException(BODY_MEASUREMENT_NOT_FOUND));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MeasurementHistoryResponse getHistoryBodyMeasurement() {
+        ClientProfile client = clientProfileUtils.getCurrentClientProfile();
+        List<BodyMeasurement> measurements = bodyMeasurementRepository.findAllBodyMeasurementsByClientId(client.getId());
+
+        return bodyMeasurementMapper.toResponseHistory(measurements);
     }
 
     private BodyMeasurement getEntityByIdAndValidateAccess(String id) {
