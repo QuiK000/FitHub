@@ -3,6 +3,7 @@ package com.dev.quikkkk.service;
 import com.dev.quikkkk.dto.request.CreateBodyMeasurementRequest;
 import com.dev.quikkkk.dto.request.UpdateBodyMeasurementRequest;
 import com.dev.quikkkk.dto.response.BodyMeasurementResponse;
+import com.dev.quikkkk.dto.response.MeasurementHistoryResponse;
 import com.dev.quikkkk.dto.response.PageResponse;
 
 public interface IBodyMeasurementService {
@@ -15,4 +16,6 @@ public interface IBodyMeasurementService {
     BodyMeasurementResponse updateBodyMeasurement(UpdateBodyMeasurementRequest request, String id);
 
     BodyMeasurementResponse getLatestBodyMeasurement();
+
+    MeasurementHistoryResponse getHistoryBodyMeasurement();
 }

@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -26,4 +27,6 @@ public interface IBodyMeasurementRepository extends JpaRepository<BodyMeasuremen
     Page<BodyMeasurement> findBodyMeasurementsByClientId(String clientId, Pageable pageable);
 
     Optional<BodyMeasurement> findFirstByClientIdOrderByMeasurementDateDesc(String clientId);
+
+    List<BodyMeasurement> findAllBodyMeasurementsByClientId(String clientId);
 }
