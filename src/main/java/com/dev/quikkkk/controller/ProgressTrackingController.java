@@ -3,6 +3,7 @@ package com.dev.quikkkk.controller;
 import com.dev.quikkkk.dto.request.CreateBodyMeasurementRequest;
 import com.dev.quikkkk.dto.request.UpdateBodyMeasurementRequest;
 import com.dev.quikkkk.dto.response.BodyMeasurementResponse;
+import com.dev.quikkkk.dto.response.MeasurementHistoryResponse;
 import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.service.IBodyMeasurementService;
 import jakarta.validation.Valid;
@@ -53,6 +54,12 @@ public class ProgressTrackingController {
     @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<BodyMeasurementResponse> getLatestBodyMeasurement() {
         return ResponseEntity.ok(bodyMeasurementService.getLatestBodyMeasurement());
+    }
+
+    @GetMapping("/measurements/history")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<MeasurementHistoryResponse> getHistoryBodyMeasurement() {
+        return ResponseEntity.ok(bodyMeasurementService.getHistoryBodyMeasurement());
     }
 
     @PutMapping("/measurements/{measurement-id}")
