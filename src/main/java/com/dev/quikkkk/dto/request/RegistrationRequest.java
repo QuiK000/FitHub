@@ -1,6 +1,7 @@
 package com.dev.quikkkk.dto.request;
 
 import com.dev.quikkkk.validation.NonDisposableEmail;
+import com.dev.quikkkk.validation.PasswordMatches;
 import com.dev.quikkkk.validation.ValidationPatterns;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -16,6 +17,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@PasswordMatches
 public class RegistrationRequest {
     @NotBlank(message = "VALIDATION.REGISTRATION.EMAIL.NOT_BLANK")
     @Size(max = 155, message = "VALIDATION.REGISTRATION.EMAIL.SIZE")
