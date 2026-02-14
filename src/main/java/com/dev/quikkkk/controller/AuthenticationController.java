@@ -23,12 +23,12 @@ public class AuthenticationController {
     private final IAuthenticationService authenticationService;
 
     @PostMapping("/signin")
-    public ResponseEntity<AuthenticationResponse> Login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<AuthenticationResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authenticationService.login(request));
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<MessageResponse> Registration(@Valid @RequestBody RegistrationRequest request) {
+    public ResponseEntity<MessageResponse> register(@Valid @RequestBody RegistrationRequest request) {
         return ResponseEntity.ok(authenticationService.register(request));
     }
 
