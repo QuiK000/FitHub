@@ -7,6 +7,7 @@ import com.dev.quikkkk.dto.response.AuthenticationResponse;
 import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.entity.Role;
 import com.dev.quikkkk.entity.User;
+import com.dev.quikkkk.enums.RoleName;
 import com.dev.quikkkk.enums.TokenType;
 import com.dev.quikkkk.exception.BusinessException;
 import com.dev.quikkkk.mapper.AuthenticationMapper;
@@ -25,13 +26,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import static com.dev.quikkkk.enums.ErrorCode.ACCOUNT_DISABLED;
 import static com.dev.quikkkk.enums.ErrorCode.EMAIL_ALREADY_EXISTS;
-import static com.dev.quikkkk.enums.ErrorCode.PASSWORD_MISMATCH;
+import static com.dev.quikkkk.enums.ErrorCode.ROLE_NOT_FOUND;
 import static com.dev.quikkkk.enums.ErrorCode.TOKEN_BLACKLISTED;
 import static com.dev.quikkkk.enums.ErrorCode.TOKEN_EXPIRED;
 import static com.dev.quikkkk.enums.ErrorCode.TOKEN_INVALID;
@@ -39,6 +41,7 @@ import static com.dev.quikkkk.enums.ErrorCode.TOKEN_INVALID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class AuthenticationServiceImpl implements IAuthenticationService {
     private final static String TOKEN_TYPE = "Bearer ";
 
@@ -55,6 +58,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     private final AuthenticationMapper authMapper;
 
     @Override
+    @Transactional
     public AuthenticationResponse login(LoginRequest request) {
         log.info("Login request for email: {}", request.getEmail());
         User user = serviceUtils.getUserByEmailOrThrow(request.getEmail());
@@ -99,14 +103,13 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     }
 
     @Override
+    @Transactional
     public MessageResponse register(RegistrationRequest request) {
         log.info("Register request for email: {}", request.getEmail());
 
         checkUserEmail(request.getEmail());
-        checkPassword(request.getPassword(), request.getConfirmPassword());
-
-        Role defaultRole = roleRepository.findByName("CLIENT")
-                .orElseThrow(() -> new RuntimeException("Role user does not exist"));
+        Role defaultRole = roleRepository.findByName(RoleName.CLIENT.name())
+                .orElseThrow(() -> new BusinessException(ROLE_NOT_FOUND));
 
         Set<Role> roles = new HashSet<>();
         roles.add(defaultRole);
@@ -136,9 +139,5 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     private void checkUserEmail(String email) {
         boolean emailExists = userRepository.existsByEmailIgnoreCase(email);
         if (emailExists) throw new BusinessException(EMAIL_ALREADY_EXISTS);
-    }
-
-    private void checkPassword(String password, String confirmPassword) {
-        if (password == null || !password.equals(confirmPassword)) throw new BusinessException(PASSWORD_MISMATCH);
     }
 }
