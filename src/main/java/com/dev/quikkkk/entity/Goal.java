@@ -48,6 +48,9 @@ public class Goal extends BaseEntity {
     @Column(name = "goal_type", nullable = false)
     private GoalType goalType;
 
+    @Column(name = "start_value")
+    private Double startValue;
+
     @Column(name = "target_value")
     private Double targetValue;
 
