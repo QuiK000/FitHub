@@ -108,6 +108,9 @@ public class ClientProfile extends BaseEntity {
     @OneToMany(mappedBy = "client")
     private Set<BodyMeasurement> bodyMeasurements = new HashSet<>();
 
+    @OneToMany(mappedBy = "client")
+    private Set<Goal> goals = new HashSet<>();
+
     public void clearPersonalData() {
         this.firstname = null;
         this.lastname = null;
