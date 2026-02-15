@@ -1,11 +1,14 @@
 package com.dev.quikkkk.controller;
 
 import com.dev.quikkkk.dto.request.CreateBodyMeasurementRequest;
+import com.dev.quikkkk.dto.request.CreateGoalRequest;
 import com.dev.quikkkk.dto.request.UpdateBodyMeasurementRequest;
 import com.dev.quikkkk.dto.response.BodyMeasurementResponse;
+import com.dev.quikkkk.dto.response.GoalResponse;
 import com.dev.quikkkk.dto.response.MeasurementHistoryResponse;
 import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.service.IBodyMeasurementService;
+import com.dev.quikkkk.service.IGoalService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ProgressTrackingController {
     private final IBodyMeasurementService bodyMeasurementService;
+    private final IGoalService goalService;
 
     @PostMapping("/measurements")
     @PreAuthorize("hasRole('CLIENT')")
@@ -31,6 +35,12 @@ public class ProgressTrackingController {
             @RequestBody @Valid CreateBodyMeasurementRequest request
     ) {
         return ResponseEntity.ok(bodyMeasurementService.createBodyMeasurement(request));
+    }
+
+    @PostMapping("/goals")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<GoalResponse> createGoal(@Valid @RequestBody CreateGoalRequest request) {
+        return ResponseEntity.ok(goalService.createGoal(request));
     }
 
     @GetMapping("/measurements/{measurement-id}")
