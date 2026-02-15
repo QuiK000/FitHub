@@ -22,7 +22,7 @@ public class GoalMapper {
                 .unit(request.getUnit())
                 .startDate(LocalDateTime.now())
                 .targetDate(request.getTargetDate())
-                .status(GoalStatus.ON_HOLD)
+                .status(GoalStatus.ACTIVE)
                 .notes(request.getNotes())
                 .createdBy(client.getId())
                 .build();
