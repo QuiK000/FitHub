@@ -5,4 +5,6 @@ import com.dev.quikkkk.dto.response.GoalResponse;
 
 public interface IGoalService {
     GoalResponse createGoal(CreateGoalRequest request);
+
+    GoalResponse getGoalById(String goalId);
 }
