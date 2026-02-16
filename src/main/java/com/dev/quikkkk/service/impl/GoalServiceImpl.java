@@ -30,4 +30,10 @@ public class GoalServiceImpl implements IGoalService {
         goalRepository.save(goal);
         return goalMapper.toResponse(goal);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public GoalResponse getGoalById(String goalId) {
+        return null;
+    }
 }
