@@ -104,7 +104,9 @@ public enum ErrorCode {
     MEAL_NOT_FOUND("MEAL_NOT_FOUND", "Meal not Found", NOT_FOUND),
     MEAL_ALREADY_COMPLETED("MEAL_ALREADY_COMPLETED", "Meal Already Completed", BAD_REQUEST),
     BODY_MEASUREMENT_NOT_FOUND("BODY_MEASUREMENT_NOT_FOUND", "Body measurement Not Found", NOT_FOUND),
-    ROLE_NOT_FOUND("ROLE_NOT_FOUND", "Role not found", NOT_FOUND)
+    ROLE_NOT_FOUND("ROLE_NOT_FOUND", "Role not found", NOT_FOUND),
+    GOAL_NOT_FOUND("GOAL_NOT_FOUND", "Goal not found", NOT_FOUND),
+    GOAL_ALREADY_COMPLETED("GOAL_ALREADY_COMPLETED", "Goal already completed", BAD_REQUEST),
     ;
 
     private final String code;
