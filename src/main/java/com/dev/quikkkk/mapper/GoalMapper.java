@@ -2,6 +2,7 @@ package com.dev.quikkkk.mapper;
 
 import com.dev.quikkkk.dto.request.CreateGoalRequest;
 import com.dev.quikkkk.dto.request.UpdateGoalProgressRequest;
+import com.dev.quikkkk.dto.request.UpdateGoalRequest;
 import com.dev.quikkkk.dto.response.GoalResponse;
 import com.dev.quikkkk.entity.ClientProfile;
 import com.dev.quikkkk.entity.Goal;
@@ -49,7 +50,19 @@ public class GoalMapper {
                 .build();
     }
 
-    public void update(Goal goal, UpdateGoalProgressRequest request) {
+    public void update(Goal goal, UpdateGoalRequest request) {
+        if (request.getTitle() != null) goal.setTitle(request.getTitle());
+        if (request.getDescription() != null) goal.setDescription(request.getDescription());
+        if (request.getGoalType() != null) goal.setGoalType(request.getGoalType());
+        if (request.getTargetValue() != null) goal.setTargetValue(request.getTargetValue());
+        if (request.getCurrentValue() != null) goal.setCurrentValue(request.getCurrentValue());
+        if (request.getUnit() != null) goal.setUnit(request.getUnit());
+        if (request.getTargetDate() != null) goal.setTargetDate(request.getTargetDate());
+        if (request.getNotes() != null) goal.setNotes(request.getNotes());
+        goal.setLastModifiedBy(goal.getClient().getId());
+    }
+
+    public void updateProgress(Goal goal, UpdateGoalProgressRequest request) {
         if (request.getCurrentValue() != null) goal.setCurrentValue(request.getCurrentValue());
         if (request.getNotes() != null) goal.setNotes(request.getNotes());
         goal.setLastModifiedBy(goal.getClient().getId());
