@@ -2,8 +2,10 @@ package com.dev.quikkkk.service.impl;
 
 import com.dev.quikkkk.dto.request.CreateGoalRequest;
 import com.dev.quikkkk.dto.request.UpdateGoalProgressRequest;
+import com.dev.quikkkk.dto.request.UpdateGoalRequest;
 import com.dev.quikkkk.dto.response.GoalResponse;
 import com.dev.quikkkk.dto.response.MessageResponse;
+import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.entity.ClientProfile;
 import com.dev.quikkkk.entity.Goal;
 import com.dev.quikkkk.enums.GoalStatus;
@@ -13,8 +15,11 @@ import com.dev.quikkkk.mapper.MessageMapper;
 import com.dev.quikkkk.repository.IGoalRepository;
 import com.dev.quikkkk.service.IGoalService;
 import com.dev.quikkkk.utils.ClientProfileUtils;
+import com.dev.quikkkk.utils.PaginationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,15 +50,33 @@ public class GoalServiceImpl implements IGoalService {
 
     @Override
     @Transactional(readOnly = true)
+    public PageResponse<GoalResponse> getGoals(int page, int size) {
+        ClientProfile client = clientProfileUtils.getCurrentClientProfile();
+        Pageable pageable = PaginationUtils.createPageRequest(page, size, "createdDate");
+        Page<Goal> goalPage = goalRepository.getGoalsByClientId(pageable, client.getId());
+
+        return PaginationUtils.toPageResponse(goalPage, goalMapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public GoalResponse getGoalById(String goalId) {
         Goal goal = getEntityByIdAndValidateAccess(goalId);
         return goalMapper.toResponse(goal);
     }
 
     @Override
-    public GoalResponse updateGoalById(String goalId, UpdateGoalProgressRequest request) {
+    public GoalResponse updateGoalById(String goalId, UpdateGoalRequest request) {
         Goal goal = getEntityByIdAndValidateAccess(goalId);
         goalMapper.update(goal, request);
+
+        return goalMapper.toResponse(goal);
+    }
+
+    @Override
+    public GoalResponse updateGoalProgress(String goalId, UpdateGoalProgressRequest request) {
+        Goal goal = getEntityByIdAndValidateAccess(goalId);
+        goalMapper.updateProgress(goal, request);
 
         return goalMapper.toResponse(goal);
     }
@@ -65,6 +88,26 @@ public class GoalServiceImpl implements IGoalService {
 
         goal.setStatus(GoalStatus.COMPLETED);
         return messageMapper.message("Goal successfully completed");
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<GoalResponse> getActiveGoals(int page, int size) {
+        ClientProfile client = clientProfileUtils.getCurrentClientProfile();
+        Pageable pageable = PaginationUtils.createPageRequest(page, size, "createdDate");
+        Page<Goal> goalPage = goalRepository.getActiveGoals(client.getId(), pageable);
+
+        return PaginationUtils.toPageResponse(goalPage, goalMapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<GoalResponse> getCompletedGoals(int page, int size) {
+        ClientProfile client = clientProfileUtils.getCurrentClientProfile();
+        Pageable pageable = PaginationUtils.createPageRequest(page, size, "createdDate");
+        Page<Goal> goalPage = goalRepository.getCompletedGoals(client.getId(), pageable);
+
+        return PaginationUtils.toPageResponse(goalPage, goalMapper::toResponse);
     }
 
     private Goal getEntityByIdAndValidateAccess(String id) {
