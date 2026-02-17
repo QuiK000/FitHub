@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
+import static com.dev.quikkkk.enums.ErrorCode.ACTIVE_GOAL_ALREADY_EXISTS;
 import static com.dev.quikkkk.enums.ErrorCode.FORBIDDEN_ACCESS;
 import static com.dev.quikkkk.enums.ErrorCode.GOAL_ALREADY_COMPLETED;
 import static com.dev.quikkkk.enums.ErrorCode.GOAL_NOT_FOUND;
@@ -42,20 +43,28 @@ public class GoalServiceImpl implements IGoalService {
     @Override
     public GoalResponse createGoal(CreateGoalRequest request) {
         ClientProfile client = clientProfileUtils.getCurrentClientProfile();
-        Goal goal = goalMapper.toEntity(request, client);
+        if (goalRepository.existsByClientIdAndGoalTypeAndStatus(
+                client.getId(),
+                request.getGoalType(),
+                GoalStatus.ACTIVE)
+        ) throw new BusinessException(ACTIVE_GOAL_ALREADY_EXISTS);
 
+        Goal goal = goalMapper.toEntity(request, client);
+        Double initialCurrentValue = request.getCurrentValue() != null
+                ? request.getCurrentValue()
+                : request.getStartValue();
+
+        goal.trackProgress(initialCurrentValue, null);
         goalRepository.save(goal);
+
+        log.info("Created new goal [{}] for client [{}]", goal.getId(), client.getId());
         return goalMapper.toResponse(goal);
     }
 
     @Override
     @Transactional(readOnly = true)
     public PageResponse<GoalResponse> getGoals(int page, int size) {
-        ClientProfile client = clientProfileUtils.getCurrentClientProfile();
-        Pageable pageable = PaginationUtils.createPageRequest(page, size, "createdDate");
-        Page<Goal> goalPage = goalRepository.getGoalsByClientId(pageable, client.getId());
-
-        return PaginationUtils.toPageResponse(goalPage, goalMapper::toResponse);
+        return getGoalsByStatus(page, size, null);
     }
 
     @Override
@@ -70,13 +79,31 @@ public class GoalServiceImpl implements IGoalService {
         Goal goal = getEntityByIdAndValidateAccess(goalId);
         goalMapper.update(goal, request);
 
+        if (request.getStartValue() != null) goal.setStartValue(request.getStartValue());
+        boolean progressFieldsChanged = request.getStartValue() != null
+                || request.getTargetValue() != null
+                || request.getCurrentValue() != null;
+
+        if (progressFieldsChanged) {
+            Double valToUse = request.getCurrentValue() != null
+                    ? request.getCurrentValue()
+                    : goal.getCurrentValue();
+
+            goal.trackProgress(valToUse, null);
+        }
+
         return goalMapper.toResponse(goal);
     }
 
     @Override
     public GoalResponse updateGoalProgress(String goalId, UpdateGoalProgressRequest request) {
         Goal goal = getEntityByIdAndValidateAccess(goalId);
-        goalMapper.updateProgress(goal, request);
+        goal.trackProgress(request.getCurrentValue(), request.getNotes());
+
+        if (goal.getProgressPercentage() >= 100.0 && goal.getStatus() == GoalStatus.ACTIVE) {
+            log.info("Goal [{}] reached 100% progress. Consider prompting user to complete.", goalId);
+            goal.complete();
+        }
 
         return goalMapper.toResponse(goal);
     }
@@ -86,26 +113,34 @@ public class GoalServiceImpl implements IGoalService {
         Goal goal = getEntityByIdAndValidateAccess(goalId);
         if (goal.getStatus().equals(GoalStatus.COMPLETED)) throw new BusinessException(GOAL_ALREADY_COMPLETED);
 
-        goal.setStatus(GoalStatus.COMPLETED);
+        goal.complete();
+
+        log.info("Goal [{}] manually completed by client [{}]", goalId, goal.getClient().getId());
         return messageMapper.message("Goal successfully completed");
     }
 
     @Override
     @Transactional(readOnly = true)
     public PageResponse<GoalResponse> getActiveGoals(int page, int size) {
-        ClientProfile client = clientProfileUtils.getCurrentClientProfile();
-        Pageable pageable = PaginationUtils.createPageRequest(page, size, "createdDate");
-        Page<Goal> goalPage = goalRepository.getActiveGoals(client.getId(), pageable);
-
-        return PaginationUtils.toPageResponse(goalPage, goalMapper::toResponse);
+        return getGoalsByStatus(page, size, GoalStatus.ACTIVE);
     }
 
     @Override
     @Transactional(readOnly = true)
     public PageResponse<GoalResponse> getCompletedGoals(int page, int size) {
+        return getGoalsByStatus(page, size, GoalStatus.COMPLETED);
+    }
+
+    private PageResponse<GoalResponse> getGoalsByStatus(int page, int size, GoalStatus status) {
         ClientProfile client = clientProfileUtils.getCurrentClientProfile();
         Pageable pageable = PaginationUtils.createPageRequest(page, size, "createdDate");
-        Page<Goal> goalPage = goalRepository.getCompletedGoals(client.getId(), pageable);
+        Page<Goal> goalPage;
+
+        if (status == null) {
+            goalPage = goalRepository.findAllByClientId(client.getId(), pageable);
+        } else {
+            goalPage = goalRepository.findAllByClientIdAndStatus(client.getId(), status, pageable);
+        }
 
         return PaginationUtils.toPageResponse(goalPage, goalMapper::toResponse);
     }
@@ -114,8 +149,15 @@ public class GoalServiceImpl implements IGoalService {
         Goal goal = goalRepository.findById(id).orElseThrow(() -> new BusinessException(GOAL_NOT_FOUND));
 
         ClientProfile currentClient = clientProfileUtils.getCurrentClientProfile();
-        if (!Objects.equals(currentClient.getId(), goal.getClient().getId()))
+        if (!Objects.equals(currentClient.getId(), goal.getClient().getId())) {
+            log.warn(
+                    "Access denied: User [{}] tried to access goal [{}] owned by [{}]",
+                    currentClient.getId(),
+                    id,
+                    goal.getClient().getId()
+            );
             throw new BusinessException(FORBIDDEN_ACCESS);
+        }
 
         return goal;
     }
