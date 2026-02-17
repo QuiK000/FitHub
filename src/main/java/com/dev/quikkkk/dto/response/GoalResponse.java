@@ -24,6 +24,7 @@ public class GoalResponse {
     private GoalType goalType;
     private Double targetValue;
     private Double currentValue;
+    private Double startValue;
     private MeasurementUnit unit;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime startDate;
