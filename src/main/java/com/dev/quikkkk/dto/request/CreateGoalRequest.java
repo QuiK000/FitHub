@@ -29,6 +29,9 @@ public class CreateGoalRequest {
     @NotNull(message = "VALIDATION.GOAL.TYPE.NOT_NULL")
     private GoalType goalType;
 
+    @Positive(message = "VALIDATION.GOAL.START_VALUE.POSITIVE")
+    private Double startValue;
+
     @Positive(message = "VALIDATION.GOAL.TARGET_VALUE.POSITIVE")
     private Double targetValue;
 

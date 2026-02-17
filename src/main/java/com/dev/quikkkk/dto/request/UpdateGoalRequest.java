@@ -24,6 +24,9 @@ public class UpdateGoalRequest {
     private String description;
     private GoalType goalType;
 
+    @Positive(message = "VALIDATION.GOAL.START_VALUE.POSITIVE")
+    private Double startValue;
+
     @Positive(message = "VALIDATION.GOAL.TARGET_VALUE.POSITIVE")
     private Double targetValue;
 
