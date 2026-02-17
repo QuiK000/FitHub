@@ -3,9 +3,11 @@ package com.dev.quikkkk.controller;
 import com.dev.quikkkk.dto.request.CreateBodyMeasurementRequest;
 import com.dev.quikkkk.dto.request.CreateGoalRequest;
 import com.dev.quikkkk.dto.request.UpdateBodyMeasurementRequest;
+import com.dev.quikkkk.dto.request.UpdateGoalProgressRequest;
 import com.dev.quikkkk.dto.response.BodyMeasurementResponse;
 import com.dev.quikkkk.dto.response.GoalResponse;
 import com.dev.quikkkk.dto.response.MeasurementHistoryResponse;
+import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.service.IBodyMeasurementService;
 import com.dev.quikkkk.service.IGoalService;
@@ -14,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -72,6 +75,12 @@ public class ProgressTrackingController {
         return ResponseEntity.ok(bodyMeasurementService.getHistoryBodyMeasurement());
     }
 
+    @GetMapping("/goals/{goal-id}")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<GoalResponse> getGoalById(@PathVariable("goal-id") String goalId) {
+        return ResponseEntity.ok(goalService.getGoalById(goalId));
+    }
+
     @PutMapping("/measurements/{measurement-id}")
     @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<BodyMeasurementResponse> updateBodyMeasurement(
@@ -79,5 +88,20 @@ public class ProgressTrackingController {
             @Valid @RequestBody UpdateBodyMeasurementRequest request
     ) {
         return ResponseEntity.ok(bodyMeasurementService.updateBodyMeasurement(request, id));
+    }
+
+    @PutMapping("/goals/{goal-id}")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<GoalResponse> updateGoalById(
+            @PathVariable("goal-id") String goalId,
+            @Valid @RequestBody UpdateGoalProgressRequest request
+    ) {
+        return ResponseEntity.ok(goalService.updateGoalById(goalId, request));
+    }
+
+    @PatchMapping("/goals/{goal-id}/complete")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<MessageResponse> completeGoal(@PathVariable("goal-id") String goalId) {
+        return ResponseEntity.ok(goalService.completeGoal(goalId));
     }
 }
