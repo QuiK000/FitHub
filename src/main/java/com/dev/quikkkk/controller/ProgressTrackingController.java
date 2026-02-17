@@ -4,6 +4,7 @@ import com.dev.quikkkk.dto.request.CreateBodyMeasurementRequest;
 import com.dev.quikkkk.dto.request.CreateGoalRequest;
 import com.dev.quikkkk.dto.request.UpdateBodyMeasurementRequest;
 import com.dev.quikkkk.dto.request.UpdateGoalProgressRequest;
+import com.dev.quikkkk.dto.request.UpdateGoalRequest;
 import com.dev.quikkkk.dto.response.BodyMeasurementResponse;
 import com.dev.quikkkk.dto.response.GoalResponse;
 import com.dev.quikkkk.dto.response.MeasurementHistoryResponse;
@@ -81,6 +82,33 @@ public class ProgressTrackingController {
         return ResponseEntity.ok(goalService.getGoalById(goalId));
     }
 
+    @GetMapping("/goals")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<PageResponse<GoalResponse>> getGoals(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(goalService.getGoals(page, size));
+    }
+
+    @GetMapping("/goals/active")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<PageResponse<GoalResponse>> getActiveGoals(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(goalService.getActiveGoals(page, size));
+    }
+
+    @GetMapping("/goals/completed")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<PageResponse<GoalResponse>> getCompletedGoals(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(goalService.getCompletedGoals(page, size));
+    }
+
     @PutMapping("/measurements/{measurement-id}")
     @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<BodyMeasurementResponse> updateBodyMeasurement(
@@ -94,9 +122,18 @@ public class ProgressTrackingController {
     @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<GoalResponse> updateGoalById(
             @PathVariable("goal-id") String goalId,
-            @Valid @RequestBody UpdateGoalProgressRequest request
+            @Valid @RequestBody UpdateGoalRequest request
     ) {
         return ResponseEntity.ok(goalService.updateGoalById(goalId, request));
+    }
+
+    @PatchMapping("/goals/{goal-id}/progress")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<GoalResponse> updateGoalProgress(
+            @PathVariable("goal-id") String goalId,
+            @Valid @RequestBody UpdateGoalProgressRequest request
+    ) {
+        return ResponseEntity.ok(goalService.updateGoalProgress(goalId, request));
     }
 
     @PatchMapping("/goals/{goal-id}/complete")
