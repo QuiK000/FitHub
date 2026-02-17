@@ -107,6 +107,8 @@ public enum ErrorCode {
     ROLE_NOT_FOUND("ROLE_NOT_FOUND", "Role not found", NOT_FOUND),
     GOAL_NOT_FOUND("GOAL_NOT_FOUND", "Goal not found", NOT_FOUND),
     GOAL_ALREADY_COMPLETED("GOAL_ALREADY_COMPLETED", "Goal already completed", BAD_REQUEST),
+    GOAL_NOT_ACTIVE("GOAL_NOT_ACTIVE", "Goal is not active", BAD_REQUEST),
+    ACTIVE_GOAL_ALREADY_EXISTS("ACTIVE_GOAL_ALREADY_EXISTS", "Active goal of this type already exists", CONFLICT),
     ;
 
     private final String code;
