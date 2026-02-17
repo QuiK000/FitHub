@@ -1,6 +1,7 @@
 package com.dev.quikkkk.mapper;
 
 import com.dev.quikkkk.dto.request.CreateGoalRequest;
+import com.dev.quikkkk.dto.request.UpdateGoalProgressRequest;
 import com.dev.quikkkk.dto.response.GoalResponse;
 import com.dev.quikkkk.entity.ClientProfile;
 import com.dev.quikkkk.entity.Goal;
@@ -46,5 +47,11 @@ public class GoalMapper {
                 .daysRemaining(0)
                 .averageProgressPerDay(0.0)
                 .build();
+    }
+
+    public void update(Goal goal, UpdateGoalProgressRequest request) {
+        if (request.getCurrentValue() != null) goal.setCurrentValue(request.getCurrentValue());
+        if (request.getNotes() != null) goal.setNotes(request.getNotes());
+        goal.setLastModifiedBy(goal.getClient().getId());
     }
 }
