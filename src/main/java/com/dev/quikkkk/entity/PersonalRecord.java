@@ -11,6 +11,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,6 +26,17 @@ import java.time.LocalDateTime;
         indexes = {
                 @Index(name = "idx_pr_client_exercise", columnList = "client_id, exercise_id"),
                 @Index(name = "idx_pr_date", columnList = "record_date DESC")
+        },
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_active_personal_record",
+                        columnNames = {
+                                "client_id",
+                                "exercise_id",
+                                "record_type",
+                                "is_current_best"
+                        }
+                )
         }
 )
 @Getter
@@ -65,5 +77,5 @@ public class PersonalRecord extends BaseEntity {
     private String videoUrl;
 
     @Column(name = "is_current_best")
-    private boolean isCurrentBest;
+    private Boolean isCurrentBest;
 }
