@@ -63,4 +63,7 @@ public class PersonalRecord extends BaseEntity {
 
     @Column(name = "video_url")
     private String videoUrl;
+
+    @Column(name = "is_current_best")
+    private boolean isCurrentBest;
 }
