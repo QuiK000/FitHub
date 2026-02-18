@@ -111,6 +111,7 @@ public enum ErrorCode {
     ACTIVE_GOAL_ALREADY_EXISTS("ACTIVE_GOAL_ALREADY_EXISTS", "Active goal of this type already exists", CONFLICT),
     PERSONAL_RECORD_NOT_FOUND("PERSONAL_RECORD_NOT_FOUND", "Personal Record Not Found", NOT_FOUND),
     NOT_A_NEW_RECORD("NOT_A_NEW_RECORD", "New value is not better than current best value", BAD_REQUEST),
+    CONCURRENT_UPDATE_ERROR("CONCURRENT_UPDATE_ERROR", "Resource was updated by another request. Please retry.", CONFLICT),
     ;
 
     private final String code;
