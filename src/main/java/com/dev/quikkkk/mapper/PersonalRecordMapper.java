@@ -22,6 +22,7 @@ public class PersonalRecordMapper {
                 .notes(request.getNotes())
                 .videoUrl(request.getVideoUrl())
                 .recordDate(LocalDateTime.now())
+                .isCurrentBest(true)
                 .createdBy(client.getId())
                 .build();
     }
