@@ -5,6 +5,7 @@ import com.dev.quikkkk.dto.request.UpdateExerciseRequest;
 import com.dev.quikkkk.dto.response.ExerciseResponse;
 import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.dto.response.PageResponse;
+import com.dev.quikkkk.entity.Exercise;
 import com.dev.quikkkk.enums.ExerciseCategory;
 import com.dev.quikkkk.enums.MuscleGroup;
 
@@ -20,6 +21,8 @@ public interface IExerciseService {
     PageResponse<ExerciseResponse> findAllExercisesByCategory(ExerciseCategory category, int page, int size);
 
     PageResponse<ExerciseResponse> findAllExercisesByMuscleGroup(MuscleGroup muscleGroup, int page, int size);
+
+    Exercise getActiveExerciseEntity(String exerciseId);
 
     ExerciseResponse updateExercise(String exerciseId, UpdateExerciseRequest request);
 

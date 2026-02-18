@@ -114,6 +114,12 @@ public class ExerciseServiceImpl implements IExerciseService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Exercise getActiveExerciseEntity(String exerciseId) {
+        return findActiveExerciseOrThrow(exerciseId);
+    }
+
+    @Override
     @Transactional
     @Caching(evict = {
             @CacheEvict(value = "exercises", key = "'byId:' + #exerciseId"),
