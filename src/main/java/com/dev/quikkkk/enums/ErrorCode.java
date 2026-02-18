@@ -110,6 +110,7 @@ public enum ErrorCode {
     GOAL_NOT_ACTIVE("GOAL_NOT_ACTIVE", "Goal is not active", BAD_REQUEST),
     ACTIVE_GOAL_ALREADY_EXISTS("ACTIVE_GOAL_ALREADY_EXISTS", "Active goal of this type already exists", CONFLICT),
     PERSONAL_RECORD_NOT_FOUND("PERSONAL_RECORD_NOT_FOUND", "Personal Record Not Found", NOT_FOUND),
+    NOT_A_NEW_RECORD("NOT_A_NEW_RECORD", "New value is not better than current best value", BAD_REQUEST),
     ;
 
     private final String code;
