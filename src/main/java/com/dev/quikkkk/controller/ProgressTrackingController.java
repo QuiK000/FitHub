@@ -2,6 +2,7 @@ package com.dev.quikkkk.controller;
 
 import com.dev.quikkkk.dto.request.CreateBodyMeasurementRequest;
 import com.dev.quikkkk.dto.request.CreateGoalRequest;
+import com.dev.quikkkk.dto.request.CreatePersonalRecordRequest;
 import com.dev.quikkkk.dto.request.UpdateBodyMeasurementRequest;
 import com.dev.quikkkk.dto.request.UpdateGoalProgressRequest;
 import com.dev.quikkkk.dto.request.UpdateGoalRequest;
@@ -10,8 +11,10 @@ import com.dev.quikkkk.dto.response.GoalResponse;
 import com.dev.quikkkk.dto.response.MeasurementHistoryResponse;
 import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.dto.response.PageResponse;
+import com.dev.quikkkk.dto.response.PersonalRecordResponse;
 import com.dev.quikkkk.service.IBodyMeasurementService;
 import com.dev.quikkkk.service.IGoalService;
+import com.dev.quikkkk.service.IPersonalRecordService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProgressTrackingController {
     private final IBodyMeasurementService bodyMeasurementService;
     private final IGoalService goalService;
+    private final IPersonalRecordService personalRecordService;
 
     @PostMapping("/measurements")
     @PreAuthorize("hasRole('CLIENT')")
@@ -45,6 +49,14 @@ public class ProgressTrackingController {
     @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<GoalResponse> createGoal(@Valid @RequestBody CreateGoalRequest request) {
         return ResponseEntity.ok(goalService.createGoal(request));
+    }
+
+    @PostMapping("/records")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<PersonalRecordResponse> createPersonalRecord(
+            @Valid @RequestBody CreatePersonalRecordRequest request
+    ) {
+        return ResponseEntity.ok(personalRecordService.createPersonalRecord(request));
     }
 
     @GetMapping("/measurements/{measurement-id}")
@@ -107,6 +119,41 @@ public class ProgressTrackingController {
             @RequestParam(defaultValue = "10") int size
     ) {
         return ResponseEntity.ok(goalService.getCompletedGoals(page, size));
+    }
+
+    @GetMapping("/records")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<PageResponse<PersonalRecordResponse>> getPersonalRecords(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(personalRecordService.getPersonalRecords(page, size));
+    }
+
+    @GetMapping("/records/{record-id}")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<PersonalRecordResponse> getPersonalRecordById(
+            @PathVariable("record-id") String personalRecordId
+    ) {
+        return ResponseEntity.ok(personalRecordService.getPersonalRecordById(personalRecordId));
+    }
+
+    @GetMapping("/records/exercise/{exercise-id}")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<PageResponse<PersonalRecordResponse>> getPersonalRecordsByExerciseId(
+            @PathVariable("exercise-id") String exerciseId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(personalRecordService.getPersonalRecordsByExerciseId(exerciseId, page, size));
+    }
+
+    @GetMapping("/records/recent")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<PageResponse<PersonalRecordResponse>> getRecentPersonalRecords(
+            @RequestParam(defaultValue = "5") int limit
+    ) {
+        return ResponseEntity.ok(personalRecordService.getRecentPersonalRecords(limit));
     }
 
     @PutMapping("/measurements/{measurement-id}")
