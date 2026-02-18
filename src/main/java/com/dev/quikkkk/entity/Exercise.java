@@ -70,4 +70,7 @@ public class Exercise extends BaseEntity {
 
     @OneToMany(mappedBy = "exercise")
     private Set<WorkoutLog> workoutLogs = new HashSet<>();
+
+    @OneToMany(mappedBy = "exercise")
+    private Set<PersonalRecord> personalRecords = new HashSet<>();
 }
