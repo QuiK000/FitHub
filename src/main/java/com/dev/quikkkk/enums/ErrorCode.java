@@ -109,6 +109,7 @@ public enum ErrorCode {
     GOAL_ALREADY_COMPLETED("GOAL_ALREADY_COMPLETED", "Goal already completed", BAD_REQUEST),
     GOAL_NOT_ACTIVE("GOAL_NOT_ACTIVE", "Goal is not active", BAD_REQUEST),
     ACTIVE_GOAL_ALREADY_EXISTS("ACTIVE_GOAL_ALREADY_EXISTS", "Active goal of this type already exists", CONFLICT),
+    PERSONAL_RECORD_NOT_FOUND("PERSONAL_RECORD_NOT_FOUND", "Personal Record Not Found", NOT_FOUND),
     ;
 
     private final String code;
