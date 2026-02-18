@@ -6,6 +6,7 @@ import com.dev.quikkkk.dto.response.PersonalRecordResponse;
 import com.dev.quikkkk.entity.ClientProfile;
 import com.dev.quikkkk.entity.Exercise;
 import com.dev.quikkkk.entity.PersonalRecord;
+import com.dev.quikkkk.enums.RecordType;
 import com.dev.quikkkk.exception.BusinessException;
 import com.dev.quikkkk.mapper.PersonalRecordMapper;
 import com.dev.quikkkk.repository.IPersonalRecordRepository;
@@ -21,8 +22,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import static com.dev.quikkkk.enums.ErrorCode.FORBIDDEN_ACCESS;
+import static com.dev.quikkkk.enums.ErrorCode.NOT_A_NEW_RECORD;
 import static com.dev.quikkkk.enums.ErrorCode.PERSONAL_RECORD_NOT_FOUND;
 
 @Service
@@ -40,9 +43,28 @@ public class PersonalRecordServiceImpl implements IPersonalRecordService {
         Exercise exercise = exerciseService.getActiveExerciseEntity(request.getExerciseId());
         ClientProfile client = clientProfileUtils.getCurrentClientProfile();
 
+        Optional<PersonalRecord> currentBest = personalRecordRepository.findCurrentBest(
+                client.getId(),
+                exercise.getId(),
+                request.getRecordType()
+        );
+
+        if (currentBest.isPresent()) {
+            if (!isBetter(request.getValue(), currentBest.get().getValue(), request.getRecordType())) {
+                throw new BusinessException(NOT_A_NEW_RECORD);
+            }
+
+            personalRecordRepository.disableOldBests(client.getId(), exercise.getId(), request.getRecordType());
+        }
+
         PersonalRecord record = personalRecordMapper.toEntity(request, exercise, client);
         personalRecordRepository.save(record);
 
+        log.info("New PR created for user [{}]: Exercise [{}], Value [{}]",
+                client.getId(),
+                exercise.getId(),
+                record.getValue()
+        );
         return personalRecordMapper.toResponse(record);
     }
 
@@ -106,5 +128,10 @@ public class PersonalRecordServiceImpl implements IPersonalRecordService {
         }
 
         return personalRecord;
+    }
+
+    private boolean isBetter(Double createValue, Double currentValue, RecordType type) {
+        if (type == RecordType.BEST_TIME) return createValue < currentValue;
+        return createValue > currentValue;
     }
 }
