@@ -3,6 +3,7 @@ package com.dev.quikkkk.controller;
 import com.dev.quikkkk.dto.request.CreateBodyMeasurementRequest;
 import com.dev.quikkkk.dto.request.CreateGoalRequest;
 import com.dev.quikkkk.dto.request.CreatePersonalRecordRequest;
+import com.dev.quikkkk.dto.request.CreateProgressPhotoRequest;
 import com.dev.quikkkk.dto.request.UpdateBodyMeasurementRequest;
 import com.dev.quikkkk.dto.request.UpdateGoalProgressRequest;
 import com.dev.quikkkk.dto.request.UpdateGoalRequest;
@@ -12,9 +13,11 @@ import com.dev.quikkkk.dto.response.MeasurementHistoryResponse;
 import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.dto.response.PersonalRecordResponse;
+import com.dev.quikkkk.dto.response.ProgressPhotoResponse;
 import com.dev.quikkkk.service.IBodyMeasurementService;
 import com.dev.quikkkk.service.IGoalService;
 import com.dev.quikkkk.service.IPersonalRecordService;
+import com.dev.quikkkk.service.IProgressPhotoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +39,7 @@ public class ProgressTrackingController {
     private final IBodyMeasurementService bodyMeasurementService;
     private final IGoalService goalService;
     private final IPersonalRecordService personalRecordService;
+    private final IProgressPhotoService progressPhotoService;
 
     @PostMapping("/measurements")
     @PreAuthorize("hasRole('CLIENT')")
@@ -57,6 +61,14 @@ public class ProgressTrackingController {
             @Valid @RequestBody CreatePersonalRecordRequest request
     ) {
         return ResponseEntity.ok(personalRecordService.createPersonalRecord(request));
+    }
+
+    @PostMapping("/photos")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<ProgressPhotoResponse> createProgressPhoto(
+            @Valid @RequestBody CreateProgressPhotoRequest request
+    ) {
+        return ResponseEntity.ok(progressPhotoService.createPhotoProgress(request));
     }
 
     @GetMapping("/measurements/{measurement-id}")
@@ -154,6 +166,23 @@ public class ProgressTrackingController {
             @RequestParam(defaultValue = "5") int limit
     ) {
         return ResponseEntity.ok(personalRecordService.getRecentPersonalRecords(limit));
+    }
+
+    @GetMapping("/photos")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<PageResponse<ProgressPhotoResponse>> getProgressPhotos(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(progressPhotoService.getProgressPhotos(page, size));
+    }
+
+    @GetMapping("/photos/{photo-progress-id}")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<ProgressPhotoResponse> getProgressPhotoById(
+            @PathVariable("photo-progress-id") String photoProgressId
+    ) {
+        return ResponseEntity.ok(progressPhotoService.getProgressPhotoById(photoProgressId));
     }
 
     @PutMapping("/measurements/{measurement-id}")
