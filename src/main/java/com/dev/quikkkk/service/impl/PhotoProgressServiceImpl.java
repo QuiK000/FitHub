@@ -21,13 +21,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.dev.quikkkk.enums.ErrorCode.BODY_MEASUREMENT_NOT_FOUND;
-import static com.dev.quikkkk.enums.ErrorCode.FORBIDDEN_ACCESS;
 import static com.dev.quikkkk.enums.ErrorCode.PROGRESS_PHOTO_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional
+@Transactional(readOnly = true)
 public class PhotoProgressServiceImpl implements IProgressPhotoService {
     private final IProgressPhotoRepository photoRepository;
     private final IBodyMeasurementRepository bodyMeasurementRepository;
@@ -35,37 +34,49 @@ public class PhotoProgressServiceImpl implements IProgressPhotoService {
     private final ClientProfileUtils clientProfileUtils;
 
     @Override
+    @Transactional
     public ProgressPhotoResponse createPhotoProgress(CreateProgressPhotoRequest request) {
-        BodyMeasurement measurement = bodyMeasurementRepository.findById(request.getMeasurementId())
-                .orElseThrow(() -> new BusinessException(BODY_MEASUREMENT_NOT_FOUND));
-
         ClientProfile client = clientProfileUtils.getCurrentClientProfile();
-        if (!measurement.getClient().getId().equals(client.getId())) throw new BusinessException(FORBIDDEN_ACCESS);
+        log.info("Creating progress photo for client: {}", client.getId());
+
+        BodyMeasurement measurement = null;
+        if (request.getMeasurementId() != null) {
+            measurement = bodyMeasurementRepository.findById(request.getMeasurementId())
+                    .filter(m -> m.getClient().getId().equals(client.getId()))
+                    .orElseThrow(() -> {
+                        log.warn("Client {} tried to link measurement {} not belonging to them",
+                                client.getId(),
+                                request.getMeasurementId());
+                        return new BusinessException(BODY_MEASUREMENT_NOT_FOUND);
+                    });
+        }
 
         ProgressPhoto progressPhoto = progressPhotoMapper.toEntity(request, client, measurement);
-        photoRepository.save(progressPhoto);
+        ProgressPhoto savedPhoto = photoRepository.save(progressPhoto);
 
-        return progressPhotoMapper.toResponse(progressPhoto);
+        log.info("Progress photo created successfully with ID: {}", savedPhoto.getId());
+        return progressPhotoMapper.toResponse(savedPhoto);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public PageResponse<ProgressPhotoResponse> getProgressPhotos(int page, int size) {
         ClientProfile client = clientProfileUtils.getCurrentClientProfile();
+        log.debug("Fetching progress photos for client: {}, page: {}", client.getId(), page);
+
         Pageable pageable = PaginationUtils.createPageRequest(page, size, "photoDate");
-        Page<ProgressPhoto> progressPhotoPage = photoRepository.findProgressPhotosByClientId(client.getId(), pageable);
+        Page<ProgressPhoto> progressPhotoPage = photoRepository.findAllByClientId(client.getId(), pageable);
 
         return PaginationUtils.toPageResponse(progressPhotoPage, progressPhotoMapper::toResponse);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public ProgressPhotoResponse getProgressPhotoById(String id) {
         ClientProfile client = clientProfileUtils.getCurrentClientProfile();
-        ProgressPhoto progressPhoto = photoRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(PROGRESS_PHOTO_NOT_FOUND));
-        if (!progressPhoto.getClient().getId().equals(client.getId())) throw new BusinessException(FORBIDDEN_ACCESS);
-
-        return progressPhotoMapper.toResponse(progressPhoto);
+        return photoRepository.findByIdAndClientId(id, client.getId())
+                .map(progressPhotoMapper::toResponse)
+                .orElseThrow(() -> {
+                    log.warn("Progress photo not found or access denied. PhotoID: {}, ClientID: {}", id, client.getId());
+                    return new BusinessException(PROGRESS_PHOTO_NOT_FOUND);
+                });
     }
 }
