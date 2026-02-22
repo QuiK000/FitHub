@@ -10,6 +10,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapKeyColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,6 +23,7 @@ import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 @Entity
 @Table(name = "body_measurements")
@@ -73,6 +75,9 @@ public class BodyMeasurement extends BaseEntity {
 
     @Column(name = "photo_url")
     private String photoUrl;
+
+    @OneToMany(mappedBy = "measurement")
+    private Set<ProgressPhoto> progressPhotos;
 
     public void calculateDerivedMetrics(Double heightCm, LocalDate birthDate, ClientGender gender) {
         if (this.bmi == null && this.weight != null && heightCm != null && heightCm > 0) {
