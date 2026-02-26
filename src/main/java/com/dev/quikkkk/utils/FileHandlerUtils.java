@@ -94,13 +94,13 @@ public class FileHandlerUtils {
         InputStream limitedStream = new LimitedInputStream(stream, rangeLength) {
             @Override
             protected void raiseError(long pSizeMax, long pCount) throws IOException {
-                throw new IOException("Range limit exceeded: " + pCount + " > " + pSizeMax);
+                throw new BusinessException(ErrorCode.INVALID_FILE_RANGE);
             }
         };
 
         return new InputStreamResource(limitedStream) {
             @Override
-            public long contentLength() throws IOException {
+            public long contentLength() {
                 return rangeLength;
             }
         };
