@@ -114,6 +114,10 @@ public enum ErrorCode {
     CONCURRENT_UPDATE_ERROR("CONCURRENT_UPDATE_ERROR", "Resource was updated by another request. Please retry.", CONFLICT),
     PROGRESS_PHOTO_NOT_FOUND("PROGRESS_PHOTO_NOT_FOUND", "Progress photo not found", NOT_FOUND),
     FILE_NOT_FOUND("FILE_NOT_FOUND", "File not found", NOT_FOUND),
+    FILE_STORAGE_DIRECTORY_CREATION_FAILED("FILE_STORAGE_DIRECTORY_CREATION_FAILED", "Could not create directory for file storage", HttpStatus.INTERNAL_SERVER_ERROR),
+    INVALID_FILE_RANGE("INVALID_FILE_RANGE", "Invalid file range requested", BAD_REQUEST),
+    FILE_EMPTY("FILE_EMPTY", "Uploaded file is empty", BAD_REQUEST),
+    FILE_STORAGE_FAILED("FILE_STORAGE_FAILED", "Failed to store file", HttpStatus.INTERNAL_SERVER_ERROR),
     ;
 
     private final String code;
