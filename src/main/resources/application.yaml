@@ -81,6 +81,11 @@ app:
       refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
     disposable-email: 10minutemail,20minutemail,33mail,5ymail,anonbox,guerrillamail,mailinator,maildrop,mailnesia,moakt,my10minutemail,throwawaymail,trashmail,temp-mail,tempmail,truemail,yopmail
 
+file:
+  upload:
+    video-dir: uploads/videos
+    image-dir: uploads/iamges
+
 logging:
   level:
     root: INFO
