@@ -6,6 +6,8 @@ import com.dev.quikkkk.dto.request.RegistrationRequest;
 import com.dev.quikkkk.dto.response.AuthenticationResponse;
 import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.service.IAuthenticationService;
+import com.dev.quikkkk.utils.ClientIpUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -23,8 +25,12 @@ public class AuthenticationController {
     private final IAuthenticationService authenticationService;
 
     @PostMapping("/signin")
-    public ResponseEntity<AuthenticationResponse> login(@Valid @RequestBody LoginRequest request) {
-        return ResponseEntity.ok(authenticationService.login(request));
+    public ResponseEntity<AuthenticationResponse> login(
+            @Valid @RequestBody LoginRequest request,
+            HttpServletRequest servletRequest
+    ) {
+        String clientIp = ClientIpUtils.getClientIpAddress(servletRequest);
+        return ResponseEntity.ok(authenticationService.login(request, clientIp));
     }
 
     @PostMapping("/signup")
