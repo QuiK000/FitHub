@@ -8,6 +8,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,6 +19,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
+
+import static org.springframework.http.HttpHeaders.ACCEPT_RANGES;
+import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
+import static org.springframework.http.HttpHeaders.CONTENT_LENGTH;
 
 @Service
 @RequiredArgsConstructor
@@ -79,5 +84,23 @@ public class FileUploadServiceImpl implements IFileUploadService {
         } catch (IOException e) {
             throw new BusinessException(ErrorCode.FILE_STORAGE_FAILED);
         }
+    }
+
+    private boolean isFullContentRequest(String rangeHeader) {
+        return rangeHeader == null || rangeHeader.isEmpty();
+    }
+
+    private ResponseEntity<Resource> buildFullVideoResponse(
+            Resource resource,
+            String contentType,
+            String filename,
+            String fileLength
+    ) {
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"")
+                .header(ACCEPT_RANGES, "bytes")
+                .header(CONTENT_LENGTH, String.valueOf(fileLength))
+                .body(resource);
     }
 }
