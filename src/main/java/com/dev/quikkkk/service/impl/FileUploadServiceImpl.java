@@ -23,6 +23,7 @@ import java.util.UUID;
 import static org.springframework.http.HttpHeaders.ACCEPT_RANGES;
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.HttpHeaders.CONTENT_LENGTH;
+import static org.springframework.http.HttpHeaders.CONTENT_RANGE;
 
 @Service
 @RequiredArgsConstructor
@@ -94,7 +95,7 @@ public class FileUploadServiceImpl implements IFileUploadService {
             Resource resource,
             String contentType,
             String filename,
-            String fileLength
+            long fileLength
     ) {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
@@ -102,5 +103,39 @@ public class FileUploadServiceImpl implements IFileUploadService {
                 .header(ACCEPT_RANGES, "bytes")
                 .header(CONTENT_LENGTH, String.valueOf(fileLength))
                 .body(resource);
+    }
+
+    private ResponseEntity<Resource> buildPartialVideoResponse(
+            Path filePath,
+            String rangeHeader,
+            String contentType,
+            String filename,
+            long fileLength
+    ) throws IOException {
+        long[] range = FileHandlerUtils.parseRangeHeader(rangeHeader, fileLength);
+        long rangeStart = range[0];
+        long rangeEnd = range[1];
+
+        if (!isValidRange(rangeStart, rangeEnd, fileLength)) return buildRangeNoSatisfiableResponse(fileLength);
+        long contentLength = rangeEnd - rangeStart + 1;
+
+        Resource rangeResource = FileHandlerUtils.createRangeResource(filePath, rangeStart, contentLength);
+        return ResponseEntity.status(206)
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"")
+                .header(ACCEPT_RANGES, "bytes")
+                .header(CONTENT_RANGE, "bytes " + rangeStart + "-" + rangeEnd + "/" + fileLength)
+                .header(CONTENT_LENGTH, String.valueOf(contentLength))
+                .body(rangeResource);
+    }
+
+    private boolean isValidRange(long rangeStart, long rangeEnd, long fileLength) {
+        return rangeStart <= rangeEnd && rangeStart >= 0 && rangeEnd < fileLength;
+    }
+
+    private ResponseEntity<Resource> buildRangeNoSatisfiableResponse(long fileLength) {
+        return ResponseEntity.status(416)
+                .header(CONTENT_RANGE, "bytes */" + fileLength)
+                .build();
     }
 }
