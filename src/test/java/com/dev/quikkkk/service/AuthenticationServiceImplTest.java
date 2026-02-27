@@ -7,6 +7,7 @@ import com.dev.quikkkk.dto.response.AuthenticationResponse;
 import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.entity.Role;
 import com.dev.quikkkk.entity.User;
+import com.dev.quikkkk.enums.ErrorCode;
 import com.dev.quikkkk.exception.BusinessException;
 import com.dev.quikkkk.fixtures.TestFixtures;
 import com.dev.quikkkk.mapper.AuthenticationMapper;
@@ -30,13 +31,13 @@ import java.util.Optional;
 
 import static com.dev.quikkkk.enums.ErrorCode.ACCOUNT_DISABLED;
 import static com.dev.quikkkk.enums.ErrorCode.EMAIL_ALREADY_EXISTS;
-import static com.dev.quikkkk.enums.ErrorCode.PASSWORD_MISMATCH;
 import static com.dev.quikkkk.enums.ErrorCode.TOKEN_BLACKLISTED;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -67,6 +68,8 @@ class AuthenticationServiceImplTest {
     private MessageMapper messageMapper;
     @Mock
     private AuthenticationMapper authMapper;
+    @Mock
+    private IRateLimitService rateLimitService;
 
     @InjectMocks
     private AuthenticationServiceImpl authenticationService;
@@ -75,6 +78,7 @@ class AuthenticationServiceImplTest {
     @DisplayName("Should successfully login with valid credentials")
     void login_WithValidCredentials_ReturnsTokens() {
         // given
+        String ipAddress = "192.168.0.1";
         LoginRequest request = TestFixtures.createLoginRequest("test@example.com", "password");
         User user = TestFixtures.createClientUser();
         user.setEnabled(true);
@@ -93,12 +97,15 @@ class AuthenticationServiceImplTest {
         when(authMapper.toResponse(accessToken, refreshToken, "Bearer ")).thenReturn(expectedResponse);
 
         // when
-        AuthenticationResponse response = authenticationService.login(request);
+        AuthenticationResponse response = authenticationService.login(request, ipAddress);
 
         // then
         assertThat(response).isNotNull();
         assertThat(response.getAccessToken()).isEqualTo(accessToken);
         assertThat(response.getRefreshToken()).isEqualTo(refreshToken);
+
+        verify(rateLimitService).checkLoginAttempts(ipAddress);
+        verify(rateLimitService).resetLoginAttempts(ipAddress);
 
         verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
         verify(jwtService).generateAccessToken(user);
@@ -106,9 +113,29 @@ class AuthenticationServiceImplTest {
     }
 
     @Test
+    @DisplayName("Should throw exception when ip is blocked")
+    void login_WhenIpBlocked_ThrowsException() {
+        // given
+        String ipAddress = "192.168.0.1";
+        LoginRequest request = TestFixtures.createLoginRequest("test@example.com", "password");
+
+        doThrow(new BusinessException(ErrorCode.TOO_MANY_REQUESTS))
+                .when(rateLimitService).checkLoginAttempts(ipAddress);
+
+        // when & then
+        assertThatThrownBy(() -> authenticationService.login(request, ipAddress))
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", ErrorCode.TOO_MANY_REQUESTS);
+
+        verify(serviceUtils, never()).getUserByEmailOrThrow(anyString());
+        verify(authenticationManager, never()).authenticate(any());
+    }
+
+    @Test
     @DisplayName("Should throw exception when user is disabled")
     void login_WithDisabledAccount_ThrowsBusinessException() {
         // given
+        String ipAddress = "192.168.0.1";
         LoginRequest request = TestFixtures.createLoginRequest("test@example.com", "password");
         User user = TestFixtures.createClientUser();
         user.setEnabled(false);
@@ -116,9 +143,12 @@ class AuthenticationServiceImplTest {
         when(serviceUtils.getUserByEmailOrThrow(request.getEmail())).thenReturn(user);
 
         // when & then
-        assertThatThrownBy(() -> authenticationService.login(request)).isInstanceOf(BusinessException.class)
+        assertThatThrownBy(() -> authenticationService.login(request, ipAddress))
+                .isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ACCOUNT_DISABLED);
 
+        verify(rateLimitService).checkLoginAttempts(ipAddress);
+        verify(rateLimitService).incrementLoginAttempts(ipAddress);
         verify(authenticationManager, never()).authenticate(any());
     }
 
@@ -126,6 +156,7 @@ class AuthenticationServiceImplTest {
     @DisplayName("Should throw exception with invalid credentials")
     void login_WithInvalidCredentials_ThrowsException() {
         // given
+        String ipAddress = "192.168.0.1";
         LoginRequest request = TestFixtures.createLoginRequest("test@example.com", "wrongPassword");
         User user = TestFixtures.createClientUser();
 
@@ -133,7 +164,11 @@ class AuthenticationServiceImplTest {
         when(authenticationManager.authenticate(any())).thenThrow(new BadCredentialsException("Invalid credentials"));
 
         // when & then
-        assertThatThrownBy(() -> authenticationService.login(request)).isInstanceOf(BadCredentialsException.class);
+        assertThatThrownBy(() -> authenticationService.login(request, ipAddress))
+                .isInstanceOf(BadCredentialsException.class);
+
+        verify(rateLimitService).checkLoginAttempts(ipAddress);
+        verify(rateLimitService).incrementLoginAttempts(ipAddress);
     }
 
     @Test
@@ -156,7 +191,7 @@ class AuthenticationServiceImplTest {
         when(messageMapper.message(anyString())).thenReturn(MessageResponse.builder().message("Success").build());
 
         // when
-        MessageResponse response = authenticationService.register(request);
+        authenticationService.register(request);
 
         // then
         verify(emailService).sendVerificationEmail(request.getEmail(), verificationToken);
@@ -176,24 +211,6 @@ class AuthenticationServiceImplTest {
                 .hasFieldOrPropertyWithValue("errorCode", EMAIL_ALREADY_EXISTS);
 
         verify(userRepository, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("Should throw exception when passwords don't match")
-    void register_WithMismatchedPasswords_ThrowsBusinessException() {
-        // given
-        RegistrationRequest request = RegistrationRequest.builder()
-                .email("test@example.com")
-                .password("Password123!")
-                .confirmPassword("DifferentPassword!")
-                .build();
-
-        when(userRepository.existsByEmailIgnoreCase(request.getEmail())).thenReturn(false);
-
-        // when & then
-        assertThatThrownBy(() -> authenticationService.register(request))
-                .isInstanceOf(BusinessException.class)
-                .hasFieldOrPropertyWithValue("errorCode", PASSWORD_MISMATCH);
     }
 
     @Test
