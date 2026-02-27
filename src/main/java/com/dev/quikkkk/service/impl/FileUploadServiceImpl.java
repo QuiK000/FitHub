@@ -52,22 +52,55 @@ public class FileUploadServiceImpl implements IFileUploadService {
 
     @Override
     public String storeVideoFile(MultipartFile file) {
-        return "";
+        return storeFile(file, videoStorageLocation);
     }
 
     @Override
     public String storeImageFile(MultipartFile file) {
-        return "";
+        return storeFile(file, imageStorageLocation);
     }
 
     @Override
     public ResponseEntity<Resource> serveVideo(String id, String rangeHeader) {
-        return null;
+        try {
+            Path filePath = FileHandlerUtils.findFileById(videoStorageLocation, id);
+            Resource resource = FileHandlerUtils.createFullResource(filePath);
+
+            String filename = resource.getFilename();
+            String contentType = FileHandlerUtils.detectVideoContentType(filename);
+            long fileLength = resource.contentLength();
+
+            if (isFullContentRequest(rangeHeader)) {
+                return buildFullVideoResponse(
+                        resource,
+                        contentType,
+                        filename,
+                        fileLength
+                );
+            }
+
+            return buildPartialVideoResponse(filePath, rangeHeader, contentType, filename, fileLength);
+        } catch (IOException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @Override
     public ResponseEntity<Resource> serveImage(String id, String rangeHeader) {
-        return null;
+        try {
+            Path filePath = FileHandlerUtils.findFileById(imageStorageLocation, id);
+            Resource resource = FileHandlerUtils.createFullResource(filePath);
+
+            String filename = resource.getFilename();
+            String contentType = FileHandlerUtils.detectImageContentType(filename);
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .header(CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"")
+                    .body(resource);
+        } catch (IOException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     private String storeFile(MultipartFile file, Path storageLocation) {
