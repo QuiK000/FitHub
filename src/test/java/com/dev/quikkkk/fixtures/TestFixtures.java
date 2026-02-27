@@ -24,6 +24,7 @@ import com.dev.quikkkk.enums.TrainingStatus;
 import com.dev.quikkkk.enums.TrainingType;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Currency;
 import java.util.Set;
@@ -67,7 +68,7 @@ public class TestFixtures {
                 .firstname("John")
                 .lastname("Doe")
                 .phone("+380501234567")
-                .birthdate(LocalDateTime.of(1990, 1, 1, 0, 0))
+                .birthdate(LocalDate.of(1990, 1, 1))
                 .height(180.0)
                 .weight(75.0)
                 .active(true)
@@ -82,7 +83,7 @@ public class TestFixtures {
                 .firstname("John")
                 .lastname("Doe")
                 .phone("+380501234567")
-                .birthdate(LocalDateTime.of(1990, 1, 1, 0, 0))
+                .birthdate(LocalDate.of(1990, 1, 1))
                 .height(180.0)
                 .weight(75.0)
                 .build();
