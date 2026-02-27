@@ -7,7 +7,7 @@ import com.dev.quikkkk.dto.response.AuthenticationResponse;
 import com.dev.quikkkk.dto.response.MessageResponse;
 
 public interface IAuthenticationService {
-    AuthenticationResponse login(LoginRequest request);
+    AuthenticationResponse login(LoginRequest request, String ipAddress);
 
     AuthenticationResponse refreshToken(RefreshTokenRequest request);
 

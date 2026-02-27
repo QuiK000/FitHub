@@ -18,6 +18,7 @@ import com.dev.quikkkk.repository.IUserRepository;
 import com.dev.quikkkk.service.IAuthenticationService;
 import com.dev.quikkkk.service.IEmailService;
 import com.dev.quikkkk.service.IJwtService;
+import com.dev.quikkkk.service.IRateLimitService;
 import com.dev.quikkkk.service.ITokenBlacklistService;
 import com.dev.quikkkk.service.IVerificationTokenService;
 import com.dev.quikkkk.utils.ServiceUtils;
@@ -52,6 +53,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     private final ServiceUtils serviceUtils;
     private final IVerificationTokenService verificationTokenService;
     private final ITokenBlacklistService tokenBlacklistService;
+    private final IRateLimitService rateLimitService;
     private final AuthenticationManager authenticationManager;
     private final UserMapper userMapper;
     private final MessageMapper messageMapper;
@@ -59,27 +61,37 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
     @Override
     @Transactional
-    public AuthenticationResponse login(LoginRequest request) {
+    public AuthenticationResponse login(LoginRequest request, String ipAddress) {
         log.info("Login request for email: {}", request.getEmail());
-        User user = serviceUtils.getUserByEmailOrThrow(request.getEmail());
+        rateLimitService.checkLoginAttempts(ipAddress);
 
-        if (!user.isEnabled()) {
-            log.warn("User {} is disabled", request.getEmail());
-            throw new BusinessException(ACCOUNT_DISABLED);
+        try {
+            User user = serviceUtils.getUserByEmailOrThrow(request.getEmail());
+
+            if (!user.isEnabled()) {
+                log.warn("User {} is disabled", request.getEmail());
+                throw new BusinessException(ACCOUNT_DISABLED);
+            }
+
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword()
+                    )
+            );
+
+            String accessToken = jwtService.generateAccessToken(user);
+            String refreshToken = jwtService.generateRefreshToken(user);
+
+            log.info("User {} logged successfully", request.getEmail());
+            rateLimitService.resetLoginAttempts(ipAddress);
+
+            return authMapper.toResponse(accessToken, refreshToken, TOKEN_TYPE);
+        } catch (Exception e) {
+            log.warn("Failed login attempt for email: {} from IP: {}",  request.getEmail(), ipAddress);
+            rateLimitService.incrementLoginAttempts(ipAddress);
+            throw e;
         }
-
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
-
-        String accessToken = jwtService.generateAccessToken(user);
-        String refreshToken = jwtService.generateRefreshToken(user);
-
-        log.info("User {} logged successfully", request.getEmail());
-        return authMapper.toResponse(accessToken, refreshToken, TOKEN_TYPE);
     }
 
     @Override
