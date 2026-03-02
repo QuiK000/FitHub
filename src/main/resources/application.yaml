@@ -98,6 +98,12 @@ logging:
   file:
     name: logs/fithub.log
 
+tron:
+  api:
+    url: https://nile.trongrid.io
+  wallet:
+    address: ${TEST_WALLET}
+
 management:
   endpoints:
     web:
