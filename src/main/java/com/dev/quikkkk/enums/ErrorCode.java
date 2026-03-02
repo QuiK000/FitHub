@@ -118,6 +118,12 @@ public enum ErrorCode {
     INVALID_FILE_RANGE("INVALID_FILE_RANGE", "Invalid file range requested", BAD_REQUEST),
     FILE_EMPTY("FILE_EMPTY", "Uploaded file is empty", BAD_REQUEST),
     FILE_STORAGE_FAILED("FILE_STORAGE_FAILED", "Failed to store file", HttpStatus.INTERNAL_SERVER_ERROR),
+    TRANSACTION_NOT_FOUND("TRANSACTION_NOT_FOUND", "Transaction not found", NOT_FOUND),
+    TRANSACTION_FAILED("TRANSACTION_FAILED", "Transaction failed", HttpStatus.INTERNAL_SERVER_ERROR),
+    INVALID_PAYMENT_AMOUNT("INVALID_PAYMENT_AMOUNT", "Invalid payment amount", BAD_REQUEST),
+    PAYMENT_VALIDATION_ERROR("PAYMENT_VALIDATION_ERROR", "Payment validation error", HttpStatus.INTERNAL_SERVER_ERROR),
+    UNSUPPORTED_TRANSACTION_TYPE("UNSUPPORTED_TRANSACTION_TYPE", "Unsupported transaction type", HttpStatus.INTERNAL_SERVER_ERROR),
+
     ;
 
     private final String code;
