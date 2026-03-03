@@ -36,4 +36,6 @@ public interface IPaymentRepository extends JpaRepository<Payment, String> {
             @Param("from") LocalDateTime from,
             @Param("to") LocalDateTime to
     );
+
+    boolean existsByTransactionHash(String transactionHash);
 }
