@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -45,7 +45,7 @@ public class TronPaymentValidator {
                 throw new BusinessException(TRANSACTION_NOT_FOUND);
             }
 
-            String status = root.get("ret").get(0).get("contractRet").asString();
+            String status = root.get("ret").get(0).get("contractRet").asText();
             if (!"SUCCESS".equals(status)) {
                 log.error("Transaction failed on blockchain. Status: {}", status);
                 throw new BusinessException(TRANSACTION_FAILED);
@@ -55,7 +55,7 @@ public class TronPaymentValidator {
             JsonNode contract = rawData.get("contract").get(0);
             JsonNode parameter = contract.get("parameter").get("value");
 
-            String contractType = contract.get("type").asString();
+            String contractType = contract.get("type").asText();
             if (!"TransferContract".equals(contractType)) throw new BusinessException(UNSUPPORTED_TRANSACTION_TYPE);
 
             long amountInSun = parameter.get("amount").asLong();
