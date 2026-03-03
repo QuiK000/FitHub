@@ -26,4 +26,6 @@ public class CreatePaymentRequest {
 
     @NotBlank(message = "VALIDATION.CREATE.PAYMENT.CURRENCY.NOT_BLANK")
     private String currency;
+
+    private String transactionHash;
 }
