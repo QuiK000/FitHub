@@ -123,6 +123,7 @@ public enum ErrorCode {
     INVALID_PAYMENT_AMOUNT("INVALID_PAYMENT_AMOUNT", "Invalid payment amount", BAD_REQUEST),
     PAYMENT_VALIDATION_ERROR("PAYMENT_VALIDATION_ERROR", "Payment validation error", HttpStatus.INTERNAL_SERVER_ERROR),
     UNSUPPORTED_TRANSACTION_TYPE("UNSUPPORTED_TRANSACTION_TYPE", "Unsupported transaction type", HttpStatus.INTERNAL_SERVER_ERROR),
+    TRANSACTION_ALREADY_USED("TRANSACTION_ALREADY_USED", "Transaction is already used", HttpStatus.CONFLICT),
 
     ;
 
