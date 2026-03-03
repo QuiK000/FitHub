@@ -6,6 +6,7 @@ import com.dev.quikkkk.dto.response.PaymentResponse;
 import com.dev.quikkkk.entity.ClientProfile;
 import com.dev.quikkkk.entity.Membership;
 import com.dev.quikkkk.entity.Payment;
+import com.dev.quikkkk.enums.PaymentStatus;
 import com.dev.quikkkk.exception.BusinessException;
 import com.dev.quikkkk.mapper.PaymentMapper;
 import com.dev.quikkkk.repository.IClientProfileRepository;
@@ -15,6 +16,7 @@ import com.dev.quikkkk.service.IMembershipService;
 import com.dev.quikkkk.service.IPaymentService;
 import com.dev.quikkkk.utils.ClientProfileUtils;
 import com.dev.quikkkk.utils.PaginationUtils;
+import com.dev.quikkkk.utils.TronPaymentValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -28,6 +30,8 @@ import static com.dev.quikkkk.enums.ErrorCode.MEMBERSHIP_ALREADY_ACTIVATED;
 import static com.dev.quikkkk.enums.ErrorCode.MEMBERSHIP_CANCELLED;
 import static com.dev.quikkkk.enums.ErrorCode.MEMBERSHIP_EXPIRED;
 import static com.dev.quikkkk.enums.ErrorCode.MEMBERSHIP_NOT_FOUND;
+import static com.dev.quikkkk.enums.ErrorCode.PAYMENT_VALIDATION_ERROR;
+import static com.dev.quikkkk.enums.ErrorCode.TRANSACTION_ALREADY_USED;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +43,7 @@ public class PaymentServiceImpl implements IPaymentService {
     private final IMembershipService membershipService;
     private final PaymentMapper paymentMapper;
     private final ClientProfileUtils clientProfileUtils;
+    private final TronPaymentValidator tronPaymentValidator;
 
     @Override
     @Transactional
@@ -50,6 +55,17 @@ public class PaymentServiceImpl implements IPaymentService {
         if (!membership.getClient().getId().equals(client.getId()))
             throw new BusinessException(CLIENT_MEMBERSHIP_NOT_FOUND);
 
+        if ("TRX".equalsIgnoreCase(request.getCurrency())) {
+            if (request.getTransactionHash() == null || request.getTransactionHash().isEmpty())
+                throw new BusinessException(PAYMENT_VALIDATION_ERROR);
+
+            if (paymentRepository.existsByTransactionHash(request.getTransactionHash()))
+                throw new BusinessException(TRANSACTION_ALREADY_USED);
+
+            tronPaymentValidator.validateTransaction(request.getTransactionHash(), request.getAmount());
+            log.info("Crypto payment validated for hash: {}", request.getTransactionHash());
+        }
+
         switch (membership.getStatus()) {
             case ACTIVE:
                 throw new BusinessException(MEMBERSHIP_ALREADY_ACTIVATED);
@@ -60,6 +76,11 @@ public class PaymentServiceImpl implements IPaymentService {
         }
 
         Payment payment = paymentMapper.toEntity(request, membership);
+        if ("TRX".equalsIgnoreCase(request.getCurrency())) {
+            payment.setTransactionHash(request.getTransactionHash());
+            payment.setStatus(PaymentStatus.PAID);
+        }
+
         paymentRepository.save(payment);
 
         membership.setPayment(payment);
