@@ -45,6 +45,9 @@ public class Payment extends BaseEntity {
     @Column(name = "payment_date", nullable = false)
     private LocalDateTime paymentDate;
 
+    @Column(name = "transaction_hash")
+    private String transactionHash;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", nullable = false)
     private ClientProfile client;
