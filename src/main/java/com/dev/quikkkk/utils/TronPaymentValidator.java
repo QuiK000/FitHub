@@ -29,9 +29,6 @@ public class TronPaymentValidator {
     @Value("${tron.api.url:https://nile.trongrid.io}")
     private String tronApiUrl;
 
-    @Value("${tron.wallet.address}")
-    private String myWalletAddress;
-
     public void validateTransaction(String txHash, BigDecimal expectedAmount) {
         log.info("Validating Tron transaction: {}", txHash);
         String url = tronApiUrl + "/wallet/gettransactionbyid?value=" + txHash;
