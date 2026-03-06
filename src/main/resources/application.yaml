@@ -104,6 +104,11 @@ tron:
   wallet:
     address: ${TEST_WALLET}
 
+telegram:
+  bot:
+    token: ${TELEGRAM_TOKEN}
+    api-url: ${API_TELEGRAM_URL}
+
 management:
   endpoints:
     web:
