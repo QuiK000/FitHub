@@ -5,6 +5,8 @@ import Dashboard from './pages/Dashboard'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Profile from './pages/Profile'
+import VerifyEmail from './pages/VerifyEmail'
+import Onboarding from './pages/Onboarding'
 import ProtectedRoute from './components/ProtectedRoute'
 import { useAuthStore } from './store/useAuthStore'
 
@@ -23,11 +25,13 @@ const App = () => {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
 
         <Route element={<ProtectedRoute />}>
           <Route element={<MainLayout />}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/onboarding" element={<Onboarding />} />
           </Route>
         </Route>
 
