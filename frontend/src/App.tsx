@@ -5,6 +5,8 @@ import Dashboard from './pages/Dashboard'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Profile from './pages/Profile'
+import Workouts from './pages/Workouts'
+import WorkoutDetail from './pages/WorkoutDetail'
 import VerifyEmail from './pages/VerifyEmail'
 import Onboarding from './pages/Onboarding'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -31,6 +33,8 @@ const App = () => {
           <Route element={<MainLayout />}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/workouts" element={<Workouts />} />
+            <Route path="/workouts/:id" element={<WorkoutDetail />} />
             <Route path="/onboarding" element={<Onboarding />} />
           </Route>
         </Route>
