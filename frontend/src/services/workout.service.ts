@@ -3,11 +3,11 @@ import api from './api'
 // Enums mirrored from backend; keep as string unions for type-safety
 export type DifficultyLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | string
 export type ClientWorkoutStatus =
-  | 'PENDING'
-  | 'IN_PROGRESS'
-  | 'COMPLETED'
-  | 'CANCELLED'
-  | string
+    | 'PENDING'
+    | 'IN_PROGRESS'
+    | 'COMPLETED'
+    | 'CANCELLED'
+    | string
 
 export interface TrainerShortResponse {
   id: string
@@ -92,48 +92,48 @@ export interface WorkoutLogResponse {
 }
 
 export const getMyActiveAssignments =
-  async (): Promise<ClientWorkoutPlanResponse[]> => {
-    try {
-      const { data } = await api.get<ClientWorkoutPlanResponse[]>(
-          '/workout-plans/my-assignments/active',
-      )
-      return data
-    } catch (error) {
-      if ((error as { response?: { status?: number } }).response?.status === 404) {
+    async (): Promise<ClientWorkoutPlanResponse[]> => {
+      try {
         const { data } = await api.get<ClientWorkoutPlanResponse[]>(
-            '/workout-plans/my-assignments',
+            '/workout-plans/my-assignments/active',
         )
         return data
-      }
+      } catch (error) {
+        if ((error as { response?: { status?: number } }).response?.status === 404) {
+          const { data } = await api.get<ClientWorkoutPlanResponse[]>(
+              '/workout-plans/my-assignments',
+          )
+          return data
+        }
 
-      throw error
+        throw error
+      }
     }
-  }
 
 export const getMyAssignmentById = async (
-  assignmentId: string,
+    assignmentId: string,
 ): Promise<ClientWorkoutPlanResponse> => {
   const { data } = await api.get<ClientWorkoutPlanResponse>(
-    `/workout-plans/my-assignments/${assignmentId}`,
+      `/workout-plans/my-assignments/${assignmentId}`,
   )
   return data
 }
 
 export const getWorkoutPlanById = async (
-  workoutPlanId: string,
+    workoutPlanId: string,
 ): Promise<WorkoutPlanResponse> => {
   const { data } = await api.get<WorkoutPlanResponse>(
-    `/workout-plans/${workoutPlanId}`,
+      `/workout-plans/${workoutPlanId}`,
   )
   return data
 }
 
 export const logWorkout = async (
-  payload: LogWorkoutRequest,
+    payload: LogWorkoutRequest,
 ): Promise<WorkoutLogResponse> => {
   const { data } = await api.post<WorkoutLogResponse>(
-    '/workout-logs',
-    payload,
+      '/workout-logs',
+      payload,
   )
   return data
 }
