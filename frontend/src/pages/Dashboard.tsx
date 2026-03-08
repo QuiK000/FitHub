@@ -183,11 +183,11 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="h-56 w-full md:h-64">
+          <div className="w-full">
             {isLoading ? (
               <div className="h-full w-full animate-pulse rounded-2xl bg-gradient-to-br from-slate-900/80 via-slate-800/60 to-slate-900/80" />
             ) : (
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height={260}>
                 <AreaChart data={chartData} margin={{ left: -20, right: 0 }}>
                   <defs>
                     <linearGradient id="colorSessions" x1="0" y1="0" x2="0" y2="1">
