@@ -93,10 +93,21 @@ export interface WorkoutLogResponse {
 
 export const getMyActiveAssignments =
   async (): Promise<ClientWorkoutPlanResponse[]> => {
-    const { data } = await api.get<ClientWorkoutPlanResponse[]>(
-      '/workout-plans/my-assignments/active',
-    )
-    return data
+    try {
+      const { data } = await api.get<ClientWorkoutPlanResponse[]>(
+          '/workout-plans/my-assignments/active',
+      )
+      return data
+    } catch (error) {
+      if ((error as { response?: { status?: number } }).response?.status === 404) {
+        const { data } = await api.get<ClientWorkoutPlanResponse[]>(
+            '/workout-plans/my-assignments',
+        )
+        return data
+      }
+
+      throw error
+    }
   }
 
 export const getMyAssignmentById = async (
