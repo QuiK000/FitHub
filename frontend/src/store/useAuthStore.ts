@@ -42,6 +42,8 @@ export const useAuthStore = create<AuthState>((set, get) => {
       try {
         if (typeof window !== 'undefined') {
           localStorage.removeItem('access_token')
+          localStorage.removeItem('refresh_token')
+          localStorage.removeItem('user')
         }
       } catch {
         // ignore persistence errors
