@@ -74,4 +74,7 @@ public class User extends BaseEntity {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private TrainerProfile trainerProfile;
+
+    @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL)
+    private Set<Notification> notification;
 }
