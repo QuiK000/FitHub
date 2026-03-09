@@ -124,6 +124,7 @@ public enum ErrorCode {
     PAYMENT_VALIDATION_ERROR("PAYMENT_VALIDATION_ERROR", "Payment validation error", HttpStatus.INTERNAL_SERVER_ERROR),
     UNSUPPORTED_TRANSACTION_TYPE("UNSUPPORTED_TRANSACTION_TYPE", "Unsupported transaction type", HttpStatus.INTERNAL_SERVER_ERROR),
     TRANSACTION_ALREADY_USED("TRANSACTION_ALREADY_USED", "Transaction is already used", HttpStatus.CONFLICT),
+    CREATED_DATE_IS_NULL("CREATED_DATE_IS_NULL", "Created date is null", HttpStatus.INTERNAL_SERVER_ERROR),
 
     ;
 
