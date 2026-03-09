@@ -1,0 +1,8 @@
+package com.dev.quikkkk.service;
+
+import com.dev.quikkkk.dto.response.NotificationResponse;
+import com.dev.quikkkk.dto.response.PageResponse;
+
+public interface INotificationService {
+    PageResponse<NotificationResponse> findAllNotifications(int size, int page);
+}
