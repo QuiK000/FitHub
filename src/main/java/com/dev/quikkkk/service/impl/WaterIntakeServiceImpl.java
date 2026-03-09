@@ -99,14 +99,18 @@ public class WaterIntakeServiceImpl implements IWaterIntakeService {
             LocalDate date,
             ClientProfile client
     ) {
-        int currentTotal = intakes.stream().mapToInt(WaterIntake::getAmountMl).sum();
         int target = client.getDailyWaterTarget() != null ? client.getDailyWaterTarget() : 2500;
-        double progress = (target > 0) ? ((double) currentTotal / target) * 100 : 0;
+        List<WaterIntakeResponse> intakeDto = new ArrayList<>();
+        int runningTotal = 0;
 
-        List<WaterIntakeResponse> intakeDto = intakes.stream()
-                .map(intake -> waterIntakeMapper.toResponse(intake, null)) // TODO
-                .toList();
+        for (WaterIntake intake : intakes) {
+            runningTotal += intake.getAmountMl();
+            double runningProgress = (target > 0) ? ((double) runningTotal / target) * 100 : 0;
 
-        return waterIntakeMapper.toResponse(date, currentTotal, target, progress, intakeDto);
+            intakeDto.add(waterIntakeMapper.toResponse(intake, runningProgress));
+        }
+
+        double overallProgress = (target > 0) ? ((double) runningTotal / target) * 100 : 0;
+        return waterIntakeMapper.toResponse(date, runningTotal, target, overallProgress, intakeDto);
     }
 }
