@@ -2,10 +2,15 @@ package com.dev.quikkkk.mapper;
 
 import com.dev.quikkkk.dto.response.NotificationResponse;
 import com.dev.quikkkk.entity.Notification;
+import com.dev.quikkkk.utils.TimeAgoFormatter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class NotificationMapper {
+    private final TimeAgoFormatter timeAgoFormatter;
+
     public NotificationResponse toResponse(Notification notification) {
         return NotificationResponse.builder()
                 .id(notification.getId())
@@ -19,7 +24,7 @@ public class NotificationMapper {
                 .referenceId(notification.getReferenceId())
                 .referenceType(notification.getReferenceType())
                 .createdAt(notification.getCreatedDate())
-                .timeAgo(null) // TODO: FIX
+                .timeAgo(timeAgoFormatter.format(notification.getCreatedDate()))
                 .build();
     }
 }
