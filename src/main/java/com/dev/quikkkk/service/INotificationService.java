@@ -5,4 +5,6 @@ import com.dev.quikkkk.dto.response.PageResponse;
 
 public interface INotificationService {
     PageResponse<NotificationResponse> findAllNotifications(int size, int page);
+
+    NotificationResponse findNotificationById(String id);
 }

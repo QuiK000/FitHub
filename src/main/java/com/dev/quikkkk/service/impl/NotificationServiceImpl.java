@@ -3,6 +3,7 @@ package com.dev.quikkkk.service.impl;
 import com.dev.quikkkk.dto.response.NotificationResponse;
 import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.entity.Notification;
+import com.dev.quikkkk.exception.BusinessException;
 import com.dev.quikkkk.mapper.NotificationMapper;
 import com.dev.quikkkk.repository.INotificationRepository;
 import com.dev.quikkkk.service.INotificationService;
@@ -14,6 +15,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.dev.quikkkk.enums.ErrorCode.FORBIDDEN_ACCESS;
 
 @Service
 @RequiredArgsConstructor
@@ -30,5 +33,15 @@ public class NotificationServiceImpl implements INotificationService {
         Page<Notification> notifications = notificationRepository.findNotificationsByRecipientId(userId, notificationPage);
 
         return PaginationUtils.toPageResponse(notifications, notificationMapper::toResponse);
+    }
+
+    @Override
+    public NotificationResponse findNotificationById(String id) {
+        String userId = SecurityUtils.getCurrentUserId();
+        Notification notification = notificationRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(FORBIDDEN_ACCESS));
+
+        if (!notification.getRecipient().getId().equals(userId)) throw new BusinessException(FORBIDDEN_ACCESS);
+        return notificationMapper.toResponse(notification);
     }
 }
