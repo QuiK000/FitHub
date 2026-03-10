@@ -28,4 +28,6 @@ public interface INotificationRepository extends JpaRepository<Notification, Str
         AND n.read = false
         """)
     int markAllAsReadByRecipientId(String recipientId, LocalDateTime now);
+
+    long countAllByRecipientIdAndReadIsFalse(String recipientId);
 }
