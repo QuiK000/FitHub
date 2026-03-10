@@ -125,6 +125,7 @@ public enum ErrorCode {
     UNSUPPORTED_TRANSACTION_TYPE("UNSUPPORTED_TRANSACTION_TYPE", "Unsupported transaction type", HttpStatus.INTERNAL_SERVER_ERROR),
     TRANSACTION_ALREADY_USED("TRANSACTION_ALREADY_USED", "Transaction is already used", HttpStatus.CONFLICT),
     CREATED_DATE_IS_NULL("CREATED_DATE_IS_NULL", "Created date is null", HttpStatus.INTERNAL_SERVER_ERROR),
+    NOTIFICATION_NOT_FOUND("NOTIFICATION_NOT_FOUND", "Notification not found", NOT_FOUND),
 
     ;
 
