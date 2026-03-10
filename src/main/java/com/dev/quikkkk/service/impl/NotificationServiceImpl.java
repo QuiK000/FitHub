@@ -1,9 +1,11 @@
 package com.dev.quikkkk.service.impl;
 
+import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.dto.response.NotificationResponse;
 import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.entity.Notification;
 import com.dev.quikkkk.exception.BusinessException;
+import com.dev.quikkkk.mapper.MessageMapper;
 import com.dev.quikkkk.mapper.NotificationMapper;
 import com.dev.quikkkk.repository.INotificationRepository;
 import com.dev.quikkkk.service.INotificationService;
@@ -16,7 +18,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.dev.quikkkk.enums.ErrorCode.FORBIDDEN_ACCESS;
+import java.time.LocalDateTime;
+
+import static com.dev.quikkkk.enums.ErrorCode.NOTIFICATION_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -25,12 +29,13 @@ import static com.dev.quikkkk.enums.ErrorCode.FORBIDDEN_ACCESS;
 public class NotificationServiceImpl implements INotificationService {
     private final INotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
+    private final MessageMapper messageMapper;
 
     @Override
     public PageResponse<NotificationResponse> findAllNotifications(int size, int page) {
         String userId = SecurityUtils.getCurrentUserId();
         Pageable notificationPage = PaginationUtils.createPageRequest(size, page, "createdDate");
-        Page<Notification> notifications = notificationRepository.findNotificationsByRecipientId(userId, notificationPage);
+        Page<Notification> notifications = notificationRepository.findAllByRecipientId(userId, notificationPage);
 
         return PaginationUtils.toPageResponse(notifications, notificationMapper::toResponse);
     }
@@ -38,10 +43,32 @@ public class NotificationServiceImpl implements INotificationService {
     @Override
     public NotificationResponse findNotificationById(String id) {
         String userId = SecurityUtils.getCurrentUserId();
-        Notification notification = notificationRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(FORBIDDEN_ACCESS));
+        return notificationRepository.findByIdAndRecipientId(id, userId)
+                .map(notificationMapper::toResponse)
+                .orElseThrow(() -> new BusinessException(NOTIFICATION_NOT_FOUND));
+    }
 
-        if (!notification.getRecipient().getId().equals(userId)) throw new BusinessException(FORBIDDEN_ACCESS);
-        return notificationMapper.toResponse(notification);
+    @Override
+    @Transactional
+    public MessageResponse readNotification(String id) {
+        String userId = SecurityUtils.getCurrentUserId();
+        Notification notification = notificationRepository.findByIdAndRecipientId(id, userId)
+                .orElseThrow(() -> new BusinessException(NOTIFICATION_NOT_FOUND));
+
+        if (!notification.isRead()) {
+            notification.setRead(true);
+            notification.setReadAt(LocalDateTime.now());
+        }
+
+        return messageMapper.message("Notification marked as read");
+    }
+
+    @Override
+    @Transactional
+    public MessageResponse markAllRead() {
+        String userId = SecurityUtils.getCurrentUserId();
+        int updated = notificationRepository.markAllAsReadByRecipientId(userId, LocalDateTime.now());
+
+        return messageMapper.message(updated + " notifications marked as read");
     }
 }
