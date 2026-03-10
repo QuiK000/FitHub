@@ -71,4 +71,10 @@ public class NotificationServiceImpl implements INotificationService {
 
         return messageMapper.message(updated + " notifications marked as read");
     }
+
+    @Override
+    public long getUnreadCount() {
+        String userId = SecurityUtils.getCurrentUserId();
+        return notificationRepository.countAllByRecipientIdAndReadIsFalse(userId);
+    }
 }

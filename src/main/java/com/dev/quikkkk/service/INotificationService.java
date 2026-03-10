@@ -12,4 +12,6 @@ public interface INotificationService {
     MessageResponse readNotification(String id);
 
     MessageResponse markAllRead();
+
+    long getUnreadCount();
 }
