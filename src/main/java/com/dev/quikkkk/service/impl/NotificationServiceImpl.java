@@ -2,6 +2,7 @@ package com.dev.quikkkk.service.impl;
 
 import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.dto.response.NotificationResponse;
+import com.dev.quikkkk.dto.response.NotificationSummaryResponse;
 import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.entity.Notification;
 import com.dev.quikkkk.exception.BusinessException;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static com.dev.quikkkk.enums.ErrorCode.NOTIFICATION_NOT_FOUND;
 
@@ -76,5 +78,14 @@ public class NotificationServiceImpl implements INotificationService {
     public long getUnreadCount() {
         String userId = SecurityUtils.getCurrentUserId();
         return notificationRepository.countAllByRecipientIdAndReadIsFalse(userId);
+    }
+
+    @Override
+    public NotificationSummaryResponse getNotificationSummary() {
+        String userId = SecurityUtils.getCurrentUserId();
+        Long getUnreadCount = getUnreadCount();
+        List<Notification> notifications = notificationRepository.findTop5ByRecipientIdOrderByCreatedDateDesc(userId);
+
+        return notificationMapper.toResponseSummary(getUnreadCount, notifications);
     }
 }

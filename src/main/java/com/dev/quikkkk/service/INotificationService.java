@@ -2,6 +2,7 @@ package com.dev.quikkkk.service;
 
 import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.dto.response.NotificationResponse;
+import com.dev.quikkkk.dto.response.NotificationSummaryResponse;
 import com.dev.quikkkk.dto.response.PageResponse;
 
 public interface INotificationService {
@@ -14,4 +15,6 @@ public interface INotificationService {
     MessageResponse markAllRead();
 
     long getUnreadCount();
+
+    NotificationSummaryResponse getNotificationSummary();
 }
