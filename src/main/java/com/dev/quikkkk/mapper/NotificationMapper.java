@@ -1,10 +1,13 @@
 package com.dev.quikkkk.mapper;
 
 import com.dev.quikkkk.dto.response.NotificationResponse;
+import com.dev.quikkkk.dto.response.NotificationSummaryResponse;
 import com.dev.quikkkk.entity.Notification;
 import com.dev.quikkkk.utils.TimeAgoFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +28,15 @@ public class NotificationMapper {
                 .referenceType(notification.getReferenceType())
                 .createdAt(notification.getCreatedDate())
                 .timeAgo(timeAgoFormatter.format(notification.getCreatedDate()))
+                .build();
+    }
+
+    public NotificationSummaryResponse toResponseSummary(Long getUnreadCount, List<Notification> notifications) {
+        List<NotificationResponse> recentNotifications = notifications.stream().map(this::toResponse).toList();
+
+        return NotificationSummaryResponse.builder()
+                .unreadCount(getUnreadCount)
+                .recentNotifications(recentNotifications)
                 .build();
     }
 }
