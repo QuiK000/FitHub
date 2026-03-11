@@ -2,6 +2,7 @@ package com.dev.quikkkk.controller;
 
 import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.dto.response.NotificationResponse;
+import com.dev.quikkkk.dto.response.NotificationSummaryResponse;
 import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.service.INotificationService;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,11 @@ public class NotificationController {
     @GetMapping("/unread/count")
     public ResponseEntity<Long> getUnreadCount() {
         return ResponseEntity.ok(notificationService.getUnreadCount());
+    }
+
+    @GetMapping("/summary")
+    public ResponseEntity<NotificationSummaryResponse> getNotificationSummary() {
+        return ResponseEntity.ok(notificationService.getNotificationSummary());
     }
 
     @PatchMapping("/{notification-id}/read")
