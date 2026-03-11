@@ -4,6 +4,7 @@ import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.dto.response.NotificationResponse;
 import com.dev.quikkkk.dto.response.NotificationSummaryResponse;
 import com.dev.quikkkk.dto.response.PageResponse;
+import com.dev.quikkkk.event.NotificationEvent;
 
 public interface INotificationService {
     PageResponse<NotificationResponse> findAllNotifications(int size, int page);
@@ -17,4 +18,6 @@ public interface INotificationService {
     long getUnreadCount();
 
     NotificationSummaryResponse getNotificationSummary();
+
+    void createNotificationFromEvent(NotificationEvent event);
 }
