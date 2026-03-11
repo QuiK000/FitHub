@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -30,4 +31,6 @@ public interface INotificationRepository extends JpaRepository<Notification, Str
     int markAllAsReadByRecipientId(String recipientId, LocalDateTime now);
 
     long countAllByRecipientIdAndReadIsFalse(String recipientId);
+
+    List<Notification> findTop5ByRecipientIdOrderByCreatedDateDesc(String userId);
 }
