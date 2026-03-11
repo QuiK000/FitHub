@@ -3,6 +3,8 @@ package com.dev.quikkkk.mapper;
 import com.dev.quikkkk.dto.response.NotificationResponse;
 import com.dev.quikkkk.dto.response.NotificationSummaryResponse;
 import com.dev.quikkkk.entity.Notification;
+import com.dev.quikkkk.entity.User;
+import com.dev.quikkkk.event.NotificationEvent;
 import com.dev.quikkkk.utils.TimeAgoFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -37,6 +39,21 @@ public class NotificationMapper {
         return NotificationSummaryResponse.builder()
                 .unreadCount(getUnreadCount)
                 .recentNotifications(recentNotifications)
+                .build();
+    }
+
+    public Notification toEvent(User recipientProxy, NotificationEvent event) {
+        return Notification.builder()
+                .recipient(recipientProxy)
+                .title(event.getTitle())
+                .message(event.getMessage())
+                .type(event.getType())
+                .priority(event.getPriority())
+                .actionUrl(event.getActionUrl())
+                .referenceId(event.getReferenceId())
+                .referenceType(event.getReferenceType())
+                .read(false)
+                .sent(false)
                 .build();
     }
 }
