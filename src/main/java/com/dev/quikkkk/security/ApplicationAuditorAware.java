@@ -9,6 +9,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.Optional;
 
 public class ApplicationAuditorAware implements AuditorAware<String> {
+    private static final String SYSTEM_ACCOUNT = "SYSTEM";
+
     @Override
     @NonNull
     public Optional<String> getCurrentAuditor() {
@@ -17,7 +19,7 @@ public class ApplicationAuditorAware implements AuditorAware<String> {
         if (authentication == null
                 || !authentication.isAuthenticated()
                 || authentication instanceof AnonymousAuthenticationToken
-        ) return Optional.empty();
+        ) return Optional.of(SYSTEM_ACCOUNT);
 
         Object principal = authentication.getPrincipal();
 
