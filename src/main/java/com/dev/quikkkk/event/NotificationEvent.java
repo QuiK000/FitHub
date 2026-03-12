@@ -5,6 +5,8 @@ import com.dev.quikkkk.enums.NotificationType;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Builder
 public class NotificationEvent {
@@ -16,4 +18,5 @@ public class NotificationEvent {
     private final String actionUrl;
     private final String referenceId;
     private final String referenceType;
+    private final LocalDateTime scheduledFor;
 }

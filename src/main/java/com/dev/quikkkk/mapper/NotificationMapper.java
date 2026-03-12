@@ -53,7 +53,7 @@ public class NotificationMapper {
                 .referenceId(event.getReferenceId())
                 .referenceType(event.getReferenceType())
                 .read(false)
-                .sent(false)
+                .scheduledFor(event.getScheduledFor())
                 .build();
     }
 }
