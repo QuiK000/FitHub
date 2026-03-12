@@ -1,5 +1,6 @@
 package com.dev.quikkkk.service;
 
+import com.dev.quikkkk.dto.request.CreateNotificationRequest;
 import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.dto.response.NotificationResponse;
 import com.dev.quikkkk.dto.response.NotificationSummaryResponse;
@@ -20,4 +21,6 @@ public interface INotificationService {
     NotificationSummaryResponse getNotificationSummary();
 
     void createNotificationFromEvent(NotificationEvent event);
+
+    MessageResponse sendNotification(CreateNotificationRequest request);
 }

@@ -1,5 +1,6 @@
 package com.dev.quikkkk.service.impl;
 
+import com.dev.quikkkk.dto.request.CreateNotificationRequest;
 import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.dto.response.NotificationResponse;
 import com.dev.quikkkk.dto.response.NotificationSummaryResponse;
@@ -17,6 +18,7 @@ import com.dev.quikkkk.utils.PaginationUtils;
 import com.dev.quikkkk.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -28,6 +30,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.dev.quikkkk.enums.ErrorCode.NOTIFICATION_NOT_FOUND;
+import static com.dev.quikkkk.enums.ErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +44,7 @@ public class NotificationServiceImpl implements INotificationService {
     private final NotificationMapper notificationMapper;
     private final MessageMapper messageMapper;
     private final StringRedisTemplate redisTemplate;
+    private final ApplicationEventPublisher publisher;
 
     @Override
     public PageResponse<NotificationResponse> findAllNotifications(int size, int page) {
@@ -105,9 +109,33 @@ public class NotificationServiceImpl implements INotificationService {
     public void createNotificationFromEvent(NotificationEvent event) {
         User recipientProxy = userRepository.getReferenceById(event.getRecipientId());
         Notification notification = notificationMapper.toEvent(recipientProxy, event);
+        boolean isScheduledForFuture = event.getScheduledFor() != null
+                && event.getScheduledFor().isAfter(LocalDateTime.now());
 
+        notification.setSent(!isScheduledForFuture);
         notificationRepository.save(notification);
-        incrementUnreadCountInCache(event.getRecipientId());
+
+        if (!isScheduledForFuture) incrementUnreadCountInCache(event.getRecipientId());
+    }
+
+    @Override
+    public MessageResponse sendNotification(CreateNotificationRequest request) {
+        if (!userRepository.existsById(request.getRecipientId())) throw new BusinessException(USER_NOT_FOUND);
+
+        NotificationEvent event = NotificationEvent.builder()
+                .recipientId(request.getRecipientId())
+                .type(request.getType())
+                .priority(request.getPriority())
+                .title(request.getTitle())
+                .message(request.getMessage())
+                .actionUrl(request.getActionUrl())
+                .referenceId(request.getReferenceId())
+                .referenceType(request.getReferenceType())
+                .scheduledFor(request.getScheduledFor())
+                .build();
+
+        publisher.publishEvent(event);
+        return messageMapper.message("Notification dispatched successfully");
     }
 
     private long getUnreadCountForUser(String userId) {
