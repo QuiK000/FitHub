@@ -4,8 +4,8 @@ import com.dev.quikkkk.dto.request.CreateGoalRequest;
 import com.dev.quikkkk.dto.request.UpdateGoalProgressRequest;
 import com.dev.quikkkk.dto.request.UpdateGoalRequest;
 import com.dev.quikkkk.dto.response.GoalResponse;
-import com.dev.quikkkk.dto.response.MessageResponse;
-import com.dev.quikkkk.dto.response.PageResponse;
+import com.dev.quikkkk.core.dto.MessageResponse;
+import com.dev.quikkkk.core.dto.PageResponse;
 
 public interface IGoalService {
     GoalResponse createGoal(CreateGoalRequest request);

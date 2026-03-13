@@ -1,7 +1,7 @@
 package com.dev.quikkkk.modules.notification.entity;
 
 import com.dev.quikkkk.core.entity.BaseEntity;
-import com.dev.quikkkk.entity.User;
+import com.dev.quikkkk.modules.user.entity.User;
 import com.dev.quikkkk.modules.notification.enums.NotificationPriority;
 import com.dev.quikkkk.modules.notification.enums.NotificationType;
 import jakarta.persistence.Column;

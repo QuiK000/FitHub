@@ -1,0 +1,23 @@
+package com.dev.quikkkk.modules.workout.dto.response;
+
+import com.dev.quikkkk.modules.user.dto.response.ClientShortResponse;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class AttendanceSessionResponse {
+    private String id;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime checkInTime;
+    private ClientShortResponse client;
+}

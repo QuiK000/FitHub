@@ -1,0 +1,68 @@
+package com.dev.quikkkk.modules.user.controller;
+
+import com.dev.quikkkk.modules.user.dto.request.CreateClientProfileRequest;
+import com.dev.quikkkk.modules.user.dto.request.UpdateClientProfileRequest;
+import com.dev.quikkkk.modules.user.dto.response.ClientProfileResponse;
+import com.dev.quikkkk.core.dto.MessageResponse;
+import com.dev.quikkkk.core.dto.PageResponse;
+import com.dev.quikkkk.modules.user.service.IClientProfileService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/v1/profile/client")
+@RequiredArgsConstructor
+public class ClientProfileController {
+    private final IClientProfileService clientProfileService;
+
+    @PostMapping
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<ClientProfileResponse> createProfile(@Valid @RequestBody CreateClientProfileRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(clientProfileService.createClientProfile(request));
+    }
+
+    @GetMapping("/me")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<ClientProfileResponse> getCurrentUserProfile() {
+        return ResponseEntity.ok(clientProfileService.getClientProfile());
+    }
+
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<PageResponse<ClientProfileResponse>> getAllClients(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String search
+    ) {
+        return ResponseEntity.ok(clientProfileService.getAllClientsProfile(page, size, search));
+    }
+
+    @PutMapping("/me")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<MessageResponse> updateUserProfile(@Valid @RequestBody UpdateClientProfileRequest request) {
+        return ResponseEntity.ok(clientProfileService.updateClientProfile(request));
+    }
+
+    @PatchMapping("/me/deactivate")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<MessageResponse> deactivateUserProfile() {
+        return ResponseEntity.ok(clientProfileService.deactivateProfile());
+    }
+
+    @PatchMapping("/me/clear")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<ClientProfileResponse> clearUserProfile() {
+        return ResponseEntity.ok(clientProfileService.clearProfile());
+    }
+}

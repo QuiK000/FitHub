@@ -1,20 +1,20 @@
 package com.dev.quikkkk.modules.membership.service.impl;
 
 import com.dev.quikkkk.modules.membership.dto.request.CreatePaymentRequest;
-import com.dev.quikkkk.dto.response.PageResponse;
+import com.dev.quikkkk.core.dto.PageResponse;
 import com.dev.quikkkk.modules.membership.dto.response.PaymentResponse;
-import com.dev.quikkkk.entity.ClientProfile;
+import com.dev.quikkkk.modules.user.entity.ClientProfile;
 import com.dev.quikkkk.modules.membership.entity.Membership;
 import com.dev.quikkkk.modules.membership.entity.Payment;
 import com.dev.quikkkk.modules.membership.enums.PaymentStatus;
 import com.dev.quikkkk.core.exception.BusinessException;
 import com.dev.quikkkk.modules.membership.mapper.PaymentMapper;
-import com.dev.quikkkk.repository.IClientProfileRepository;
+import com.dev.quikkkk.modules.user.repository.IClientProfileRepository;
 import com.dev.quikkkk.modules.membership.repository.IMembershipRepository;
 import com.dev.quikkkk.modules.membership.repository.IPaymentRepository;
 import com.dev.quikkkk.modules.membership.service.IMembershipService;
 import com.dev.quikkkk.modules.membership.service.IPaymentService;
-import com.dev.quikkkk.core.utils.ClientProfileUtils;
+import com.dev.quikkkk.modules.user.utils.ClientProfileUtils;
 import com.dev.quikkkk.core.utils.PaginationUtils;
 import com.dev.quikkkk.modules.membership.utils.TronPaymentValidator;
 import lombok.RequiredArgsConstructor;

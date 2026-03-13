@@ -3,7 +3,7 @@ package com.dev.quikkkk.mapper;
 import com.dev.quikkkk.dto.request.CreateGoalRequest;
 import com.dev.quikkkk.dto.request.UpdateGoalRequest;
 import com.dev.quikkkk.dto.response.GoalResponse;
-import com.dev.quikkkk.entity.ClientProfile;
+import com.dev.quikkkk.modules.user.entity.ClientProfile;
 import com.dev.quikkkk.entity.Goal;
 import com.dev.quikkkk.enums.GoalStatus;
 import org.springframework.stereotype.Service;

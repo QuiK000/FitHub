@@ -1,8 +1,8 @@
 package com.dev.quikkkk.core.utils;
 
-import com.dev.quikkkk.entity.User;
+import com.dev.quikkkk.modules.user.entity.User;
 import com.dev.quikkkk.core.exception.BusinessException;
-import com.dev.quikkkk.repository.IUserRepository;
+import com.dev.quikkkk.modules.user.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

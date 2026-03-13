@@ -1,7 +1,7 @@
 package com.dev.quikkkk.core.security;
 
-import com.dev.quikkkk.entity.Role;
-import com.dev.quikkkk.entity.User;
+import com.dev.quikkkk.modules.user.entity.Role;
+import com.dev.quikkkk.modules.user.entity.User;
 
 import java.util.Set;
 import java.util.stream.Collectors;

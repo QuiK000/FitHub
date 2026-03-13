@@ -4,14 +4,14 @@ import com.dev.quikkkk.modules.progress.dto.request.CreateBodyMeasurementRequest
 import com.dev.quikkkk.modules.progress.dto.request.UpdateBodyMeasurementRequest;
 import com.dev.quikkkk.modules.progress.dto.response.BodyMeasurementResponse;
 import com.dev.quikkkk.modules.progress.dto.response.MeasurementHistoryResponse;
-import com.dev.quikkkk.dto.response.PageResponse;
+import com.dev.quikkkk.core.dto.PageResponse;
 import com.dev.quikkkk.modules.progress.entity.BodyMeasurement;
-import com.dev.quikkkk.entity.ClientProfile;
+import com.dev.quikkkk.modules.user.entity.ClientProfile;
 import com.dev.quikkkk.core.exception.BusinessException;
 import com.dev.quikkkk.modules.progress.mapper.BodyMeasurementMapper;
 import com.dev.quikkkk.modules.progress.repository.IBodyMeasurementRepository;
 import com.dev.quikkkk.modules.progress.service.IBodyMeasurementService;
-import com.dev.quikkkk.core.utils.ClientProfileUtils;
+import com.dev.quikkkk.modules.user.utils.ClientProfileUtils;
 import com.dev.quikkkk.core.utils.PaginationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

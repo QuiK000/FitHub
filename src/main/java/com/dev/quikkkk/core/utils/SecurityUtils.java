@@ -1,9 +1,9 @@
 package com.dev.quikkkk.core.utils;
 
-import com.dev.quikkkk.entity.WorkoutPlan;
+import com.dev.quikkkk.modules.workout.entity.WorkoutPlan;
 import com.dev.quikkkk.core.enums.ErrorCode;
 import com.dev.quikkkk.core.exception.BusinessException;
-import com.dev.quikkkk.repository.IWorkoutPlanRepository;
+import com.dev.quikkkk.modules.workout.repository.IWorkoutPlanRepository;
 import com.dev.quikkkk.core.security.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;

@@ -1,8 +1,8 @@
 package com.dev.quikkkk.modules.progress.entity;
 
 import com.dev.quikkkk.core.entity.BaseEntity;
-import com.dev.quikkkk.entity.ClientProfile;
-import com.dev.quikkkk.entity.Exercise;
+import com.dev.quikkkk.modules.user.entity.ClientProfile;
+import com.dev.quikkkk.modules.workout.entity.Exercise;
 import com.dev.quikkkk.modules.progress.enums.PersonalRecordUnit;
 import com.dev.quikkkk.modules.progress.enums.RecordType;
 import jakarta.persistence.Column;

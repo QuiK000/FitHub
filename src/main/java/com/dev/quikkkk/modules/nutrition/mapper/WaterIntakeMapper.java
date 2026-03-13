@@ -3,7 +3,7 @@ package com.dev.quikkkk.modules.nutrition.mapper;
 import com.dev.quikkkk.modules.nutrition.dto.request.LogWaterIntakeRequest;
 import com.dev.quikkkk.modules.nutrition.dto.response.DailyWaterIntakeResponse;
 import com.dev.quikkkk.modules.nutrition.dto.response.WaterIntakeResponse;
-import com.dev.quikkkk.entity.ClientProfile;
+import com.dev.quikkkk.modules.user.entity.ClientProfile;
 import com.dev.quikkkk.modules.nutrition.entity.WaterIntake;
 import org.springframework.stereotype.Service;
 

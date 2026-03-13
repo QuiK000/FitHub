@@ -1,12 +1,12 @@
 package com.dev.quikkkk.service;
 
 import com.dev.quikkkk.modules.notification.entity.Notification;
-import com.dev.quikkkk.entity.User;
+import com.dev.quikkkk.modules.user.entity.User;
 import com.dev.quikkkk.modules.notification.enums.NotificationType;
 import com.dev.quikkkk.modules.notification.event.NotificationEvent;
 import com.dev.quikkkk.modules.notification.mapper.NotificationMapper;
 import com.dev.quikkkk.modules.notification.repository.INotificationRepository;
-import com.dev.quikkkk.repository.IUserRepository;
+import com.dev.quikkkk.modules.user.repository.IUserRepository;
 import com.dev.quikkkk.modules.notification.service.impl.NotificationServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

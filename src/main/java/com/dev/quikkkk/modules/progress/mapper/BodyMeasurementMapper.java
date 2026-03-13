@@ -6,7 +6,7 @@ import com.dev.quikkkk.modules.progress.dto.response.BodyMeasurementResponse;
 import com.dev.quikkkk.modules.progress.dto.response.MeasurementHistoryResponse;
 import com.dev.quikkkk.modules.progress.dto.response.MeasurementTrendsDto;
 import com.dev.quikkkk.modules.progress.entity.BodyMeasurement;
-import com.dev.quikkkk.entity.ClientProfile;
+import com.dev.quikkkk.modules.user.entity.ClientProfile;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

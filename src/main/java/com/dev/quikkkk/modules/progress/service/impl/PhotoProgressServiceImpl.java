@@ -1,17 +1,17 @@
 package com.dev.quikkkk.modules.progress.service.impl;
 
 import com.dev.quikkkk.modules.progress.dto.request.CreateProgressPhotoRequest;
-import com.dev.quikkkk.dto.response.PageResponse;
+import com.dev.quikkkk.core.dto.PageResponse;
 import com.dev.quikkkk.modules.progress.dto.response.ProgressPhotoResponse;
 import com.dev.quikkkk.modules.progress.entity.BodyMeasurement;
-import com.dev.quikkkk.entity.ClientProfile;
+import com.dev.quikkkk.modules.user.entity.ClientProfile;
 import com.dev.quikkkk.modules.progress.entity.ProgressPhoto;
 import com.dev.quikkkk.core.exception.BusinessException;
 import com.dev.quikkkk.modules.progress.mapper.ProgressPhotoMapper;
 import com.dev.quikkkk.modules.progress.repository.IBodyMeasurementRepository;
 import com.dev.quikkkk.modules.progress.repository.IProgressPhotoRepository;
 import com.dev.quikkkk.modules.progress.service.IProgressPhotoService;
-import com.dev.quikkkk.core.utils.ClientProfileUtils;
+import com.dev.quikkkk.modules.user.utils.ClientProfileUtils;
 import com.dev.quikkkk.core.utils.PaginationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

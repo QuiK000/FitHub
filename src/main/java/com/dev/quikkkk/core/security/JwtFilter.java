@@ -1,8 +1,8 @@
 package com.dev.quikkkk.core.security;
 
-import com.dev.quikkkk.enums.JwtTokenType;
-import com.dev.quikkkk.service.IJwtService;
-import com.dev.quikkkk.service.ITokenBlacklistService;
+import com.dev.quikkkk.modules.auth.enums.JwtTokenType;
+import com.dev.quikkkk.modules.auth.service.IJwtService;
+import com.dev.quikkkk.modules.auth.service.ITokenBlacklistService;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

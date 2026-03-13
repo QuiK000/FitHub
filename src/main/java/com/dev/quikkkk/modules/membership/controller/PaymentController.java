@@ -1,7 +1,7 @@
 package com.dev.quikkkk.modules.membership.controller;
 
 import com.dev.quikkkk.modules.membership.dto.request.CreatePaymentRequest;
-import com.dev.quikkkk.dto.response.PageResponse;
+import com.dev.quikkkk.core.dto.PageResponse;
 import com.dev.quikkkk.modules.membership.dto.response.PaymentResponse;
 import com.dev.quikkkk.modules.membership.service.IPaymentService;
 import jakarta.validation.Valid;

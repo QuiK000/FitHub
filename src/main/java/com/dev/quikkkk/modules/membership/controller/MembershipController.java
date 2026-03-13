@@ -5,7 +5,7 @@ import com.dev.quikkkk.modules.membership.dto.request.ExtendMembershipRequest;
 import com.dev.quikkkk.modules.membership.dto.response.MembershipHistoryResponse;
 import com.dev.quikkkk.modules.membership.dto.response.MembershipResponse;
 import com.dev.quikkkk.modules.membership.dto.response.MembershipValidationResponse;
-import com.dev.quikkkk.dto.response.PageResponse;
+import com.dev.quikkkk.core.dto.PageResponse;
 import com.dev.quikkkk.modules.membership.service.IMembershipService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

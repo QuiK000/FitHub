@@ -1,18 +1,18 @@
 package com.dev.quikkkk.modules.progress.service.impl;
 
 import com.dev.quikkkk.modules.progress.dto.request.CreatePersonalRecordRequest;
-import com.dev.quikkkk.dto.response.PageResponse;
+import com.dev.quikkkk.core.dto.PageResponse;
 import com.dev.quikkkk.modules.progress.dto.response.PersonalRecordResponse;
-import com.dev.quikkkk.entity.ClientProfile;
-import com.dev.quikkkk.entity.Exercise;
+import com.dev.quikkkk.modules.user.entity.ClientProfile;
+import com.dev.quikkkk.modules.workout.entity.Exercise;
 import com.dev.quikkkk.modules.progress.entity.PersonalRecord;
 import com.dev.quikkkk.modules.progress.enums.RecordType;
 import com.dev.quikkkk.core.exception.BusinessException;
 import com.dev.quikkkk.modules.progress.mapper.PersonalRecordMapper;
 import com.dev.quikkkk.modules.progress.repository.IPersonalRecordRepository;
-import com.dev.quikkkk.service.IExerciseService;
+import com.dev.quikkkk.modules.workout.service.IExerciseService;
 import com.dev.quikkkk.modules.progress.service.IPersonalRecordService;
-import com.dev.quikkkk.core.utils.ClientProfileUtils;
+import com.dev.quikkkk.modules.user.utils.ClientProfileUtils;
 import com.dev.quikkkk.core.utils.PaginationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

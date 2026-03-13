@@ -4,7 +4,7 @@ import com.dev.quikkkk.modules.progress.dto.request.CreateBodyMeasurementRequest
 import com.dev.quikkkk.modules.progress.dto.request.UpdateBodyMeasurementRequest;
 import com.dev.quikkkk.modules.progress.dto.response.BodyMeasurementResponse;
 import com.dev.quikkkk.modules.progress.dto.response.MeasurementHistoryResponse;
-import com.dev.quikkkk.dto.response.PageResponse;
+import com.dev.quikkkk.core.dto.PageResponse;
 
 public interface IBodyMeasurementService {
     BodyMeasurementResponse createBodyMeasurement(CreateBodyMeasurementRequest request);

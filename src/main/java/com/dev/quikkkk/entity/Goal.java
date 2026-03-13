@@ -6,6 +6,7 @@ import com.dev.quikkkk.enums.GoalStatus;
 import com.dev.quikkkk.enums.GoalType;
 import com.dev.quikkkk.modules.progress.enums.MeasurementUnit;
 import com.dev.quikkkk.core.exception.BusinessException;
+import com.dev.quikkkk.modules.user.entity.ClientProfile;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

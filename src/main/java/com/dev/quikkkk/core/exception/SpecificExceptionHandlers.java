@@ -1,6 +1,6 @@
 package com.dev.quikkkk.core.exception;
 
-import com.dev.quikkkk.dto.response.ErrorResponse;
+import com.dev.quikkkk.core.dto.ErrorResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;

@@ -1,6 +1,6 @@
 package com.dev.quikkkk.core.security;
 
-import com.dev.quikkkk.entity.User;
+import com.dev.quikkkk.modules.user.entity.User;
 import lombok.Getter;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;

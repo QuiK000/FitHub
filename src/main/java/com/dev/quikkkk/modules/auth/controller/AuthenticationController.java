@@ -1,0 +1,51 @@
+package com.dev.quikkkk.modules.auth.controller;
+
+import com.dev.quikkkk.modules.auth.dto.request.LoginRequest;
+import com.dev.quikkkk.modules.auth.dto.request.RefreshTokenRequest;
+import com.dev.quikkkk.modules.auth.dto.request.RegistrationRequest;
+import com.dev.quikkkk.modules.auth.dto.response.AuthenticationResponse;
+import com.dev.quikkkk.core.dto.MessageResponse;
+import com.dev.quikkkk.modules.auth.service.IAuthenticationService;
+import com.dev.quikkkk.core.utils.ClientIpUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/v1/auth")
+@RequiredArgsConstructor
+public class AuthenticationController {
+    private final IAuthenticationService authenticationService;
+
+    @PostMapping("/signin")
+    public ResponseEntity<AuthenticationResponse> login(
+            @Valid @RequestBody LoginRequest request,
+            HttpServletRequest servletRequest
+    ) {
+        String clientIp = ClientIpUtils.getClientIpAddress(servletRequest);
+        return ResponseEntity.ok(authenticationService.login(request, clientIp));
+    }
+
+    @PostMapping("/signup")
+    public ResponseEntity<MessageResponse> register(@Valid @RequestBody RegistrationRequest request) {
+        return ResponseEntity.ok(authenticationService.register(request));
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<AuthenticationResponse> refreshToken(@RequestBody @Valid RefreshTokenRequest request) {
+        return ResponseEntity.ok(authenticationService.refreshToken(request));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<MessageResponse> logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String accessToken) {
+        String raw = accessToken.startsWith("Bearer ") ? accessToken.substring(7) : accessToken;
+        return ResponseEntity.ok(authenticationService.logout(raw));
+    }
+}

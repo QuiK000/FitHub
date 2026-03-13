@@ -1,7 +1,7 @@
 package com.dev.quikkkk.modules.membership.entity;
 
 import com.dev.quikkkk.core.entity.BaseEntity;
-import com.dev.quikkkk.entity.ClientProfile;
+import com.dev.quikkkk.modules.user.entity.ClientProfile;
 import com.dev.quikkkk.modules.membership.enums.PaymentStatus;
 import com.dev.quikkkk.modules.membership.utils.CurrencyConverter;
 import jakarta.persistence.CascadeType;

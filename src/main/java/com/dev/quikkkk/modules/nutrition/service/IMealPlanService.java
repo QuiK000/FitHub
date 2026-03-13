@@ -3,7 +3,7 @@ package com.dev.quikkkk.modules.nutrition.service;
 import com.dev.quikkkk.modules.nutrition.dto.request.CreateMealPlanRequest;
 import com.dev.quikkkk.modules.nutrition.dto.request.UpdateMealPlanRequest;
 import com.dev.quikkkk.modules.nutrition.dto.response.MealPlanResponse;
-import com.dev.quikkkk.dto.response.PageResponse;
+import com.dev.quikkkk.core.dto.PageResponse;
 
 import java.time.LocalDate;
 

@@ -1,7 +1,7 @@
 package com.dev.quikkkk.modules.progress.service;
 
 import com.dev.quikkkk.modules.progress.dto.request.CreateProgressPhotoRequest;
-import com.dev.quikkkk.dto.response.PageResponse;
+import com.dev.quikkkk.core.dto.PageResponse;
 import com.dev.quikkkk.modules.progress.dto.response.ProgressPhotoResponse;
 
 public interface IProgressPhotoService {

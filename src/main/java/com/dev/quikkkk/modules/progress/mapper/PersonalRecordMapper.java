@@ -1,10 +1,10 @@
 package com.dev.quikkkk.modules.progress.mapper;
 
 import com.dev.quikkkk.modules.progress.dto.request.CreatePersonalRecordRequest;
-import com.dev.quikkkk.dto.response.ExerciseShortResponse;
+import com.dev.quikkkk.modules.workout.dto.response.ExerciseShortResponse;
 import com.dev.quikkkk.modules.progress.dto.response.PersonalRecordResponse;
-import com.dev.quikkkk.entity.ClientProfile;
-import com.dev.quikkkk.entity.Exercise;
+import com.dev.quikkkk.modules.user.entity.ClientProfile;
+import com.dev.quikkkk.modules.workout.entity.Exercise;
 import com.dev.quikkkk.modules.progress.entity.PersonalRecord;
 import org.springframework.stereotype.Service;
 

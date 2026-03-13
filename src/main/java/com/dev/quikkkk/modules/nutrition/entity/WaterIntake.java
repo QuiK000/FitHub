@@ -1,7 +1,7 @@
 package com.dev.quikkkk.modules.nutrition.entity;
 
 import com.dev.quikkkk.core.entity.BaseEntity;
-import com.dev.quikkkk.entity.ClientProfile;
+import com.dev.quikkkk.modules.user.entity.ClientProfile;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

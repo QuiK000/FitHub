@@ -1,6 +1,6 @@
 package com.dev.quikkkk.core.utils;
 
-import com.dev.quikkkk.service.ISpecializationService;
+import com.dev.quikkkk.modules.user.service.ISpecializationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;

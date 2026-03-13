@@ -1,7 +1,7 @@
 package com.dev.quikkkk.validation;
 
 import com.dev.quikkkk.core.validation.PasswordMatchesValidator;
-import com.dev.quikkkk.dto.request.RegistrationRequest;
+import com.dev.quikkkk.modules.auth.dto.request.RegistrationRequest;
 import jakarta.validation.ConstraintValidatorContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

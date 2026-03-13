@@ -1,7 +1,7 @@
 package com.dev.quikkkk.modules.nutrition.entity;
 
 import com.dev.quikkkk.core.entity.BaseEntity;
-import com.dev.quikkkk.entity.ClientProfile;
+import com.dev.quikkkk.modules.user.entity.ClientProfile;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.CascadeType;

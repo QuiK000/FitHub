@@ -2,10 +2,10 @@ package com.dev.quikkkk.modules.notification.controller;
 
 import com.dev.quikkkk.modules.notification.dto.request.BroadcastNotificationRequest;
 import com.dev.quikkkk.modules.notification.dto.request.CreateNotificationRequest;
-import com.dev.quikkkk.dto.response.MessageResponse;
+import com.dev.quikkkk.core.dto.MessageResponse;
 import com.dev.quikkkk.modules.notification.dto.response.NotificationResponse;
 import com.dev.quikkkk.modules.notification.dto.response.NotificationSummaryResponse;
-import com.dev.quikkkk.dto.response.PageResponse;
+import com.dev.quikkkk.core.dto.PageResponse;
 import com.dev.quikkkk.modules.notification.service.INotificationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

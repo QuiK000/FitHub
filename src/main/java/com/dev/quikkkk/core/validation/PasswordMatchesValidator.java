@@ -1,6 +1,6 @@
 package com.dev.quikkkk.core.validation;
 
-import com.dev.quikkkk.dto.request.RegistrationRequest;
+import com.dev.quikkkk.modules.auth.dto.request.RegistrationRequest;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

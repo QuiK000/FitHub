@@ -1,6 +1,6 @@
 package com.dev.quikkkk.core.exception;
 
-import com.dev.quikkkk.dto.response.ErrorResponse;
+import com.dev.quikkkk.core.dto.ErrorResponse;
 import com.dev.quikkkk.core.enums.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

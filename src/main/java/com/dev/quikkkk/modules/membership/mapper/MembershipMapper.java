@@ -2,7 +2,7 @@ package com.dev.quikkkk.modules.membership.mapper;
 
 import com.dev.quikkkk.modules.membership.dto.response.MembershipHistoryResponse;
 import com.dev.quikkkk.modules.membership.dto.response.MembershipResponse;
-import com.dev.quikkkk.entity.ClientProfile;
+import com.dev.quikkkk.modules.user.entity.ClientProfile;
 import com.dev.quikkkk.modules.membership.entity.Membership;
 import com.dev.quikkkk.modules.membership.enums.MembershipStatus;
 import com.dev.quikkkk.modules.membership.enums.MembershipType;

@@ -1,7 +1,7 @@
 package com.dev.quikkkk.core.config;
 
-import com.dev.quikkkk.entity.Role;
-import com.dev.quikkkk.repository.IRoleRepository;
+import com.dev.quikkkk.modules.user.entity.Role;
+import com.dev.quikkkk.modules.user.repository.IRoleRepository;
 import com.dev.quikkkk.core.security.ApplicationAuditorAware;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;

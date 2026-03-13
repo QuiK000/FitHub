@@ -2,7 +2,7 @@ package com.dev.quikkkk.modules.notification.service.impl;
 
 import com.dev.quikkkk.modules.notification.entity.EmailFailureLog;
 import com.dev.quikkkk.modules.notification.enums.EmailType;
-import com.dev.quikkkk.enums.TokenType;
+import com.dev.quikkkk.modules.auth.enums.TokenType;
 import com.dev.quikkkk.core.exception.InvalidEmailAddressException;
 import com.dev.quikkkk.modules.notification.repository.IEmailFailureLogRepository;
 import com.dev.quikkkk.modules.notification.service.IEmailService;

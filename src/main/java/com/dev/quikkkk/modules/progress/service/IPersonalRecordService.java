@@ -1,7 +1,7 @@
 package com.dev.quikkkk.modules.progress.service;
 
 import com.dev.quikkkk.modules.progress.dto.request.CreatePersonalRecordRequest;
-import com.dev.quikkkk.dto.response.PageResponse;
+import com.dev.quikkkk.core.dto.PageResponse;
 import com.dev.quikkkk.modules.progress.dto.response.PersonalRecordResponse;
 
 public interface IPersonalRecordService {

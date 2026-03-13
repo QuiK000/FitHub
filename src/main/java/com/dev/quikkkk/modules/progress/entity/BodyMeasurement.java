@@ -1,8 +1,8 @@
 package com.dev.quikkkk.modules.progress.entity;
 
 import com.dev.quikkkk.core.entity.BaseEntity;
-import com.dev.quikkkk.entity.ClientProfile;
-import com.dev.quikkkk.enums.ClientGender;
+import com.dev.quikkkk.modules.user.entity.ClientProfile;
+import com.dev.quikkkk.modules.user.enums.ClientGender;
 import com.dev.quikkkk.modules.progress.enums.MeasurementType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;

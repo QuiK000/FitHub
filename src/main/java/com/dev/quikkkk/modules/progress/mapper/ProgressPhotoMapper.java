@@ -4,7 +4,7 @@ import com.dev.quikkkk.modules.progress.dto.request.CreateProgressPhotoRequest;
 import com.dev.quikkkk.modules.progress.dto.response.BodyMeasurementShortResponse;
 import com.dev.quikkkk.modules.progress.dto.response.ProgressPhotoResponse;
 import com.dev.quikkkk.modules.progress.entity.BodyMeasurement;
-import com.dev.quikkkk.entity.ClientProfile;
+import com.dev.quikkkk.modules.user.entity.ClientProfile;
 import com.dev.quikkkk.modules.progress.entity.ProgressPhoto;
 import org.springframework.stereotype.Service;
 

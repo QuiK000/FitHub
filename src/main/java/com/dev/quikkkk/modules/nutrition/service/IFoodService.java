@@ -3,8 +3,8 @@ package com.dev.quikkkk.modules.nutrition.service;
 import com.dev.quikkkk.modules.nutrition.dto.request.CreateFoodRequest;
 import com.dev.quikkkk.modules.nutrition.dto.request.UpdateFoodRequest;
 import com.dev.quikkkk.modules.nutrition.dto.response.FoodResponse;
-import com.dev.quikkkk.dto.response.MessageResponse;
-import com.dev.quikkkk.dto.response.PageResponse;
+import com.dev.quikkkk.core.dto.MessageResponse;
+import com.dev.quikkkk.core.dto.PageResponse;
 
 public interface IFoodService {
     FoodResponse createFood(CreateFoodRequest request);

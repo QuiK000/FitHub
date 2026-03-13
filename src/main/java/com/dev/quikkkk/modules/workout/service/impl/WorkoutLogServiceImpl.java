@@ -1,0 +1,239 @@
+package com.dev.quikkkk.modules.workout.service.impl;
+
+import com.dev.quikkkk.dto.request.LogWorkoutRequest;
+import com.dev.quikkkk.dto.request.UpdateLogWorkoutRequest;
+import com.dev.quikkkk.core.dto.PageResponse;
+import com.dev.quikkkk.modules.workout.dto.response.WorkoutLogResponse;
+import com.dev.quikkkk.modules.user.entity.ClientProfile;
+import com.dev.quikkkk.modules.workout.entity.ClientWorkoutPlan;
+import com.dev.quikkkk.modules.workout.entity.Exercise;
+import com.dev.quikkkk.entity.TrainerProfile;
+import com.dev.quikkkk.modules.workout.entity.WorkoutLog;
+import com.dev.quikkkk.core.exception.BusinessException;
+import com.dev.quikkkk.modules.workout.mapper.WorkoutLogMapper;
+import com.dev.quikkkk.modules.workout.repository.IClientWorkoutPlanRepository;
+import com.dev.quikkkk.modules.workout.repository.IExerciseRepository;
+import com.dev.quikkkk.modules.user.repository.ITrainerProfileRepository;
+import com.dev.quikkkk.modules.workout.repository.IWorkoutLogRepository;
+import com.dev.quikkkk.modules.workout.service.IWorkoutLogService;
+import com.dev.quikkkk.modules.user.utils.ClientProfileUtils;
+import com.dev.quikkkk.core.utils.PaginationUtils;
+import com.dev.quikkkk.core.utils.SecurityUtils;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+import static com.dev.quikkkk.core.enums.ErrorCode.CLIENT_ASSIGNMENT_NOT_FOUND;
+import static com.dev.quikkkk.core.enums.ErrorCode.EXERCISE_NOT_FOUND;
+import static com.dev.quikkkk.core.enums.ErrorCode.TRAINER_PROFILE_NOT_FOUND;
+import static com.dev.quikkkk.core.enums.ErrorCode.WORKOUT_LOG_ACCESS_DENIED;
+import static com.dev.quikkkk.core.enums.ErrorCode.WORKOUT_LOG_NOT_FOUND;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class WorkoutLogServiceImpl implements IWorkoutLogService {
+    private final IWorkoutLogRepository workoutLogRepository;
+    private final IExerciseRepository exerciseRepository;
+    private final IClientWorkoutPlanRepository clientWorkoutPlanRepository;
+    private final ITrainerProfileRepository trainerProfileRepository;
+    private final WorkoutLogMapper workoutLogMapper;
+    private final ClientProfileUtils clientProfileUtils;
+
+    @Override
+    @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "workoutLogs", allEntries = true),
+            @CacheEvict(value = "lists", allEntries = true)
+    })
+    public WorkoutLogResponse createWorkoutLog(LogWorkoutRequest request) {
+        Exercise exercise = exerciseRepository.findById(request.getExerciseId())
+                .orElseThrow(() -> new BusinessException(EXERCISE_NOT_FOUND));
+        ClientProfile client = clientProfileUtils.getCurrentClientProfile();
+        String userId = SecurityUtils.getCurrentUserId();
+        ClientWorkoutPlan activeWorkoutPlan = null;
+
+        if (request.getClientWorkoutPlanId() != null) {
+            activeWorkoutPlan = clientWorkoutPlanRepository.findById(request.getClientWorkoutPlanId())
+                    .orElseThrow(() -> new BusinessException(CLIENT_ASSIGNMENT_NOT_FOUND));
+            if (!activeWorkoutPlan.getClient().getId().equals(client.getId())) {
+                throw new BusinessException(CLIENT_ASSIGNMENT_NOT_FOUND);
+            }
+        }
+
+        WorkoutLog workoutLog = workoutLogMapper.toEntity(request, exercise, activeWorkoutPlan, userId);
+        workoutLogRepository.save(workoutLog);
+
+        log.info("Workout log created: {} for client: {}", workoutLog.getId(), client.getId());
+        return workoutLogMapper.toResponse(workoutLog);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @Cacheable(
+            value = "lists",
+            key = "'workoutLogs:all' + #page + ':' + #size"
+    )
+    public PageResponse<WorkoutLogResponse> getAllWorkoutLogs(int page, int size) {
+        log.info("Admin fetching all workout logs, page: {}, size: {}", page, size);
+        Pageable pageable = PaginationUtils.createPageRequest(page, size, "workoutDate");
+        Page<WorkoutLog> workoutLogPage = workoutLogRepository.findAll(pageable);
+
+        return PaginationUtils.toPageResponse(workoutLogPage, workoutLogMapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @Cacheable(
+            value = "workoutLogs",
+            key = "'byId:' + #id"
+    )
+    public WorkoutLogResponse getWorkoutLogById(String id) {
+        WorkoutLog workoutLog = getWorkoutLogByIdOrThrow(id);
+        validateTrainerAccessToWorkoutLog(workoutLog);
+
+        return workoutLogMapper.toResponse(workoutLog);
+    }
+
+    @Override
+    @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "workoutLogs", key = "'byId:' + #id"),
+            @CacheEvict(value = "lists", allEntries = true)
+    })
+    public WorkoutLogResponse updateWorkoutLogById(String id, UpdateLogWorkoutRequest request) {
+        WorkoutLog workoutLog = getWorkoutLogByIdOrThrow(id);
+        validateTrainerAccessToWorkoutLog(workoutLog);
+
+        workoutLogMapper.update(request, workoutLog, SecurityUtils.getCurrentUserId());
+        return workoutLogMapper.toResponse(workoutLog);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @Cacheable(
+            value = "lists",
+            key = "'workoutLogs:user:' + T(com.dev.quikkkk.core.utils.SecurityUtils).getCurrentUserId() + ':' + #page + ':' + #size"
+    )
+    public PageResponse<WorkoutLogResponse> getMyWorkoutLogs(int page, int size) {
+        String currentUserId = SecurityUtils.getCurrentUserId();
+        log.info("Client fetching own workout logs, userId: {}, page: {}, size: {}", currentUserId, page, size);
+
+        Pageable pageable = PaginationUtils.createPageRequest(page, size, "workoutDate");
+        Page<WorkoutLog> workoutLogPageable = workoutLogRepository.findAllByCreatedBy(currentUserId, pageable);
+
+        return PaginationUtils.toPageResponse(workoutLogPageable, workoutLogMapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @Cacheable(
+            value = "lists",
+            key = "'workoutLogs:assignment:' + #assignmentId + ':' + #page + ':' + #size"
+    )
+    public PageResponse<WorkoutLogResponse> getLogsByAssignment(String assignmentId, int page, int size) {
+        log.info("Fetching logs for assignment: {}, page: {}, size: {}", assignmentId, page, size);
+        ClientWorkoutPlan assignment = clientWorkoutPlanRepository.findById(assignmentId)
+                .orElseThrow(() -> new BusinessException(CLIENT_ASSIGNMENT_NOT_FOUND));
+
+        validateTrainerAccessToAssignment(assignment);
+
+        Pageable pageable = PaginationUtils.createPageRequest(page, size, "workoutDate");
+        Page<WorkoutLog> workoutLogPage = workoutLogRepository.findByAssignmentId(assignmentId, pageable);
+
+        return PaginationUtils.toPageResponse(workoutLogPage, workoutLogMapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @Cacheable(
+            value = "lists",
+            key = "'workoutLogs:exercise:' + #exerciseId + ':' + #page + ':' + #size"
+    )
+    public PageResponse<WorkoutLogResponse> getLogsByExercise(String exerciseId, int page, int size) {
+        log.info("Fetching logs for exercise: {}, page: {}, size: {}", exerciseId, page, size);
+
+        exerciseRepository.findById(exerciseId)
+                .orElseThrow(() -> new BusinessException(EXERCISE_NOT_FOUND));
+
+        Pageable pageable = PaginationUtils.createPageRequest(page, size, "workoutDate");
+        Page<WorkoutLog> workoutLogPage = workoutLogRepository.findByExerciseId(exerciseId, pageable);
+
+        return PaginationUtils.toPageResponse(workoutLogPage, workoutLogMapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @Cacheable(
+            value = "lists",
+            key = "'workoutLogs:dateRange:' + #from + ':' + #to + ':' + #page + ':' + #size + ':' + T(com.dev.quikkkk.core.utils.SecurityUtils).getCurrentUserId()"
+    )
+    public PageResponse<WorkoutLogResponse> getLogsByDateRange(LocalDate from, LocalDate to, int page, int size) {
+        log.info("Fetching logs by date range: {} to {}, page: {}, size: {}", from, to, page, size);
+
+        LocalDateTime fromDateTime = from.atStartOfDay();
+        LocalDateTime toDateTime = to.plusDays(1).atStartOfDay();
+
+        Pageable pageable = PaginationUtils.createPageRequest(page, size, "workoutDate");
+        Page<WorkoutLog> workoutLogPage;
+
+        if (SecurityUtils.isAdmin()) {
+            workoutLogPage = workoutLogRepository.findByDateRangeForAdmin(fromDateTime, toDateTime, pageable);
+        } else if (SecurityUtils.isTrainer()) {
+            TrainerProfile trainer = getCurrentTrainerProfile();
+            workoutLogPage = workoutLogRepository.findByDateRangeForTrainer(
+                    fromDateTime,
+                    toDateTime,
+                    trainer.getId(),
+                    pageable
+            );
+        } else {
+            String userId = SecurityUtils.getCurrentUserId();
+            workoutLogPage = workoutLogRepository.findByDateRangeAndUserId(
+                    fromDateTime, toDateTime, userId, pageable
+            );
+        }
+
+        return PaginationUtils.toPageResponse(workoutLogPage, workoutLogMapper::toResponse);
+    }
+
+    private TrainerProfile getCurrentTrainerProfile() {
+        String userId = SecurityUtils.getCurrentUserId();
+        return trainerProfileRepository.findTrainerProfileByUserId(userId)
+                .orElseThrow(() -> new BusinessException(TRAINER_PROFILE_NOT_FOUND));
+    }
+
+    private WorkoutLog getWorkoutLogByIdOrThrow(String id) {
+        return workoutLogRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(WORKOUT_LOG_NOT_FOUND));
+    }
+
+    private void validateTrainerAccessToWorkoutLog(WorkoutLog workoutLog) {
+        if (!SecurityUtils.isTrainer()) return;
+        if (workoutLog.getClientWorkoutPlan() == null) throw new BusinessException(WORKOUT_LOG_ACCESS_DENIED);
+
+        TrainerProfile trainer = getCurrentTrainerProfile();
+        String logTrainerId = workoutLog.getClientWorkoutPlan().getWorkoutPlan().getTrainer().getId();
+
+        if (!logTrainerId.equals(trainer.getId())) {
+            throw new BusinessException(WORKOUT_LOG_ACCESS_DENIED);
+        }
+    }
+
+    private void validateTrainerAccessToAssignment(ClientWorkoutPlan assignment) {
+        if (!SecurityUtils.isTrainer()) return;
+        TrainerProfile trainer = getCurrentTrainerProfile();
+        String assignmentTrainerId = assignment.getWorkoutPlan().getTrainer().getId();
+
+        if (!assignmentTrainerId.equals(trainer.getId())) throw new BusinessException(WORKOUT_LOG_ACCESS_DENIED);
+    }
+}

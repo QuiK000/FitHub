@@ -1,6 +1,6 @@
 package com.dev.quikkkk.modules.progress.dto.response;
 
-import com.dev.quikkkk.dto.response.ExerciseShortResponse;
+import com.dev.quikkkk.modules.workout.dto.response.ExerciseShortResponse;
 import com.dev.quikkkk.modules.progress.enums.PersonalRecordUnit;
 import com.dev.quikkkk.modules.progress.enums.RecordType;
 import com.fasterxml.jackson.annotation.JsonFormat;

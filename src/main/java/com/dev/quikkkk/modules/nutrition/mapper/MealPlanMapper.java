@@ -7,7 +7,7 @@ import com.dev.quikkkk.modules.nutrition.dto.response.FoodShortResponse;
 import com.dev.quikkkk.modules.nutrition.dto.response.MealFoodResponse;
 import com.dev.quikkkk.modules.nutrition.dto.response.MealPlanResponse;
 import com.dev.quikkkk.modules.nutrition.dto.response.MealResponse;
-import com.dev.quikkkk.entity.ClientProfile;
+import com.dev.quikkkk.modules.user.entity.ClientProfile;
 import com.dev.quikkkk.modules.nutrition.entity.MacroNutrients;
 import com.dev.quikkkk.modules.nutrition.entity.Meal;
 import com.dev.quikkkk.modules.nutrition.entity.MealFood;

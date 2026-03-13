@@ -1,7 +1,7 @@
 package com.dev.quikkkk.modules.notification.controller;
 
-import com.dev.quikkkk.dto.response.MessageResponse;
-import com.dev.quikkkk.mapper.MessageMapper;
+import com.dev.quikkkk.core.dto.MessageResponse;
+import com.dev.quikkkk.core.mapper.MessageMapper;
 import com.dev.quikkkk.modules.notification.service.ITelegramNotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
