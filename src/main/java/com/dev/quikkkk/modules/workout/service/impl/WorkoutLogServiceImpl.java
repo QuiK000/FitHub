@@ -1,13 +1,13 @@
 package com.dev.quikkkk.modules.workout.service.impl;
 
-import com.dev.quikkkk.dto.request.LogWorkoutRequest;
-import com.dev.quikkkk.dto.request.UpdateLogWorkoutRequest;
+import com.dev.quikkkk.modules.workout.dto.request.LogWorkoutRequest;
+import com.dev.quikkkk.modules.workout.dto.request.UpdateLogWorkoutRequest;
 import com.dev.quikkkk.core.dto.PageResponse;
 import com.dev.quikkkk.modules.workout.dto.response.WorkoutLogResponse;
 import com.dev.quikkkk.modules.user.entity.ClientProfile;
 import com.dev.quikkkk.modules.workout.entity.ClientWorkoutPlan;
 import com.dev.quikkkk.modules.workout.entity.Exercise;
-import com.dev.quikkkk.entity.TrainerProfile;
+import com.dev.quikkkk.modules.user.entity.TrainerProfile;
 import com.dev.quikkkk.modules.workout.entity.WorkoutLog;
 import com.dev.quikkkk.core.exception.BusinessException;
 import com.dev.quikkkk.modules.workout.mapper.WorkoutLogMapper;

@@ -5,7 +5,7 @@ import com.dev.quikkkk.modules.workout.dto.request.UpdateWorkoutPlanRequest;
 import com.dev.quikkkk.core.dto.MessageResponse;
 import com.dev.quikkkk.core.dto.PageResponse;
 import com.dev.quikkkk.modules.workout.dto.response.WorkoutPlanResponse;
-import com.dev.quikkkk.entity.TrainerProfile;
+import com.dev.quikkkk.modules.user.entity.TrainerProfile;
 import com.dev.quikkkk.modules.workout.entity.WorkoutPlan;
 import com.dev.quikkkk.modules.workout.enums.DifficultyLevel;
 import com.dev.quikkkk.core.exception.BusinessException;

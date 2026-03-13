@@ -1,7 +1,6 @@
 package com.dev.quikkkk.modules.user.entity;
 
 import com.dev.quikkkk.core.entity.BaseEntity;
-import com.dev.quikkkk.entity.TrainerProfile;
 import com.dev.quikkkk.modules.auth.entity.VerificationToken;
 import com.dev.quikkkk.modules.notification.entity.Notification;
 import jakarta.persistence.CascadeType;

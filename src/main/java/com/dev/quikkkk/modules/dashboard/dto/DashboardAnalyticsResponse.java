@@ -1,6 +1,5 @@
 package com.dev.quikkkk.modules.dashboard.dto;
 
-import com.dev.quikkkk.dto.response.PopularSessionResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

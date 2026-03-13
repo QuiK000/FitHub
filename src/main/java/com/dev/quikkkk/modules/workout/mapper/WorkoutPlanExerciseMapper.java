@@ -1,7 +1,7 @@
 package com.dev.quikkkk.modules.workout.mapper;
 
-import com.dev.quikkkk.dto.request.AddExerciseToPlanRequest;
-import com.dev.quikkkk.dto.request.UpdatePlanExerciseRequest;
+import com.dev.quikkkk.modules.workout.dto.request.AddExerciseToPlanRequest;
+import com.dev.quikkkk.modules.workout.dto.request.UpdatePlanExerciseRequest;
 import com.dev.quikkkk.modules.workout.dto.response.ExerciseShortResponse;
 import com.dev.quikkkk.modules.workout.dto.response.WorkoutPlanExerciseResponse;
 import com.dev.quikkkk.modules.workout.entity.Exercise;

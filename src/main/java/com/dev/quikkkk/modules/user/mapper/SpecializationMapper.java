@@ -3,7 +3,7 @@ package com.dev.quikkkk.modules.user.mapper;
 import com.dev.quikkkk.modules.user.dto.request.CreateSpecializationRequest;
 import com.dev.quikkkk.modules.user.dto.request.UpdateSpecializationRequest;
 import com.dev.quikkkk.modules.user.dto.response.SpecializationResponse;
-import com.dev.quikkkk.entity.Specialization;
+import com.dev.quikkkk.modules.user.entity.Specialization;
 import org.springframework.stereotype.Service;
 
 @Service

@@ -1,6 +1,6 @@
 package com.dev.quikkkk.modules.user.repository;
 
-import com.dev.quikkkk.entity.Specialization;
+import com.dev.quikkkk.modules.user.entity.Specialization;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

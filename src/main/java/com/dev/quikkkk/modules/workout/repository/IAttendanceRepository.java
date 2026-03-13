@@ -1,7 +1,7 @@
 package com.dev.quikkkk.modules.workout.repository;
 
 import com.dev.quikkkk.modules.workout.dto.response.AttendanceStatsResponse;
-import com.dev.quikkkk.dto.response.PopularSessionResponse;
+import com.dev.quikkkk.modules.dashboard.dto.PopularSessionResponse;
 import com.dev.quikkkk.modules.workout.entity.Attendance;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

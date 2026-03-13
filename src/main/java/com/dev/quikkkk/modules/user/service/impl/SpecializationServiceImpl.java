@@ -4,7 +4,7 @@ import com.dev.quikkkk.modules.user.dto.request.CreateSpecializationRequest;
 import com.dev.quikkkk.modules.user.dto.request.UpdateSpecializationRequest;
 import com.dev.quikkkk.core.dto.PageResponse;
 import com.dev.quikkkk.modules.user.dto.response.SpecializationResponse;
-import com.dev.quikkkk.entity.Specialization;
+import com.dev.quikkkk.modules.user.entity.Specialization;
 import com.dev.quikkkk.core.exception.BusinessException;
 import com.dev.quikkkk.modules.user.mapper.SpecializationMapper;
 import com.dev.quikkkk.modules.user.repository.ISpecializationRepository;

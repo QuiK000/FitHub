@@ -4,7 +4,7 @@ import com.dev.quikkkk.modules.workout.dto.request.CreateWorkoutPlanRequest;
 import com.dev.quikkkk.modules.workout.dto.request.UpdateWorkoutPlanRequest;
 import com.dev.quikkkk.modules.user.dto.response.TrainerShortResponse;
 import com.dev.quikkkk.modules.workout.dto.response.WorkoutPlanResponse;
-import com.dev.quikkkk.entity.TrainerProfile;
+import com.dev.quikkkk.modules.user.entity.TrainerProfile;
 import com.dev.quikkkk.modules.workout.entity.WorkoutPlan;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -1,10 +1,10 @@
 package com.dev.quikkkk.modules.workout.mapper;
 
 import com.dev.quikkkk.modules.workout.dto.request.CreateTrainingSessionRequest;
-import com.dev.quikkkk.dto.request.UpdateTrainingSessionRequest;
+import com.dev.quikkkk.modules.workout.dto.request.UpdateTrainingSessionRequest;
 import com.dev.quikkkk.modules.user.dto.response.TrainerShortResponse;
 import com.dev.quikkkk.modules.workout.dto.response.TrainingSessionResponse;
-import com.dev.quikkkk.entity.TrainerProfile;
+import com.dev.quikkkk.modules.user.entity.TrainerProfile;
 import com.dev.quikkkk.modules.workout.entity.TrainingSession;
 import com.dev.quikkkk.modules.workout.enums.TrainingStatus;
 import org.springframework.stereotype.Service;

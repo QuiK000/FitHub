@@ -2,7 +2,7 @@ package com.dev.quikkkk.modules.workout.entity;
 
 import com.dev.quikkkk.core.entity.BaseEntity;
 import com.dev.quikkkk.modules.user.entity.ClientProfile;
-import com.dev.quikkkk.entity.TrainerProfile;
+import com.dev.quikkkk.modules.user.entity.TrainerProfile;
 import com.dev.quikkkk.modules.workout.enums.TrainingStatus;
 import com.dev.quikkkk.modules.workout.enums.TrainingType;
 import jakarta.persistence.Column;

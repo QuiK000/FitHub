@@ -11,7 +11,7 @@ import com.dev.quikkkk.modules.user.repository.IUserRepository;
 import com.dev.quikkkk.modules.auth.repository.IVerificationTokenRepository;
 import com.dev.quikkkk.modules.auth.service.IAccountActionService;
 import com.dev.quikkkk.modules.notification.service.IEmailService;
-import com.dev.quikkkk.service.IRateLimitService;
+import com.dev.quikkkk.core.ratelimit.IRateLimitService;
 import com.dev.quikkkk.modules.auth.service.IVerificationTokenService;
 import com.dev.quikkkk.core.utils.ServiceUtils;
 import lombok.RequiredArgsConstructor;

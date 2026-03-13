@@ -1,6 +1,5 @@
 package com.dev.quikkkk.modules.workout.dto.response;
 
-import com.dev.quikkkk.dto.response.SessionShortResponse;
 import com.dev.quikkkk.modules.user.dto.response.TrainerShortResponse;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;

@@ -1,9 +1,9 @@
 package com.dev.quikkkk.modules.workout.controller;
 
-import com.dev.quikkkk.dto.request.CheckInTrainingSessionRequest;
+import com.dev.quikkkk.modules.workout.dto.request.CheckInTrainingSessionRequest;
 import com.dev.quikkkk.modules.workout.dto.request.CreateTrainingSessionRequest;
-import com.dev.quikkkk.dto.request.UpdateTrainingSessionRequest;
-import com.dev.quikkkk.dto.response.CheckInResponse;
+import com.dev.quikkkk.modules.workout.dto.request.UpdateTrainingSessionRequest;
+import com.dev.quikkkk.modules.workout.dto.response.CheckInResponse;
 import com.dev.quikkkk.core.dto.MessageResponse;
 import com.dev.quikkkk.core.dto.PageResponse;
 import com.dev.quikkkk.modules.workout.dto.response.TrainingSessionResponse;

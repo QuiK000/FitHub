@@ -3,8 +3,8 @@ package com.dev.quikkkk.modules.user.mapper;
 import com.dev.quikkkk.modules.user.dto.request.CreateTrainerProfileRequest;
 import com.dev.quikkkk.modules.user.dto.request.UpdateTrainerProfileRequest;
 import com.dev.quikkkk.modules.user.dto.response.TrainerProfileResponse;
-import com.dev.quikkkk.entity.Specialization;
-import com.dev.quikkkk.entity.TrainerProfile;
+import com.dev.quikkkk.modules.user.entity.Specialization;
+import com.dev.quikkkk.modules.user.entity.TrainerProfile;
 import com.dev.quikkkk.modules.user.entity.User;
 import org.springframework.stereotype.Service;
 
