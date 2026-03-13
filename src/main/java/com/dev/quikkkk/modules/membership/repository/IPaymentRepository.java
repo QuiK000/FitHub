@@ -22,7 +22,7 @@ public interface IPaymentRepository extends JpaRepository<Payment, String> {
     BigDecimal findPaymentsWhereStatusPaid();
 
     @Query("""
-            SELECT new com.dev.quikkkk.dto.response.RevenueStatsResponse(
+            SELECT new com.dev.quikkkk.modules.membership.dto.response.RevenueStatsResponse(
                         CAST(p.createdDate AS DATE) AS date,
                         COALESCE(SUM(p.amount), 0) AS revenue
             )
