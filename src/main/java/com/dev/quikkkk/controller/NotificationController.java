@@ -1,5 +1,6 @@
 package com.dev.quikkkk.controller;
 
+import com.dev.quikkkk.dto.request.BroadcastNotificationRequest;
 import com.dev.quikkkk.dto.request.CreateNotificationRequest;
 import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.dto.response.NotificationResponse;
@@ -29,6 +30,14 @@ public class NotificationController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MessageResponse> sendNotification(@Valid @RequestBody CreateNotificationRequest request) {
         return ResponseEntity.ok(notificationService.sendNotification(request));
+    }
+
+    @PostMapping("/broadcast")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<MessageResponse> broadcastNotification(
+            @Valid @RequestBody BroadcastNotificationRequest request
+    ) {
+        return ResponseEntity.ok(notificationService.broadcastNotification(request));
     }
 
     @GetMapping
