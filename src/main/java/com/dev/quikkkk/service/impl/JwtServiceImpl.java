@@ -3,8 +3,8 @@ package com.dev.quikkkk.service.impl;
 import com.dev.quikkkk.entity.Role;
 import com.dev.quikkkk.entity.User;
 import com.dev.quikkkk.enums.JwtTokenType;
-import com.dev.quikkkk.exception.BusinessException;
-import com.dev.quikkkk.security.JwtKeyProvider;
+import com.dev.quikkkk.core.exception.BusinessException;
+import com.dev.quikkkk.core.security.JwtKeyProvider;
 import com.dev.quikkkk.service.IJwtService;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static com.dev.quikkkk.enums.ErrorCode.TOKEN_INVALID;
+import static com.dev.quikkkk.core.enums.ErrorCode.TOKEN_INVALID;
 
 @Service
 @RequiredArgsConstructor

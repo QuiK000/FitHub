@@ -2,7 +2,7 @@ package com.dev.quikkkk.service.impl;
 
 import com.dev.quikkkk.entity.User;
 import com.dev.quikkkk.repository.IUserRepository;
-import com.dev.quikkkk.security.SecurityUser;
+import com.dev.quikkkk.core.security.SecurityUser;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.userdetails.UserDetails;

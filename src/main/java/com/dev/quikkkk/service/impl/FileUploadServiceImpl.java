@@ -1,9 +1,9 @@
 package com.dev.quikkkk.service.impl;
 
-import com.dev.quikkkk.enums.ErrorCode;
-import com.dev.quikkkk.exception.BusinessException;
+import com.dev.quikkkk.core.enums.ErrorCode;
+import com.dev.quikkkk.core.exception.BusinessException;
 import com.dev.quikkkk.service.IFileUploadService;
-import com.dev.quikkkk.utils.FileHandlerUtils;
+import com.dev.quikkkk.core.utils.FileHandlerUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

@@ -10,16 +10,16 @@ import com.dev.quikkkk.entity.TrainerProfile;
 import com.dev.quikkkk.entity.TrainingSession;
 import com.dev.quikkkk.entity.User;
 import com.dev.quikkkk.enums.TrainingStatus;
-import com.dev.quikkkk.exception.BusinessException;
+import com.dev.quikkkk.core.exception.BusinessException;
 import com.dev.quikkkk.mapper.MessageMapper;
 import com.dev.quikkkk.mapper.TrainerProfileMapper;
 import com.dev.quikkkk.repository.ISpecializationRepository;
 import com.dev.quikkkk.repository.ITrainerProfileRepository;
 import com.dev.quikkkk.repository.ITrainingSessionRepository;
 import com.dev.quikkkk.service.ITrainerProfileService;
-import com.dev.quikkkk.utils.PaginationUtils;
-import com.dev.quikkkk.utils.SecurityUtils;
-import com.dev.quikkkk.utils.ServiceUtils;
+import com.dev.quikkkk.core.utils.PaginationUtils;
+import com.dev.quikkkk.core.utils.SecurityUtils;
+import com.dev.quikkkk.core.utils.ServiceUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -34,10 +34,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
-import static com.dev.quikkkk.enums.ErrorCode.SPECIALIZATION_NOT_FOUND_OR_INACTIVE;
-import static com.dev.quikkkk.enums.ErrorCode.TRAINER_PROFILE_ALREADY_EXISTS;
-import static com.dev.quikkkk.enums.ErrorCode.TRAINER_PROFILE_DEACTIVATED;
-import static com.dev.quikkkk.enums.ErrorCode.TRAINER_PROFILE_NOT_FOUND;
+import static com.dev.quikkkk.core.enums.ErrorCode.SPECIALIZATION_NOT_FOUND_OR_INACTIVE;
+import static com.dev.quikkkk.core.enums.ErrorCode.TRAINER_PROFILE_ALREADY_EXISTS;
+import static com.dev.quikkkk.core.enums.ErrorCode.TRAINER_PROFILE_DEACTIVATED;
+import static com.dev.quikkkk.core.enums.ErrorCode.TRAINER_PROFILE_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -75,7 +75,7 @@ public class TrainerProfileServiceImpl implements ITrainerProfileService {
     @Transactional(readOnly = true)
     @Cacheable(
             value = "trainerProfiles",
-            key = "'current:' + T(com.dev.quikkkk.utils.SecurityUtils).getCurrentUserId()"
+            key = "'current:' + T(com.dev.quikkkk.core.utils.SecurityUtils).getCurrentUserId()"
     )
     public TrainerProfileResponse getTrainerProfile() {
         User user = getCurrentUser();
@@ -115,7 +115,7 @@ public class TrainerProfileServiceImpl implements ITrainerProfileService {
     @Caching(evict = {
             @CacheEvict(
                     value = "trainerProfiles",
-                    key = "'current:' + T(com.dev.quikkkk.utils.SecurityUtils).getCurrentUserId()",
+                    key = "'current:' + T(com.dev.quikkkk.core.utils.SecurityUtils).getCurrentUserId()",
                     allEntries = true
             ),
             @CacheEvict(value = "lists", allEntries = true)

@@ -9,14 +9,14 @@ import com.dev.quikkkk.dto.response.WorkoutPlanExerciseResponse;
 import com.dev.quikkkk.entity.Exercise;
 import com.dev.quikkkk.entity.WorkoutPlan;
 import com.dev.quikkkk.entity.WorkoutPlanExercise;
-import com.dev.quikkkk.exception.BusinessException;
+import com.dev.quikkkk.core.exception.BusinessException;
 import com.dev.quikkkk.mapper.MessageMapper;
 import com.dev.quikkkk.mapper.WorkoutPlanExerciseMapper;
 import com.dev.quikkkk.repository.IExerciseRepository;
 import com.dev.quikkkk.repository.IWorkoutPlanExerciseRepository;
 import com.dev.quikkkk.repository.IWorkoutPlanRepository;
 import com.dev.quikkkk.service.IWorkoutPlanExerciseService;
-import com.dev.quikkkk.utils.SecurityUtils;
+import com.dev.quikkkk.core.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,14 +29,14 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static com.dev.quikkkk.enums.ErrorCode.EXERCISE_NOT_FOUND;
-import static com.dev.quikkkk.enums.ErrorCode.PLAN_EXERCISE_ALREADY_EXISTS;
-import static com.dev.quikkkk.enums.ErrorCode.PLAN_EXERCISE_DAY_EMPTY;
-import static com.dev.quikkkk.enums.ErrorCode.PLAN_EXERCISE_DAY_MISMATCH;
-import static com.dev.quikkkk.enums.ErrorCode.PLAN_EXERCISE_NOT_FOUND;
-import static com.dev.quikkkk.enums.ErrorCode.PLAN_EXERCISE_NOT_IN_PLAN;
-import static com.dev.quikkkk.enums.ErrorCode.PLAN_EXERCISE_ORDER_DUPLICATED;
-import static com.dev.quikkkk.enums.ErrorCode.WORKOUT_PLAN_NOT_FOUND;
+import static com.dev.quikkkk.core.enums.ErrorCode.EXERCISE_NOT_FOUND;
+import static com.dev.quikkkk.core.enums.ErrorCode.PLAN_EXERCISE_ALREADY_EXISTS;
+import static com.dev.quikkkk.core.enums.ErrorCode.PLAN_EXERCISE_DAY_EMPTY;
+import static com.dev.quikkkk.core.enums.ErrorCode.PLAN_EXERCISE_DAY_MISMATCH;
+import static com.dev.quikkkk.core.enums.ErrorCode.PLAN_EXERCISE_NOT_FOUND;
+import static com.dev.quikkkk.core.enums.ErrorCode.PLAN_EXERCISE_NOT_IN_PLAN;
+import static com.dev.quikkkk.core.enums.ErrorCode.PLAN_EXERCISE_ORDER_DUPLICATED;
+import static com.dev.quikkkk.core.enums.ErrorCode.WORKOUT_PLAN_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor

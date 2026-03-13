@@ -6,7 +6,7 @@ import com.dev.quikkkk.dto.request.RegistrationRequest;
 import com.dev.quikkkk.dto.response.AuthenticationResponse;
 import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.service.IAuthenticationService;
-import com.dev.quikkkk.utils.ClientIpUtils;
+import com.dev.quikkkk.core.utils.ClientIpUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

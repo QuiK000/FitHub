@@ -4,21 +4,21 @@ import com.dev.quikkkk.dto.response.AttendanceStatsResponse;
 import com.dev.quikkkk.dto.response.ClientAnalyticsResponse;
 import com.dev.quikkkk.dto.response.DashboardAnalyticsResponse;
 import com.dev.quikkkk.dto.response.PopularSessionResponse;
-import com.dev.quikkkk.dto.response.RevenueStatsResponse;
+import com.dev.quikkkk.modules.membership.dto.response.RevenueStatsResponse;
 import com.dev.quikkkk.dto.response.TrainerAnalyticsResponse;
 import com.dev.quikkkk.dto.response.TrainerAttendanceMetrics;
 import com.dev.quikkkk.entity.ClientProfile;
 import com.dev.quikkkk.entity.TrainerProfile;
-import com.dev.quikkkk.exception.BusinessException;
+import com.dev.quikkkk.core.exception.BusinessException;
 import com.dev.quikkkk.mapper.DashboardMapper;
 import com.dev.quikkkk.repository.IAttendanceRepository;
 import com.dev.quikkkk.repository.IClientProfileRepository;
-import com.dev.quikkkk.repository.IMembershipRepository;
-import com.dev.quikkkk.repository.IPaymentRepository;
+import com.dev.quikkkk.modules.membership.repository.IMembershipRepository;
+import com.dev.quikkkk.modules.membership.repository.IPaymentRepository;
 import com.dev.quikkkk.repository.ITrainerProfileRepository;
 import com.dev.quikkkk.repository.ITrainingSessionRepository;
 import com.dev.quikkkk.service.IDashboardService;
-import com.dev.quikkkk.utils.SecurityUtils;
+import com.dev.quikkkk.core.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -30,8 +30,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.dev.quikkkk.enums.ErrorCode.CLIENT_PROFILE_NOT_FOUND;
-import static com.dev.quikkkk.enums.ErrorCode.TRAINER_PROFILE_NOT_FOUND;
+import static com.dev.quikkkk.core.enums.ErrorCode.CLIENT_PROFILE_NOT_FOUND;
+import static com.dev.quikkkk.core.enums.ErrorCode.TRAINER_PROFILE_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor

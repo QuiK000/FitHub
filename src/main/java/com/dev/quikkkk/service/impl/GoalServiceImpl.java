@@ -9,13 +9,13 @@ import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.entity.ClientProfile;
 import com.dev.quikkkk.entity.Goal;
 import com.dev.quikkkk.enums.GoalStatus;
-import com.dev.quikkkk.exception.BusinessException;
+import com.dev.quikkkk.core.exception.BusinessException;
 import com.dev.quikkkk.mapper.GoalMapper;
 import com.dev.quikkkk.mapper.MessageMapper;
 import com.dev.quikkkk.repository.IGoalRepository;
 import com.dev.quikkkk.service.IGoalService;
-import com.dev.quikkkk.utils.ClientProfileUtils;
-import com.dev.quikkkk.utils.PaginationUtils;
+import com.dev.quikkkk.core.utils.ClientProfileUtils;
+import com.dev.quikkkk.core.utils.PaginationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -25,10 +25,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
-import static com.dev.quikkkk.enums.ErrorCode.ACTIVE_GOAL_ALREADY_EXISTS;
-import static com.dev.quikkkk.enums.ErrorCode.FORBIDDEN_ACCESS;
-import static com.dev.quikkkk.enums.ErrorCode.GOAL_ALREADY_COMPLETED;
-import static com.dev.quikkkk.enums.ErrorCode.GOAL_NOT_FOUND;
+import static com.dev.quikkkk.core.enums.ErrorCode.ACTIVE_GOAL_ALREADY_EXISTS;
+import static com.dev.quikkkk.core.enums.ErrorCode.FORBIDDEN_ACCESS;
+import static com.dev.quikkkk.core.enums.ErrorCode.GOAL_ALREADY_COMPLETED;
+import static com.dev.quikkkk.core.enums.ErrorCode.GOAL_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor

@@ -5,15 +5,15 @@ import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.entity.User;
 import com.dev.quikkkk.entity.VerificationToken;
 import com.dev.quikkkk.enums.TokenType;
-import com.dev.quikkkk.exception.BusinessException;
+import com.dev.quikkkk.core.exception.BusinessException;
 import com.dev.quikkkk.mapper.MessageMapper;
 import com.dev.quikkkk.repository.IUserRepository;
 import com.dev.quikkkk.repository.IVerificationTokenRepository;
 import com.dev.quikkkk.service.IAccountActionService;
-import com.dev.quikkkk.service.IEmailService;
+import com.dev.quikkkk.modules.notification.service.IEmailService;
 import com.dev.quikkkk.service.IRateLimitService;
 import com.dev.quikkkk.service.IVerificationTokenService;
-import com.dev.quikkkk.utils.ServiceUtils;
+import com.dev.quikkkk.core.utils.ServiceUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,11 +22,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
-import static com.dev.quikkkk.enums.ErrorCode.EMAIL_ALREADY_VERIFIED;
-import static com.dev.quikkkk.enums.ErrorCode.PASSWORD_MISMATCH;
-import static com.dev.quikkkk.enums.ErrorCode.VERIFICATION_TOKEN_EXPIRED;
-import static com.dev.quikkkk.enums.ErrorCode.VERIFICATION_TOKEN_INVALID;
-import static com.dev.quikkkk.enums.ErrorCode.VERIFICATION_TOKEN_TYPE_INVALID;
+import static com.dev.quikkkk.core.enums.ErrorCode.EMAIL_ALREADY_VERIFIED;
+import static com.dev.quikkkk.core.enums.ErrorCode.PASSWORD_MISMATCH;
+import static com.dev.quikkkk.core.enums.ErrorCode.VERIFICATION_TOKEN_EXPIRED;
+import static com.dev.quikkkk.core.enums.ErrorCode.VERIFICATION_TOKEN_INVALID;
+import static com.dev.quikkkk.core.enums.ErrorCode.VERIFICATION_TOKEN_TYPE_INVALID;
 
 @Service
 @RequiredArgsConstructor

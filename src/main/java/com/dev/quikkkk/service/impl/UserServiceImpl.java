@@ -2,19 +2,19 @@ package com.dev.quikkkk.service.impl;
 
 import com.dev.quikkkk.dto.response.UserResponse;
 import com.dev.quikkkk.entity.User;
-import com.dev.quikkkk.exception.BusinessException;
+import com.dev.quikkkk.core.exception.BusinessException;
 import com.dev.quikkkk.mapper.UserMapper;
 import com.dev.quikkkk.repository.IUserRepository;
 import com.dev.quikkkk.service.IUserService;
-import com.dev.quikkkk.utils.SecurityUtils;
+import com.dev.quikkkk.core.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.dev.quikkkk.enums.ErrorCode.UNAUTHORIZED_USER;
-import static com.dev.quikkkk.enums.ErrorCode.USER_NOT_FOUND;
+import static com.dev.quikkkk.core.enums.ErrorCode.UNAUTHORIZED_USER;
+import static com.dev.quikkkk.core.enums.ErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +25,7 @@ public class UserServiceImpl implements IUserService {
     private final UserMapper userMapper;
 
     @Override
-    @Cacheable(value = "users", key = "#root.method.name + ':' + T(com.dev.quikkkk.utils.SecurityUtils).getCurrentUserId()")
+    @Cacheable(value = "users", key = "#root.method.name + ':' + T(com.dev.quikkkk.core.utils.SecurityUtils).getCurrentUserId()")
     public UserResponse getCurrentUser() {
         log.info("Fetching current authenticated user");
         return userMapper.toResponse(getCurrentUserEntity());

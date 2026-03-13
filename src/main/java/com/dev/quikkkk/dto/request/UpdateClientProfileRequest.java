@@ -1,7 +1,7 @@
 package com.dev.quikkkk.dto.request;
 
 import com.dev.quikkkk.enums.ClientGender;
-import com.dev.quikkkk.validation.ValidationPatterns;
+import com.dev.quikkkk.core.validation.ValidationPatterns;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;

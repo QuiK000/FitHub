@@ -8,13 +8,13 @@ import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.entity.Exercise;
 import com.dev.quikkkk.enums.ExerciseCategory;
 import com.dev.quikkkk.enums.MuscleGroup;
-import com.dev.quikkkk.exception.BusinessException;
+import com.dev.quikkkk.core.exception.BusinessException;
 import com.dev.quikkkk.mapper.ExerciseMapper;
 import com.dev.quikkkk.mapper.MessageMapper;
 import com.dev.quikkkk.repository.IExerciseRepository;
 import com.dev.quikkkk.service.IExerciseService;
-import com.dev.quikkkk.utils.PaginationUtils;
-import com.dev.quikkkk.utils.SecurityUtils;
+import com.dev.quikkkk.core.utils.PaginationUtils;
+import com.dev.quikkkk.core.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -25,10 +25,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.dev.quikkkk.enums.ErrorCode.EXERCISE_ALREADY_ACTIVATED;
-import static com.dev.quikkkk.enums.ErrorCode.EXERCISE_ALREADY_DEACTIVATED;
-import static com.dev.quikkkk.enums.ErrorCode.EXERCISE_DEACTIVATED;
-import static com.dev.quikkkk.enums.ErrorCode.EXERCISE_NOT_FOUND;
+import static com.dev.quikkkk.core.enums.ErrorCode.EXERCISE_ALREADY_ACTIVATED;
+import static com.dev.quikkkk.core.enums.ErrorCode.EXERCISE_ALREADY_DEACTIVATED;
+import static com.dev.quikkkk.core.enums.ErrorCode.EXERCISE_DEACTIVATED;
+import static com.dev.quikkkk.core.enums.ErrorCode.EXERCISE_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor

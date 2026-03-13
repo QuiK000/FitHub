@@ -3,7 +3,7 @@ package com.dev.quikkkk.controller;
 import com.dev.quikkkk.dto.response.AttendanceStatsResponse;
 import com.dev.quikkkk.dto.response.ClientAnalyticsResponse;
 import com.dev.quikkkk.dto.response.DashboardAnalyticsResponse;
-import com.dev.quikkkk.dto.response.RevenueStatsResponse;
+import com.dev.quikkkk.modules.membership.dto.response.RevenueStatsResponse;
 import com.dev.quikkkk.dto.response.TrainerAnalyticsResponse;
 import com.dev.quikkkk.service.IDashboardService;
 import lombok.RequiredArgsConstructor;

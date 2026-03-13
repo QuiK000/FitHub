@@ -5,11 +5,11 @@ import com.dev.quikkkk.dto.request.UpdateSpecializationRequest;
 import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.dto.response.SpecializationResponse;
 import com.dev.quikkkk.entity.Specialization;
-import com.dev.quikkkk.exception.BusinessException;
+import com.dev.quikkkk.core.exception.BusinessException;
 import com.dev.quikkkk.mapper.SpecializationMapper;
 import com.dev.quikkkk.repository.ISpecializationRepository;
 import com.dev.quikkkk.service.ISpecializationService;
-import com.dev.quikkkk.utils.PaginationUtils;
+import com.dev.quikkkk.core.utils.PaginationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -20,8 +20,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.dev.quikkkk.enums.ErrorCode.SPECIALIZATION_ALREADY_EXISTS;
-import static com.dev.quikkkk.enums.ErrorCode.SPECIALIZATION_NOT_FOUND;
+import static com.dev.quikkkk.core.enums.ErrorCode.SPECIALIZATION_ALREADY_EXISTS;
+import static com.dev.quikkkk.core.enums.ErrorCode.SPECIALIZATION_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor

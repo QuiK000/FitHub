@@ -6,7 +6,7 @@ import com.dev.quikkkk.enums.TokenType;
 import com.dev.quikkkk.mapper.VerificationTokenMapper;
 import com.dev.quikkkk.repository.IVerificationTokenRepository;
 import com.dev.quikkkk.service.IVerificationTokenService;
-import com.dev.quikkkk.utils.ServiceUtils;
+import com.dev.quikkkk.core.utils.ServiceUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

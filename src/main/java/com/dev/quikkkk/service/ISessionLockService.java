@@ -1,6 +1,6 @@
 package com.dev.quikkkk.service;
 
-import com.dev.quikkkk.functional.LockOperation;
+import com.dev.quikkkk.core.functional.LockOperation;
 
 public interface ISessionLockService {
     String acquireLock(String sessionId);

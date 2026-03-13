@@ -1,6 +1,6 @@
 package com.dev.quikkkk.dto.request;
 
-import com.dev.quikkkk.validation.ValidationPatterns;
+import com.dev.quikkkk.core.validation.ValidationPatterns;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;

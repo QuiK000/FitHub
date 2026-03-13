@@ -1,7 +1,7 @@
 package com.dev.quikkkk.dto.request;
 
 import com.dev.quikkkk.enums.GoalType;
-import com.dev.quikkkk.enums.MeasurementUnit;
+import com.dev.quikkkk.modules.progress.enums.MeasurementUnit;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;

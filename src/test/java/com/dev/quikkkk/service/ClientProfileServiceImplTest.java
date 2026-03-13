@@ -7,14 +7,14 @@ import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.entity.ClientProfile;
 import com.dev.quikkkk.entity.User;
-import com.dev.quikkkk.exception.BusinessException;
+import com.dev.quikkkk.core.exception.BusinessException;
 import com.dev.quikkkk.fixtures.TestFixtures;
 import com.dev.quikkkk.mapper.ClientProfileMapper;
 import com.dev.quikkkk.mapper.MessageMapper;
 import com.dev.quikkkk.repository.IClientProfileRepository;
 import com.dev.quikkkk.service.impl.ClientProfileServiceImpl;
-import com.dev.quikkkk.utils.SecurityUtils;
-import com.dev.quikkkk.utils.ServiceUtils;
+import com.dev.quikkkk.core.utils.SecurityUtils;
+import com.dev.quikkkk.core.utils.ServiceUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,8 +28,8 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-import static com.dev.quikkkk.enums.ErrorCode.CLIENT_PROFILE_ALREADY_EXISTS;
-import static com.dev.quikkkk.enums.ErrorCode.CLIENT_PROFILE_DEACTIVATED;
+import static com.dev.quikkkk.core.enums.ErrorCode.CLIENT_PROFILE_ALREADY_EXISTS;
+import static com.dev.quikkkk.core.enums.ErrorCode.CLIENT_PROFILE_DEACTIVATED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;

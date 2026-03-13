@@ -1,5 +1,7 @@
 package com.dev.quikkkk.entity;
 
+import com.dev.quikkkk.core.entity.BaseEntity;
+import com.dev.quikkkk.modules.notification.entity.Notification;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

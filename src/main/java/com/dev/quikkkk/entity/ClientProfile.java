@@ -1,6 +1,14 @@
 package com.dev.quikkkk.entity;
 
+import com.dev.quikkkk.core.entity.BaseEntity;
 import com.dev.quikkkk.enums.ClientGender;
+import com.dev.quikkkk.modules.membership.entity.Membership;
+import com.dev.quikkkk.modules.membership.entity.Payment;
+import com.dev.quikkkk.modules.nutrition.entity.MealPlan;
+import com.dev.quikkkk.modules.nutrition.entity.WaterIntake;
+import com.dev.quikkkk.modules.progress.entity.BodyMeasurement;
+import com.dev.quikkkk.modules.progress.entity.PersonalRecord;
+import com.dev.quikkkk.modules.progress.entity.ProgressPhoto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

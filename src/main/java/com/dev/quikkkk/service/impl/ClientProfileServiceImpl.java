@@ -7,14 +7,14 @@ import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.entity.ClientProfile;
 import com.dev.quikkkk.entity.User;
-import com.dev.quikkkk.exception.BusinessException;
+import com.dev.quikkkk.core.exception.BusinessException;
 import com.dev.quikkkk.mapper.ClientProfileMapper;
 import com.dev.quikkkk.mapper.MessageMapper;
 import com.dev.quikkkk.repository.IClientProfileRepository;
 import com.dev.quikkkk.service.IClientProfileService;
-import com.dev.quikkkk.utils.PaginationUtils;
-import com.dev.quikkkk.utils.SecurityUtils;
-import com.dev.quikkkk.utils.ServiceUtils;
+import com.dev.quikkkk.core.utils.PaginationUtils;
+import com.dev.quikkkk.core.utils.SecurityUtils;
+import com.dev.quikkkk.core.utils.ServiceUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -26,9 +26,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.dev.quikkkk.enums.ErrorCode.CLIENT_PROFILE_ALREADY_EXISTS;
-import static com.dev.quikkkk.enums.ErrorCode.CLIENT_PROFILE_DEACTIVATED;
-import static com.dev.quikkkk.enums.ErrorCode.CLIENT_PROFILE_NOT_FOUND;
+import static com.dev.quikkkk.core.enums.ErrorCode.CLIENT_PROFILE_ALREADY_EXISTS;
+import static com.dev.quikkkk.core.enums.ErrorCode.CLIENT_PROFILE_DEACTIVATED;
+import static com.dev.quikkkk.core.enums.ErrorCode.CLIENT_PROFILE_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -58,7 +58,7 @@ public class ClientProfileServiceImpl implements IClientProfileService {
     @Transactional(readOnly = true)
     @Cacheable(
             value = "clientProfiles",
-            key = "'current:' + T(com.dev.quikkkk.utils.SecurityUtils).getCurrentUserId()",
+            key = "'current:' + T(com.dev.quikkkk.core.utils.SecurityUtils).getCurrentUserId()",
             sync = true
     )
     public ClientProfileResponse getClientProfile() {
@@ -89,7 +89,7 @@ public class ClientProfileServiceImpl implements IClientProfileService {
     @Override
     @Transactional
     @Caching(evict = {
-            @CacheEvict(value = "clientProfiles", key = "'current:' + T(com.dev.quikkkk.utils.SecurityUtils).getCurrentUserId()"),
+            @CacheEvict(value = "clientProfiles", key = "'current:' + T(com.dev.quikkkk.core.utils.SecurityUtils).getCurrentUserId()"),
             @CacheEvict(value = "lists", allEntries = true)
     })
     public MessageResponse updateClientProfile(UpdateClientProfileRequest request) {
@@ -107,7 +107,7 @@ public class ClientProfileServiceImpl implements IClientProfileService {
     @Override
     @Transactional
     @Caching(evict = {
-            @CacheEvict(value = "clientProfiles", key = "'current:' + T(com.dev.quikkkk.utils.SecurityUtils).getCurrentUserId()"),
+            @CacheEvict(value = "clientProfiles", key = "'current:' + T(com.dev.quikkkk.core.utils.SecurityUtils).getCurrentUserId()"),
             @CacheEvict(value = "lists", allEntries = true)
     })
     public MessageResponse deactivateProfile() {
@@ -127,7 +127,7 @@ public class ClientProfileServiceImpl implements IClientProfileService {
     @Override
     @Transactional
     @Caching(evict = {
-            @CacheEvict(value = "clientProfiles", key = "'current:' + T(com.dev.quikkkk.utils.SecurityUtils).getCurrentUserId()"),
+            @CacheEvict(value = "clientProfiles", key = "'current:' + T(com.dev.quikkkk.core.utils.SecurityUtils).getCurrentUserId()"),
             @CacheEvict(value = "lists", allEntries = true)
     })
     public ClientProfileResponse clearProfile() {

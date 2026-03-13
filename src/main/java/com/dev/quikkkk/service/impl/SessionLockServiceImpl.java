@@ -1,7 +1,7 @@
 package com.dev.quikkkk.service.impl;
 
-import com.dev.quikkkk.exception.BusinessException;
-import com.dev.quikkkk.functional.LockOperation;
+import com.dev.quikkkk.core.exception.BusinessException;
+import com.dev.quikkkk.core.functional.LockOperation;
 import com.dev.quikkkk.service.ISessionLockService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.util.UUID;
 
-import static com.dev.quikkkk.enums.ErrorCode.SESSION_IS_FULL;
+import static com.dev.quikkkk.core.enums.ErrorCode.SESSION_IS_FULL;
 
 @Service
 @RequiredArgsConstructor

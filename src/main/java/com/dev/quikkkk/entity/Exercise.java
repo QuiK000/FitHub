@@ -1,7 +1,9 @@
 package com.dev.quikkkk.entity;
 
+import com.dev.quikkkk.core.entity.BaseEntity;
 import com.dev.quikkkk.enums.ExerciseCategory;
 import com.dev.quikkkk.enums.MuscleGroup;
+import com.dev.quikkkk.modules.progress.entity.PersonalRecord;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;

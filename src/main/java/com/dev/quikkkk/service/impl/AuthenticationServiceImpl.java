@@ -7,21 +7,21 @@ import com.dev.quikkkk.dto.response.AuthenticationResponse;
 import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.entity.Role;
 import com.dev.quikkkk.entity.User;
-import com.dev.quikkkk.enums.RoleName;
+import com.dev.quikkkk.core.enums.RoleName;
 import com.dev.quikkkk.enums.TokenType;
-import com.dev.quikkkk.exception.BusinessException;
+import com.dev.quikkkk.core.exception.BusinessException;
 import com.dev.quikkkk.mapper.AuthenticationMapper;
 import com.dev.quikkkk.mapper.MessageMapper;
 import com.dev.quikkkk.mapper.UserMapper;
 import com.dev.quikkkk.repository.IRoleRepository;
 import com.dev.quikkkk.repository.IUserRepository;
 import com.dev.quikkkk.service.IAuthenticationService;
-import com.dev.quikkkk.service.IEmailService;
+import com.dev.quikkkk.modules.notification.service.IEmailService;
 import com.dev.quikkkk.service.IJwtService;
 import com.dev.quikkkk.service.IRateLimitService;
 import com.dev.quikkkk.service.ITokenBlacklistService;
 import com.dev.quikkkk.service.IVerificationTokenService;
-import com.dev.quikkkk.utils.ServiceUtils;
+import com.dev.quikkkk.core.utils.ServiceUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,12 +32,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.dev.quikkkk.enums.ErrorCode.ACCOUNT_DISABLED;
-import static com.dev.quikkkk.enums.ErrorCode.EMAIL_ALREADY_EXISTS;
-import static com.dev.quikkkk.enums.ErrorCode.ROLE_NOT_FOUND;
-import static com.dev.quikkkk.enums.ErrorCode.TOKEN_BLACKLISTED;
-import static com.dev.quikkkk.enums.ErrorCode.TOKEN_EXPIRED;
-import static com.dev.quikkkk.enums.ErrorCode.TOKEN_INVALID;
+import static com.dev.quikkkk.core.enums.ErrorCode.ACCOUNT_DISABLED;
+import static com.dev.quikkkk.core.enums.ErrorCode.EMAIL_ALREADY_EXISTS;
+import static com.dev.quikkkk.core.enums.ErrorCode.ROLE_NOT_FOUND;
+import static com.dev.quikkkk.core.enums.ErrorCode.TOKEN_BLACKLISTED;
+import static com.dev.quikkkk.core.enums.ErrorCode.TOKEN_EXPIRED;
+import static com.dev.quikkkk.core.enums.ErrorCode.TOKEN_INVALID;
 
 @Service
 @RequiredArgsConstructor

@@ -8,14 +8,14 @@ import com.dev.quikkkk.dto.response.WorkoutPlanResponse;
 import com.dev.quikkkk.entity.TrainerProfile;
 import com.dev.quikkkk.entity.WorkoutPlan;
 import com.dev.quikkkk.enums.DifficultyLevel;
-import com.dev.quikkkk.exception.BusinessException;
+import com.dev.quikkkk.core.exception.BusinessException;
 import com.dev.quikkkk.mapper.MessageMapper;
 import com.dev.quikkkk.mapper.WorkoutPlanMapper;
 import com.dev.quikkkk.repository.ITrainerProfileRepository;
 import com.dev.quikkkk.repository.IWorkoutPlanRepository;
 import com.dev.quikkkk.service.IWorkoutPlanService;
-import com.dev.quikkkk.utils.PaginationUtils;
-import com.dev.quikkkk.utils.SecurityUtils;
+import com.dev.quikkkk.core.utils.PaginationUtils;
+import com.dev.quikkkk.core.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -26,12 +26,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.dev.quikkkk.enums.ErrorCode.TRAINER_PROFILE_NOT_FOUND;
-import static com.dev.quikkkk.enums.ErrorCode.WORKOUT_PLAN_ALREADY_ACTIVATED;
-import static com.dev.quikkkk.enums.ErrorCode.WORKOUT_PLAN_ALREADY_DEACTIVATED;
-import static com.dev.quikkkk.enums.ErrorCode.WORKOUT_PLAN_DEACTIVATED;
-import static com.dev.quikkkk.enums.ErrorCode.WORKOUT_PLAN_FORBIDDEN;
-import static com.dev.quikkkk.enums.ErrorCode.WORKOUT_PLAN_NOT_FOUND;
+import static com.dev.quikkkk.core.enums.ErrorCode.TRAINER_PROFILE_NOT_FOUND;
+import static com.dev.quikkkk.core.enums.ErrorCode.WORKOUT_PLAN_ALREADY_ACTIVATED;
+import static com.dev.quikkkk.core.enums.ErrorCode.WORKOUT_PLAN_ALREADY_DEACTIVATED;
+import static com.dev.quikkkk.core.enums.ErrorCode.WORKOUT_PLAN_DEACTIVATED;
+import static com.dev.quikkkk.core.enums.ErrorCode.WORKOUT_PLAN_FORBIDDEN;
+import static com.dev.quikkkk.core.enums.ErrorCode.WORKOUT_PLAN_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -96,7 +96,7 @@ public class WorkoutPlanServiceImpl implements IWorkoutPlanService {
     @Transactional(readOnly = true)
     @Cacheable(
             value = "lists",
-            key = "'workoutPlans:trainer:' + T(com.dev.quikkkk.utils.SecurityUtils).getCurrentUserId() + ':' + #page + ':' + #size"
+            key = "'workoutPlans:trainer:' + T(com.dev.quikkkk.core.utils.SecurityUtils).getCurrentUserId() + ':' + #page + ':' + #size"
     )
     public PageResponse<WorkoutPlanResponse> getMyPlans(int page, int size) {
         TrainerProfile trainer = getTrainerProfile();

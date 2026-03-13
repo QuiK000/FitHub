@@ -1,7 +1,8 @@
 package com.dev.quikkkk.entity;
 
+import com.dev.quikkkk.core.entity.BaseEntity;
 import com.dev.quikkkk.enums.ClientWorkoutStatus;
-import com.dev.quikkkk.exception.BusinessException;
+import com.dev.quikkkk.core.exception.BusinessException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,7 +24,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.dev.quikkkk.enums.ErrorCode.INVALID_ASSIGNMENT_STATUS;
+import static com.dev.quikkkk.core.enums.ErrorCode.INVALID_ASSIGNMENT_STATUS;
 
 @Entity
 @Table(

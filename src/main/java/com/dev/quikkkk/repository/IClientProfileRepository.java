@@ -1,7 +1,7 @@
 package com.dev.quikkkk.repository;
 
 import com.dev.quikkkk.entity.ClientProfile;
-import com.dev.quikkkk.enums.MembershipStatus;
+import com.dev.quikkkk.modules.membership.enums.MembershipStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;

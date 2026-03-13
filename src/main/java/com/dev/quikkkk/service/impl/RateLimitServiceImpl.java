@@ -1,6 +1,6 @@
 package com.dev.quikkkk.service.impl;
 
-import com.dev.quikkkk.exception.BusinessException;
+import com.dev.quikkkk.core.exception.BusinessException;
 import com.dev.quikkkk.service.IRateLimitService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 
-import static com.dev.quikkkk.enums.ErrorCode.RESEND_TOO_FREQUENT;
-import static com.dev.quikkkk.enums.ErrorCode.TOO_MANY_REQUESTS;
+import static com.dev.quikkkk.core.enums.ErrorCode.RESEND_TOO_FREQUENT;
+import static com.dev.quikkkk.core.enums.ErrorCode.TOO_MANY_REQUESTS;
 
 @Service
 @RequiredArgsConstructor

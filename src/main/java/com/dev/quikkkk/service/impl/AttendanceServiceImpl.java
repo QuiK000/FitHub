@@ -4,12 +4,12 @@ import com.dev.quikkkk.dto.response.AttendanceResponse;
 import com.dev.quikkkk.dto.response.AttendanceSessionResponse;
 import com.dev.quikkkk.entity.ClientProfile;
 import com.dev.quikkkk.entity.TrainingSession;
-import com.dev.quikkkk.exception.BusinessException;
+import com.dev.quikkkk.core.exception.BusinessException;
 import com.dev.quikkkk.mapper.AttendanceMapper;
 import com.dev.quikkkk.repository.IAttendanceRepository;
 import com.dev.quikkkk.repository.ITrainingSessionRepository;
 import com.dev.quikkkk.service.IAttendanceService;
-import com.dev.quikkkk.utils.ClientProfileUtils;
+import com.dev.quikkkk.core.utils.ClientProfileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.dev.quikkkk.enums.ErrorCode.SESSION_NOT_FOUND;
+import static com.dev.quikkkk.core.enums.ErrorCode.SESSION_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor

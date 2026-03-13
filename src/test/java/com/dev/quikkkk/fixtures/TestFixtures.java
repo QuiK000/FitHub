@@ -1,25 +1,25 @@
 package com.dev.quikkkk.fixtures;
 
 import com.dev.quikkkk.dto.request.CreateClientProfileRequest;
-import com.dev.quikkkk.dto.request.CreateMembershipRequest;
+import com.dev.quikkkk.modules.membership.dto.request.CreateMembershipRequest;
 import com.dev.quikkkk.dto.request.CreateTrainerProfileRequest;
 import com.dev.quikkkk.dto.request.CreateTrainingSessionRequest;
 import com.dev.quikkkk.dto.request.LoginRequest;
 import com.dev.quikkkk.dto.request.RegistrationRequest;
 import com.dev.quikkkk.entity.ClientProfile;
 import com.dev.quikkkk.entity.Exercise;
-import com.dev.quikkkk.entity.Membership;
-import com.dev.quikkkk.entity.Payment;
+import com.dev.quikkkk.modules.membership.entity.Membership;
+import com.dev.quikkkk.modules.membership.entity.Payment;
 import com.dev.quikkkk.entity.Role;
 import com.dev.quikkkk.entity.Specialization;
 import com.dev.quikkkk.entity.TrainerProfile;
 import com.dev.quikkkk.entity.TrainingSession;
 import com.dev.quikkkk.entity.User;
 import com.dev.quikkkk.enums.ExerciseCategory;
-import com.dev.quikkkk.enums.MembershipStatus;
-import com.dev.quikkkk.enums.MembershipType;
+import com.dev.quikkkk.modules.membership.enums.MembershipStatus;
+import com.dev.quikkkk.modules.membership.enums.MembershipType;
 import com.dev.quikkkk.enums.MuscleGroup;
-import com.dev.quikkkk.enums.PaymentStatus;
+import com.dev.quikkkk.modules.membership.enums.PaymentStatus;
 import com.dev.quikkkk.enums.TrainingStatus;
 import com.dev.quikkkk.enums.TrainingType;
 

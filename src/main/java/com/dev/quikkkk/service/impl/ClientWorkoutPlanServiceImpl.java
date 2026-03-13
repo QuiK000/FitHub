@@ -7,15 +7,15 @@ import com.dev.quikkkk.dto.response.PageResponse;
 import com.dev.quikkkk.entity.ClientProfile;
 import com.dev.quikkkk.entity.ClientWorkoutPlan;
 import com.dev.quikkkk.entity.WorkoutPlan;
-import com.dev.quikkkk.exception.BusinessException;
+import com.dev.quikkkk.core.exception.BusinessException;
 import com.dev.quikkkk.mapper.ClientWorkoutPlanMapper;
 import com.dev.quikkkk.mapper.MessageMapper;
 import com.dev.quikkkk.repository.IClientProfileRepository;
 import com.dev.quikkkk.repository.IClientWorkoutPlanRepository;
 import com.dev.quikkkk.repository.IWorkoutPlanRepository;
 import com.dev.quikkkk.service.IClientWorkoutPlanService;
-import com.dev.quikkkk.utils.ClientProfileUtils;
-import com.dev.quikkkk.utils.PaginationUtils;
+import com.dev.quikkkk.core.utils.ClientProfileUtils;
+import com.dev.quikkkk.core.utils.PaginationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -25,9 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.dev.quikkkk.enums.ErrorCode.CLIENT_ASSIGNMENT_NOT_FOUND;
-import static com.dev.quikkkk.enums.ErrorCode.CLIENT_PROFILE_NOT_FOUND;
-import static com.dev.quikkkk.enums.ErrorCode.WORKOUT_PLAN_NOT_FOUND;
+import static com.dev.quikkkk.core.enums.ErrorCode.CLIENT_ASSIGNMENT_NOT_FOUND;
+import static com.dev.quikkkk.core.enums.ErrorCode.CLIENT_PROFILE_NOT_FOUND;
+import static com.dev.quikkkk.core.enums.ErrorCode.WORKOUT_PLAN_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor

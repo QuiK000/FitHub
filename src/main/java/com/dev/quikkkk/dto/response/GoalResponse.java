@@ -2,7 +2,7 @@ package com.dev.quikkkk.dto.response;
 
 import com.dev.quikkkk.enums.GoalStatus;
 import com.dev.quikkkk.enums.GoalType;
-import com.dev.quikkkk.enums.MeasurementUnit;
+import com.dev.quikkkk.modules.progress.enums.MeasurementUnit;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

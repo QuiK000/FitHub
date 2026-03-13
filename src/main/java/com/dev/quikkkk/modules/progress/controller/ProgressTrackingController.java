@@ -1,0 +1,220 @@
+package com.dev.quikkkk.modules.progress.controller;
+
+import com.dev.quikkkk.modules.progress.dto.request.CreateBodyMeasurementRequest;
+import com.dev.quikkkk.dto.request.CreateGoalRequest;
+import com.dev.quikkkk.modules.progress.dto.request.CreatePersonalRecordRequest;
+import com.dev.quikkkk.modules.progress.dto.request.CreateProgressPhotoRequest;
+import com.dev.quikkkk.modules.progress.dto.request.UpdateBodyMeasurementRequest;
+import com.dev.quikkkk.dto.request.UpdateGoalProgressRequest;
+import com.dev.quikkkk.dto.request.UpdateGoalRequest;
+import com.dev.quikkkk.modules.progress.dto.response.BodyMeasurementResponse;
+import com.dev.quikkkk.dto.response.GoalResponse;
+import com.dev.quikkkk.modules.progress.dto.response.MeasurementHistoryResponse;
+import com.dev.quikkkk.dto.response.MessageResponse;
+import com.dev.quikkkk.dto.response.PageResponse;
+import com.dev.quikkkk.modules.progress.dto.response.PersonalRecordResponse;
+import com.dev.quikkkk.modules.progress.dto.response.ProgressPhotoResponse;
+import com.dev.quikkkk.modules.progress.service.IBodyMeasurementService;
+import com.dev.quikkkk.service.IGoalService;
+import com.dev.quikkkk.modules.progress.service.IPersonalRecordService;
+import com.dev.quikkkk.modules.progress.service.IProgressPhotoService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/v1/progress")
+@RequiredArgsConstructor
+public class ProgressTrackingController {
+    private final IBodyMeasurementService bodyMeasurementService;
+    private final IGoalService goalService;
+    private final IPersonalRecordService personalRecordService;
+    private final IProgressPhotoService progressPhotoService;
+
+    @PostMapping("/measurements")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<BodyMeasurementResponse> createBodyMeasurement(
+            @RequestBody @Valid CreateBodyMeasurementRequest request
+    ) {
+        return ResponseEntity.ok(bodyMeasurementService.createBodyMeasurement(request));
+    }
+
+    @PostMapping("/goals")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<GoalResponse> createGoal(@Valid @RequestBody CreateGoalRequest request) {
+        return ResponseEntity.ok(goalService.createGoal(request));
+    }
+
+    @PostMapping("/records")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<PersonalRecordResponse> createPersonalRecord(
+            @Valid @RequestBody CreatePersonalRecordRequest request
+    ) {
+        return ResponseEntity.ok(personalRecordService.createPersonalRecord(request));
+    }
+
+    @PostMapping("/photos")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<ProgressPhotoResponse> createProgressPhoto(
+            @Valid @RequestBody CreateProgressPhotoRequest request
+    ) {
+        return ResponseEntity.ok(progressPhotoService.createPhotoProgress(request));
+    }
+
+    @GetMapping("/measurements/{measurement-id}")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<BodyMeasurementResponse> getBodyMeasurementById(
+            @PathVariable("measurement-id") String measurementId
+    ) {
+        return ResponseEntity.ok(bodyMeasurementService.getBodyMeasurementById(measurementId));
+    }
+
+    @GetMapping("/measurements")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<PageResponse<BodyMeasurementResponse>> getBodyMeasurements(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(bodyMeasurementService.getBodyMeasurements(page, size));
+    }
+
+    @GetMapping("/measurements/latest")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<BodyMeasurementResponse> getLatestBodyMeasurement() {
+        return ResponseEntity.ok(bodyMeasurementService.getLatestBodyMeasurement());
+    }
+
+    @GetMapping("/measurements/history")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<MeasurementHistoryResponse> getHistoryBodyMeasurement() {
+        return ResponseEntity.ok(bodyMeasurementService.getHistoryBodyMeasurement());
+    }
+
+    @GetMapping("/goals/{goal-id}")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<GoalResponse> getGoalById(@PathVariable("goal-id") String goalId) {
+        return ResponseEntity.ok(goalService.getGoalById(goalId));
+    }
+
+    @GetMapping("/goals")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<PageResponse<GoalResponse>> getGoals(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(goalService.getGoals(page, size));
+    }
+
+    @GetMapping("/goals/active")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<PageResponse<GoalResponse>> getActiveGoals(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(goalService.getActiveGoals(page, size));
+    }
+
+    @GetMapping("/goals/completed")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<PageResponse<GoalResponse>> getCompletedGoals(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(goalService.getCompletedGoals(page, size));
+    }
+
+    @GetMapping("/records")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<PageResponse<PersonalRecordResponse>> getPersonalRecords(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(personalRecordService.getPersonalRecords(page, size));
+    }
+
+    @GetMapping("/records/{record-id}")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<PersonalRecordResponse> getPersonalRecordById(
+            @PathVariable("record-id") String personalRecordId
+    ) {
+        return ResponseEntity.ok(personalRecordService.getPersonalRecordById(personalRecordId));
+    }
+
+    @GetMapping("/records/exercise/{exercise-id}")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<PageResponse<PersonalRecordResponse>> getPersonalRecordsByExerciseId(
+            @PathVariable("exercise-id") String exerciseId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(personalRecordService.getPersonalRecordsByExerciseId(exerciseId, page, size));
+    }
+
+    @GetMapping("/records/recent")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<PageResponse<PersonalRecordResponse>> getRecentPersonalRecords(
+            @RequestParam(defaultValue = "5") int limit
+    ) {
+        return ResponseEntity.ok(personalRecordService.getRecentPersonalRecords(limit));
+    }
+
+    @GetMapping("/photos")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<PageResponse<ProgressPhotoResponse>> getProgressPhotos(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(progressPhotoService.getProgressPhotos(page, size));
+    }
+
+    @GetMapping("/photos/{photo-progress-id}")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<ProgressPhotoResponse> getProgressPhotoById(
+            @PathVariable("photo-progress-id") String photoProgressId
+    ) {
+        return ResponseEntity.ok(progressPhotoService.getProgressPhotoById(photoProgressId));
+    }
+
+    @PutMapping("/measurements/{measurement-id}")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<BodyMeasurementResponse> updateBodyMeasurement(
+            @PathVariable("measurement-id") String id,
+            @Valid @RequestBody UpdateBodyMeasurementRequest request
+    ) {
+        return ResponseEntity.ok(bodyMeasurementService.updateBodyMeasurement(request, id));
+    }
+
+    @PutMapping("/goals/{goal-id}")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<GoalResponse> updateGoalById(
+            @PathVariable("goal-id") String goalId,
+            @Valid @RequestBody UpdateGoalRequest request
+    ) {
+        return ResponseEntity.ok(goalService.updateGoalById(goalId, request));
+    }
+
+    @PatchMapping("/goals/{goal-id}/progress")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<GoalResponse> updateGoalProgress(
+            @PathVariable("goal-id") String goalId,
+            @Valid @RequestBody UpdateGoalProgressRequest request
+    ) {
+        return ResponseEntity.ok(goalService.updateGoalProgress(goalId, request));
+    }
+
+    @PatchMapping("/goals/{goal-id}/complete")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<MessageResponse> completeGoal(@PathVariable("goal-id") String goalId) {
+        return ResponseEntity.ok(goalService.completeGoal(goalId));
+    }
+}

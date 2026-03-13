@@ -1,0 +1,131 @@
+package com.dev.quikkkk.modules.progress.mapper;
+
+import com.dev.quikkkk.modules.progress.dto.request.CreateBodyMeasurementRequest;
+import com.dev.quikkkk.modules.progress.dto.request.UpdateBodyMeasurementRequest;
+import com.dev.quikkkk.modules.progress.dto.response.BodyMeasurementResponse;
+import com.dev.quikkkk.modules.progress.dto.response.MeasurementHistoryResponse;
+import com.dev.quikkkk.modules.progress.dto.response.MeasurementTrendsDto;
+import com.dev.quikkkk.modules.progress.entity.BodyMeasurement;
+import com.dev.quikkkk.entity.ClientProfile;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class BodyMeasurementMapper {
+    public BodyMeasurement toEntity(CreateBodyMeasurementRequest request, ClientProfile client) {
+        return BodyMeasurement.builder()
+                .client(client)
+                .createdBy(client.getId())
+                .measurementDate(Optional.ofNullable(request.getMeasurementDate()).orElse(LocalDateTime.now()))
+                .weight(request.getWeight())
+                .bodyFatPercentage(request.getBodyFatPercentage())
+                .muscleMass(request.getMuscleMass())
+                .bmi(request.getBmi())
+                .bmr(request.getBmr())
+                .bodyWaterPercentage(request.getBodyWaterPercentage())
+                .boneMass(request.getBoneMass())
+                .visceralFatLevel(request.getVisceralFatLevel())
+                .notes(request.getNotes())
+                .photoUrl(request.getPhotoUrl())
+                .measurements(request.getMeasurements() != null ? request.getMeasurements() : new HashMap<>())
+                .build();
+    }
+
+    public BodyMeasurementResponse toResponse(BodyMeasurement bodyMeasurement) {
+        return BodyMeasurementResponse.builder()
+                .id(bodyMeasurement.getId())
+                .measurementDate(bodyMeasurement.getMeasurementDate())
+                .weight(bodyMeasurement.getWeight())
+                .bodyFatPercentage(bodyMeasurement.getBodyFatPercentage())
+                .muscleMass(bodyMeasurement.getMuscleMass())
+                .bmi(bodyMeasurement.getBmi())
+                .bmr(bodyMeasurement.getBmr())
+                .bodyWaterPercentage(bodyMeasurement.getBodyWaterPercentage())
+                .boneMass(bodyMeasurement.getBoneMass())
+                .visceralFatLevel(bodyMeasurement.getVisceralFatLevel())
+                .measurements(bodyMeasurement.getMeasurements())
+                .notes(bodyMeasurement.getNotes())
+                .photoUrl(bodyMeasurement.getPhotoUrl())
+                .weightChange(0.0)
+                .bodyFatChange(0.0)
+                .muscleMassChange(0.0)
+                .build();
+    }
+
+    public void update(UpdateBodyMeasurementRequest request, BodyMeasurement entity) {
+        if (request.getWeight() != null) entity.setWeight(request.getWeight());
+        if (request.getBodyFatPercentage() != null) entity.setBodyFatPercentage(request.getBodyFatPercentage());
+        if (request.getMuscleMass() != null) entity.setMuscleMass(request.getMuscleMass());
+        if (request.getBmi() != null) entity.setBmi(request.getBmi());
+        if (request.getBmr() != null) entity.setBmr(request.getBmr());
+        if (request.getBodyWaterPercentage() != null) entity.setBodyWaterPercentage(request.getBodyWaterPercentage());
+        if (request.getBoneMass() != null) entity.setBoneMass(request.getBoneMass());
+        if (request.getVisceralFatLevel() != null) entity.setVisceralFatLevel(request.getVisceralFatLevel());
+        if (request.getMeasurements() != null) entity.setMeasurements(request.getMeasurements());
+        if (request.getNotes() != null) entity.setNotes(request.getNotes());
+        if (request.getPhotoUrl() != null) entity.setPhotoUrl(request.getPhotoUrl());
+
+        entity.setLastModifiedBy(entity.getClient().getId());
+    }
+
+    public MeasurementHistoryResponse toResponseHistory(List<BodyMeasurement> measurements) {
+        if (measurements == null || measurements.isEmpty()) {
+            return MeasurementHistoryResponse.builder()
+                    .measurements(Collections.emptyList())
+                    .trends(MeasurementTrendsDto.builder()
+                            .measurementCount(0)
+                            .daysSinceFirst(0)
+                            .build())
+                    .build();
+        }
+
+        List<BodyMeasurement> sorted = measurements.stream()
+                .sorted(Comparator.comparing(BodyMeasurement::getMeasurementDate))
+                .toList();
+
+        List<BodyMeasurementResponse> responseList = new ArrayList<>();
+        for (int i = 0; i < sorted.size(); i++) {
+            BodyMeasurement current = sorted.get(i);
+            BodyMeasurement previous = i == 0 ? null : sorted.get(i - 1);
+
+            BodyMeasurementResponse dto = toResponse(current);
+
+            dto.setWeightChange(diff(current.getWeight(), previous != null ? previous.getWeight() : null));
+            dto.setBodyFatChange(diff(current.getBodyFatPercentage(), previous != null ? previous.getBodyFatPercentage() : null));
+            dto.setMuscleMassChange(diff(current.getMuscleMass(), previous != null ? previous.getMuscleMass() : null));
+
+            responseList.add(dto);
+        }
+
+        Collections.reverse(responseList);
+
+        BodyMeasurement oldest = sorted.getFirst();
+        BodyMeasurement newest = sorted.getLast();
+
+        MeasurementTrendsDto trends = MeasurementTrendsDto.builder()
+                .measurementCount(sorted.size())
+                .daysSinceFirst((int) ChronoUnit.DAYS.between(oldest.getMeasurementDate(), newest.getMeasurementDate()))
+                .totalWeightChange(diff(newest.getWeight(), oldest.getWeight()))
+                .totalBodyFatChange(diff(newest.getBodyFatPercentage(), oldest.getBodyFatPercentage()))
+                .totalMuscleMassChange(diff(newest.getMuscleMass(), oldest.getMuscleMass()))
+                .build();
+
+        return MeasurementHistoryResponse.builder()
+                .measurements(responseList)
+                .trends(trends)
+                .build();
+    }
+
+    private Double diff(Double current, Double previous) {
+        if (current == null || previous == null) return null;
+        return Math.round((current - previous) * 100.0) / 100.0;
+    }
+}

@@ -1,0 +1,111 @@
+package com.dev.quikkkk.modules.nutrition.service.impl;
+
+import com.dev.quikkkk.modules.nutrition.dto.request.CreateFoodRequest;
+import com.dev.quikkkk.modules.nutrition.dto.request.UpdateFoodRequest;
+import com.dev.quikkkk.modules.nutrition.dto.response.FoodResponse;
+import com.dev.quikkkk.dto.response.MessageResponse;
+import com.dev.quikkkk.dto.response.PageResponse;
+import com.dev.quikkkk.modules.nutrition.entity.Food;
+import com.dev.quikkkk.core.exception.BusinessException;
+import com.dev.quikkkk.modules.nutrition.mapper.FoodMapper;
+import com.dev.quikkkk.mapper.MessageMapper;
+import com.dev.quikkkk.modules.nutrition.repository.IFoodRepository;
+import com.dev.quikkkk.modules.nutrition.service.IFoodService;
+import com.dev.quikkkk.core.utils.PaginationUtils;
+import com.dev.quikkkk.core.utils.SecurityUtils;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import static com.dev.quikkkk.core.enums.ErrorCode.DUPLICATE_RESOURCE;
+import static com.dev.quikkkk.core.enums.ErrorCode.FOOD_NOT_FOUND;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class FoodServiceImpl implements IFoodService {
+    private final IFoodRepository foodRepository;
+    private final FoodMapper foodMapper;
+    private final MessageMapper messageMapper;
+
+    @Override
+    @Transactional
+    public FoodResponse createFood(CreateFoodRequest request) {
+        if (StringUtils.hasText(request.getBarcode())
+                && foodRepository.existsByBarcodeAndActiveIsTrue(request.getBarcode())
+        ) throw new BusinessException(DUPLICATE_RESOURCE);
+
+        if (foodRepository.existsByNameAndBrandAndActiveIsTrue(request.getName(), request.getBrand()))
+            throw new BusinessException(DUPLICATE_RESOURCE);
+
+        String userId = SecurityUtils.getCurrentUserId();
+        Food food = foodMapper.toEntity(request, userId);
+
+        foodRepository.save(food);
+        return foodMapper.toResponse(food);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<FoodResponse> getAllFoods(int page, int size) {
+        Pageable pageable = PaginationUtils.createPageRequest(page, size, "createdDate");
+        Page<Food> foodPage = foodRepository.getFoodsWhereActiveIsTrue(pageable);
+
+        return PaginationUtils.toPageResponse(foodPage, foodMapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public FoodResponse getFoodById(String id) {
+        return foodMapper.toResponse(findFoodByIdAndActiveIsTrue(id));
+    }
+
+    @Override
+    @Transactional
+    public FoodResponse updateFoodById(String id, UpdateFoodRequest request) {
+        Food food = foodRepository.findFoodByIdAndActiveIsTrue(id)
+                .orElseThrow(() -> new BusinessException(FOOD_NOT_FOUND));
+        String userId = SecurityUtils.getCurrentUserId();
+
+        foodMapper.update(food, userId, request);
+        return foodMapper.toResponse(food);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<FoodResponse> searchFoodByQuery(String query, int page, int size) {
+        Pageable pageable = PaginationUtils.createPageRequest(page, size, "createdDate");
+        Page<Food> foodPage = foodRepository.findFoodByQuery(query, pageable);
+        return PaginationUtils.toPageResponse(foodPage, foodMapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public FoodResponse getFoodByBarcode(String barcode) {
+        return foodRepository.findFoodByBarcodeAndActiveIsTrue(barcode)
+                .map(foodMapper::toResponse)
+                .orElseThrow(() -> new BusinessException(FOOD_NOT_FOUND));
+    }
+
+    @Override
+    @Transactional
+    public MessageResponse deactivateFood(String foodId) {
+        Food food = findFoodByIdAndActiveIsTrue(foodId);
+        String userId = SecurityUtils.getCurrentUserId();
+
+        food.setActive(false);
+        food.setLastModifiedBy(userId);
+
+        foodRepository.save(food);
+        return messageMapper.message("Food has been deactivated");
+    }
+
+    private Food findFoodByIdAndActiveIsTrue(String id) {
+        return foodRepository.findFoodByIdAndActiveIsTrue(id)
+                .orElseThrow(() -> new BusinessException(FOOD_NOT_FOUND));
+    }
+}

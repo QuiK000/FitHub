@@ -9,16 +9,16 @@ import com.dev.quikkkk.entity.ClientWorkoutPlan;
 import com.dev.quikkkk.entity.Exercise;
 import com.dev.quikkkk.entity.TrainerProfile;
 import com.dev.quikkkk.entity.WorkoutLog;
-import com.dev.quikkkk.exception.BusinessException;
+import com.dev.quikkkk.core.exception.BusinessException;
 import com.dev.quikkkk.mapper.WorkoutLogMapper;
 import com.dev.quikkkk.repository.IClientWorkoutPlanRepository;
 import com.dev.quikkkk.repository.IExerciseRepository;
 import com.dev.quikkkk.repository.ITrainerProfileRepository;
 import com.dev.quikkkk.repository.IWorkoutLogRepository;
 import com.dev.quikkkk.service.IWorkoutLogService;
-import com.dev.quikkkk.utils.ClientProfileUtils;
-import com.dev.quikkkk.utils.PaginationUtils;
-import com.dev.quikkkk.utils.SecurityUtils;
+import com.dev.quikkkk.core.utils.ClientProfileUtils;
+import com.dev.quikkkk.core.utils.PaginationUtils;
+import com.dev.quikkkk.core.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -32,11 +32,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static com.dev.quikkkk.enums.ErrorCode.CLIENT_ASSIGNMENT_NOT_FOUND;
-import static com.dev.quikkkk.enums.ErrorCode.EXERCISE_NOT_FOUND;
-import static com.dev.quikkkk.enums.ErrorCode.TRAINER_PROFILE_NOT_FOUND;
-import static com.dev.quikkkk.enums.ErrorCode.WORKOUT_LOG_ACCESS_DENIED;
-import static com.dev.quikkkk.enums.ErrorCode.WORKOUT_LOG_NOT_FOUND;
+import static com.dev.quikkkk.core.enums.ErrorCode.CLIENT_ASSIGNMENT_NOT_FOUND;
+import static com.dev.quikkkk.core.enums.ErrorCode.EXERCISE_NOT_FOUND;
+import static com.dev.quikkkk.core.enums.ErrorCode.TRAINER_PROFILE_NOT_FOUND;
+import static com.dev.quikkkk.core.enums.ErrorCode.WORKOUT_LOG_ACCESS_DENIED;
+import static com.dev.quikkkk.core.enums.ErrorCode.WORKOUT_LOG_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -122,7 +122,7 @@ public class WorkoutLogServiceImpl implements IWorkoutLogService {
     @Transactional(readOnly = true)
     @Cacheable(
             value = "lists",
-            key = "'workoutLogs:user:' + T(com.dev.quikkkk.utils.SecurityUtils).getCurrentUserId() + ':' + #page + ':' + #size"
+            key = "'workoutLogs:user:' + T(com.dev.quikkkk.core.utils.SecurityUtils).getCurrentUserId() + ':' + #page + ':' + #size"
     )
     public PageResponse<WorkoutLogResponse> getMyWorkoutLogs(int page, int size) {
         String currentUserId = SecurityUtils.getCurrentUserId();
@@ -175,7 +175,7 @@ public class WorkoutLogServiceImpl implements IWorkoutLogService {
     @Transactional(readOnly = true)
     @Cacheable(
             value = "lists",
-            key = "'workoutLogs:dateRange:' + #from + ':' + #to + ':' + #page + ':' + #size + ':' + T(com.dev.quikkkk.utils.SecurityUtils).getCurrentUserId()"
+            key = "'workoutLogs:dateRange:' + #from + ':' + #to + ':' + #page + ':' + #size + ':' + T(com.dev.quikkkk.core.utils.SecurityUtils).getCurrentUserId()"
     )
     public PageResponse<WorkoutLogResponse> getLogsByDateRange(LocalDate from, LocalDate to, int page, int size) {
         log.info("Fetching logs by date range: {} to {}, page: {}, size: {}", from, to, page, size);

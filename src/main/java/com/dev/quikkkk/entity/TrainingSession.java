@@ -1,5 +1,6 @@
 package com.dev.quikkkk.entity;
 
+import com.dev.quikkkk.core.entity.BaseEntity;
 import com.dev.quikkkk.enums.TrainingStatus;
 import com.dev.quikkkk.enums.TrainingType;
 import jakarta.persistence.Column;
