@@ -1,7 +1,7 @@
 package com.dev.quikkkk.modules.workout.repository;
 
-import com.dev.quikkkk.modules.workout.dto.response.AttendanceStatsResponse;
 import com.dev.quikkkk.modules.dashboard.dto.PopularSessionResponse;
+import com.dev.quikkkk.modules.workout.dto.response.AttendanceStatsResponse;
 import com.dev.quikkkk.modules.workout.entity.Attendance;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,7 +32,7 @@ public interface IAttendanceRepository extends JpaRepository<Attendance, String>
     Integer countAttendanceByToday(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
     @Query("""
-            SELECT new com.dev.quikkkk.dto.response.PopularSessionResponse(
+            SELECT new com.dev.quikkkk.modules.dashboard.dto.PopularSessionResponse(
             s.id,
             CONCAT(t.firstname, ' ', t.lastname),
             COUNT(a)
@@ -79,7 +79,7 @@ public interface IAttendanceRepository extends JpaRepository<Attendance, String>
     LocalDateTime findLastVisitByClient(@Param("clientId") String clientId);
 
     @Query("""
-                SELECT new com.dev.quikkkk.dto.response.AttendanceStatsResponse(
+                SELECT new com.dev.quikkkk.modules.workout.dto.response.AttendanceStatsResponse(
                     CAST(a.checkInTime AS date),
                     COUNT(a.id)
                 )
