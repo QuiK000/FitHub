@@ -3,11 +3,11 @@ package com.dev.quikkkk.modules.workout.mapper;
 import com.dev.quikkkk.modules.workout.dto.response.AttendanceResponse;
 import com.dev.quikkkk.modules.workout.dto.response.AttendanceSessionResponse;
 import com.dev.quikkkk.modules.user.dto.response.ClientShortResponse;
-import com.dev.quikkkk.dto.response.SessionShortResponse;
+import com.dev.quikkkk.modules.workout.dto.response.SessionShortResponse;
 import com.dev.quikkkk.modules.user.dto.response.TrainerShortResponse;
 import com.dev.quikkkk.modules.workout.entity.Attendance;
 import com.dev.quikkkk.modules.user.entity.ClientProfile;
-import com.dev.quikkkk.entity.TrainerProfile;
+import com.dev.quikkkk.modules.user.entity.TrainerProfile;
 import com.dev.quikkkk.modules.workout.entity.TrainingSession;
 import org.springframework.stereotype.Service;
 

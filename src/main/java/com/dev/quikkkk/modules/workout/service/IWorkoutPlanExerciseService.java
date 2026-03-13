@@ -1,8 +1,8 @@
 package com.dev.quikkkk.modules.workout.service;
 
-import com.dev.quikkkk.dto.request.AddExerciseToPlanRequest;
-import com.dev.quikkkk.dto.request.ReorderWorkoutPlanExerciseRequest;
-import com.dev.quikkkk.dto.request.UpdatePlanExerciseRequest;
+import com.dev.quikkkk.modules.workout.dto.request.AddExerciseToPlanRequest;
+import com.dev.quikkkk.modules.workout.dto.request.ReorderWorkoutPlanExerciseRequest;
+import com.dev.quikkkk.modules.workout.dto.request.UpdatePlanExerciseRequest;
 import com.dev.quikkkk.core.dto.MessageResponse;
 import com.dev.quikkkk.modules.workout.dto.response.WorkoutPlanExerciseResponse;
 

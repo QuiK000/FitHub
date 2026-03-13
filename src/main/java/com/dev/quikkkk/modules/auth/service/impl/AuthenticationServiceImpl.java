@@ -18,7 +18,7 @@ import com.dev.quikkkk.modules.user.repository.IUserRepository;
 import com.dev.quikkkk.modules.auth.service.IAuthenticationService;
 import com.dev.quikkkk.modules.notification.service.IEmailService;
 import com.dev.quikkkk.modules.auth.service.IJwtService;
-import com.dev.quikkkk.service.IRateLimitService;
+import com.dev.quikkkk.core.ratelimit.IRateLimitService;
 import com.dev.quikkkk.modules.auth.service.ITokenBlacklistService;
 import com.dev.quikkkk.modules.auth.service.IVerificationTokenService;
 import com.dev.quikkkk.core.utils.ServiceUtils;

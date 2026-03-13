@@ -2,11 +2,11 @@ package com.dev.quikkkk.modules.dashboard.mapper;
 
 import com.dev.quikkkk.modules.user.dto.response.ClientAnalyticsResponse;
 import com.dev.quikkkk.modules.dashboard.dto.DashboardAnalyticsResponse;
-import com.dev.quikkkk.dto.response.PopularSessionResponse;
+import com.dev.quikkkk.modules.dashboard.dto.PopularSessionResponse;
 import com.dev.quikkkk.modules.user.dto.response.TrainerAnalyticsResponse;
 import com.dev.quikkkk.modules.user.dto.response.TrainerAttendanceMetrics;
 import com.dev.quikkkk.modules.user.entity.ClientProfile;
-import com.dev.quikkkk.entity.TrainerProfile;
+import com.dev.quikkkk.modules.user.entity.TrainerProfile;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;

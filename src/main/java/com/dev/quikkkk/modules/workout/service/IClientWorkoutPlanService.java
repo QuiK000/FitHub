@@ -1,6 +1,6 @@
 package com.dev.quikkkk.modules.workout.service;
 
-import com.dev.quikkkk.dto.request.AssignWorkoutPlanRequest;
+import com.dev.quikkkk.modules.workout.dto.request.AssignWorkoutPlanRequest;
 import com.dev.quikkkk.modules.workout.dto.response.ClientWorkoutPlanResponse;
 import com.dev.quikkkk.core.dto.MessageResponse;
 import com.dev.quikkkk.core.dto.PageResponse;

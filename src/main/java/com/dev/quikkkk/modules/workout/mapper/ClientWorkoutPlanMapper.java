@@ -1,6 +1,6 @@
 package com.dev.quikkkk.modules.workout.mapper;
 
-import com.dev.quikkkk.dto.request.AssignWorkoutPlanRequest;
+import com.dev.quikkkk.modules.workout.dto.request.AssignWorkoutPlanRequest;
 import com.dev.quikkkk.modules.workout.dto.response.ClientWorkoutPlanResponse;
 import com.dev.quikkkk.modules.user.dto.response.TrainerShortResponse;
 import com.dev.quikkkk.modules.workout.dto.response.WorkoutPlanShortResponse;

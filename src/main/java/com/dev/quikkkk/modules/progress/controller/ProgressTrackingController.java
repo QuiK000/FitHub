@@ -1,21 +1,21 @@
 package com.dev.quikkkk.modules.progress.controller;
 
 import com.dev.quikkkk.modules.progress.dto.request.CreateBodyMeasurementRequest;
-import com.dev.quikkkk.dto.request.CreateGoalRequest;
+import com.dev.quikkkk.modules.progress.dto.request.CreateGoalRequest;
 import com.dev.quikkkk.modules.progress.dto.request.CreatePersonalRecordRequest;
 import com.dev.quikkkk.modules.progress.dto.request.CreateProgressPhotoRequest;
 import com.dev.quikkkk.modules.progress.dto.request.UpdateBodyMeasurementRequest;
-import com.dev.quikkkk.dto.request.UpdateGoalProgressRequest;
-import com.dev.quikkkk.dto.request.UpdateGoalRequest;
+import com.dev.quikkkk.modules.progress.dto.request.UpdateGoalProgressRequest;
+import com.dev.quikkkk.modules.progress.dto.request.UpdateGoalRequest;
 import com.dev.quikkkk.modules.progress.dto.response.BodyMeasurementResponse;
-import com.dev.quikkkk.dto.response.GoalResponse;
+import com.dev.quikkkk.modules.progress.dto.response.GoalResponse;
 import com.dev.quikkkk.modules.progress.dto.response.MeasurementHistoryResponse;
 import com.dev.quikkkk.core.dto.MessageResponse;
 import com.dev.quikkkk.core.dto.PageResponse;
 import com.dev.quikkkk.modules.progress.dto.response.PersonalRecordResponse;
 import com.dev.quikkkk.modules.progress.dto.response.ProgressPhotoResponse;
 import com.dev.quikkkk.modules.progress.service.IBodyMeasurementService;
-import com.dev.quikkkk.service.IGoalService;
+import com.dev.quikkkk.modules.progress.service.IGoalService;
 import com.dev.quikkkk.modules.progress.service.IPersonalRecordService;
 import com.dev.quikkkk.modules.progress.service.IProgressPhotoService;
 import jakarta.validation.Valid;

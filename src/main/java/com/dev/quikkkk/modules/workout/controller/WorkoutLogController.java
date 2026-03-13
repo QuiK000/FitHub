@@ -1,7 +1,7 @@
 package com.dev.quikkkk.modules.workout.controller;
 
-import com.dev.quikkkk.dto.request.LogWorkoutRequest;
-import com.dev.quikkkk.dto.request.UpdateLogWorkoutRequest;
+import com.dev.quikkkk.modules.workout.dto.request.LogWorkoutRequest;
+import com.dev.quikkkk.modules.workout.dto.request.UpdateLogWorkoutRequest;
 import com.dev.quikkkk.core.dto.PageResponse;
 import com.dev.quikkkk.modules.workout.dto.response.WorkoutLogResponse;
 import com.dev.quikkkk.modules.workout.service.IWorkoutLogService;

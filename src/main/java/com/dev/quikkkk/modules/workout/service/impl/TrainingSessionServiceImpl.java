@@ -1,16 +1,16 @@
 package com.dev.quikkkk.modules.workout.service.impl;
 
-import com.dev.quikkkk.dto.request.CheckInTrainingSessionRequest;
+import com.dev.quikkkk.modules.workout.dto.request.CheckInTrainingSessionRequest;
 import com.dev.quikkkk.modules.workout.dto.request.CreateTrainingSessionRequest;
-import com.dev.quikkkk.dto.request.UpdateTrainingSessionRequest;
-import com.dev.quikkkk.dto.response.CheckInResponse;
+import com.dev.quikkkk.modules.workout.dto.request.UpdateTrainingSessionRequest;
+import com.dev.quikkkk.modules.workout.dto.response.CheckInResponse;
 import com.dev.quikkkk.core.dto.MessageResponse;
 import com.dev.quikkkk.core.dto.PageResponse;
 import com.dev.quikkkk.modules.workout.dto.response.TrainingSessionResponse;
 import com.dev.quikkkk.modules.workout.entity.Attendance;
 import com.dev.quikkkk.modules.user.entity.ClientProfile;
 import com.dev.quikkkk.modules.membership.entity.Membership;
-import com.dev.quikkkk.entity.TrainerProfile;
+import com.dev.quikkkk.modules.user.entity.TrainerProfile;
 import com.dev.quikkkk.modules.workout.entity.TrainingSession;
 import com.dev.quikkkk.modules.membership.enums.MembershipStatus;
 import com.dev.quikkkk.modules.membership.enums.MembershipType;
