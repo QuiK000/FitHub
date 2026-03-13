@@ -1,5 +1,6 @@
 package com.dev.quikkkk.service.impl;
 
+import com.dev.quikkkk.dto.request.BroadcastNotificationRequest;
 import com.dev.quikkkk.dto.request.CreateNotificationRequest;
 import com.dev.quikkkk.dto.response.MessageResponse;
 import com.dev.quikkkk.dto.response.NotificationResponse;
@@ -136,6 +137,29 @@ public class NotificationServiceImpl implements INotificationService {
 
         publisher.publishEvent(event);
         return messageMapper.message("Notification dispatched successfully");
+    }
+
+    @Override
+    public MessageResponse broadcastNotification(BroadcastNotificationRequest request) {
+        List<String> userIds = userRepository.findAllUserIds();
+
+        for (String userId : userIds) {
+            NotificationEvent event = NotificationEvent.builder()
+                    .recipientId(userId)
+                    .type(request.getType())
+                    .priority(request.getPriority())
+                    .title(request.getTitle())
+                    .message(request.getMessage())
+                    .actionUrl(request.getActionUrl())
+                    .referenceId(request.getReferenceId())
+                    .referenceType(request.getReferenceType())
+                    .scheduledFor(request.getScheduledFor())
+                    .build();
+
+            publisher.publishEvent(event);
+        }
+
+        return messageMapper.message("Broadcast initiated for " + userIds.size() + " users.");
     }
 
     private long getUnreadCountForUser(String userId) {
