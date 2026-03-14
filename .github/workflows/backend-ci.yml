@@ -8,6 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: TEST
     services:
       redis:
         image: redis:latest
@@ -31,7 +32,7 @@ jobs:
         run: chmod +x mvnw
       - name: Build and Test with Maven
         env:
-          DB_PASSWORD: ${{secrets.DB_PASSWOD}}
-          DB_USERNAME: ${{secrets.DB_USERNAME}}
           DB_URL: ${{secrets.DB_URL}}
+          DB_USERNAME: ${{secrets.DB_USERNAME}}
+          DB_PASSWORD: ${{secrets.DB_PASSWOD}}
         run: ./mvnw clean verify -Dspring.profiles.active=test
