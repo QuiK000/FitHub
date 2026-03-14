@@ -34,5 +34,5 @@ jobs:
         env:
           DB_URL: ${{secrets.DB_URL}}
           DB_USERNAME: ${{secrets.DB_USERNAME}}
-          DB_PASSWORD: ${{secrets.DB_PASSWOD}}
+          DB_PASSWORD: ${{secrets.DB_PASSWORD}}
         run: ./mvnw clean verify -Dspring.profiles.active=test
