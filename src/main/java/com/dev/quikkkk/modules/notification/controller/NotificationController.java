@@ -1,11 +1,11 @@
 package com.dev.quikkkk.modules.notification.controller;
 
+import com.dev.quikkkk.core.dto.MessageResponse;
+import com.dev.quikkkk.core.dto.PageResponse;
 import com.dev.quikkkk.modules.notification.dto.request.BroadcastNotificationRequest;
 import com.dev.quikkkk.modules.notification.dto.request.CreateNotificationRequest;
-import com.dev.quikkkk.core.dto.MessageResponse;
 import com.dev.quikkkk.modules.notification.dto.response.NotificationResponse;
 import com.dev.quikkkk.modules.notification.dto.response.NotificationSummaryResponse;
-import com.dev.quikkkk.core.dto.PageResponse;
 import com.dev.quikkkk.modules.notification.service.INotificationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -61,6 +61,15 @@ public class NotificationController {
     @GetMapping("/summary")
     public ResponseEntity<NotificationSummaryResponse> getNotificationSummary() {
         return ResponseEntity.ok(notificationService.getNotificationSummary());
+    }
+
+    @GetMapping("/scheduled")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<PageResponse<NotificationResponse>> getScheduledNotifications(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(notificationService.getScheduledNotifications(page, size));
     }
 
     @PatchMapping("/{notification-id}/read")

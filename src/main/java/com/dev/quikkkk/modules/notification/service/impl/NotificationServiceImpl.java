@@ -162,6 +162,17 @@ public class NotificationServiceImpl implements INotificationService {
         return messageMapper.message("Broadcast initiated for " + userIds.size() + " users.");
     }
 
+    @Override
+    public PageResponse<NotificationResponse> getScheduledNotifications(int page, int size) {
+        Pageable pageable = PaginationUtils.createPageRequest(page, size);
+        Page<Notification> scheduledPage = notificationRepository.findScheduledNotifications(
+                LocalDateTime.now(),
+                pageable
+        );
+
+        return PaginationUtils.toPageResponse(scheduledPage, notificationMapper::toResponse);
+    }
+
     private long getUnreadCountForUser(String userId) {
         String key = UNREAD_COUNT_KEY + userId;
         String cachedCount = redisTemplate.opsForValue().get(key);

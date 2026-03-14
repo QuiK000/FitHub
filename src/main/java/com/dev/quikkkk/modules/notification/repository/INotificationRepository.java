@@ -22,15 +22,24 @@ public interface INotificationRepository extends JpaRepository<Notification, Str
 
     @Modifying
     @Query("""
-        UPDATE Notification n
-        SET n.read = true,
-                n.readAt = :now
-        WHERE n.recipient.id = :recipientId
-        AND n.read = false
-        """)
+            UPDATE Notification n
+            SET n.read = true,
+                    n.readAt = :now
+            WHERE n.recipient.id = :recipientId
+            AND n.read = false
+            """)
     int markAllAsReadByRecipientId(String recipientId, LocalDateTime now);
 
     long countAllByRecipientIdAndReadIsFalse(String recipientId);
 
     List<Notification> findTop5ByRecipientIdOrderByCreatedDateDesc(String userId);
+
+    @Query("""
+            SELECT n FROM Notification n
+            WHERE n.sent = false
+            AND n.scheduledFor IS NOT NULL
+            AND n.scheduledFor > :now
+            ORDER BY n.scheduledFor ASC
+            """)
+    Page<Notification> findScheduledNotifications(LocalDateTime now, Pageable pageable);
 }

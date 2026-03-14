@@ -26,4 +26,6 @@ public interface INotificationService {
     MessageResponse sendNotification(CreateNotificationRequest request);
 
     MessageResponse broadcastNotification(BroadcastNotificationRequest request);
+
+    PageResponse<NotificationResponse> getScheduledNotifications(int page, int size);
 }
