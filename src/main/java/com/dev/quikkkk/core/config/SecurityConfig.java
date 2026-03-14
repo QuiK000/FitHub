@@ -32,7 +32,9 @@ public class SecurityConfig {
             "/swagger-ui.html",
 
             "/swagger-resources/**",
-            "/webjars/**"
+            "/webjars/**",
+
+            "/actuator/**"
     };
 
     private final JwtFilter filter;
