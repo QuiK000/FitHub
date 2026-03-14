@@ -2,13 +2,14 @@ services:
   backend:
     container_name: fithub-backend
     build:
-      context: ...
+      context: ..
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
     restart: unless-stopped
     env_file:
-      - ../.env
+      - /home/quikkkk/fithub-env/.env
+
     depends_on:
       - redis
     networks:

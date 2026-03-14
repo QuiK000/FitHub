@@ -1,4 +1,5 @@
 name: FitHub Backend CI
+
 on:
   push:
     branches: ["main", "master"]
@@ -39,6 +40,11 @@ jobs:
           TELEGRAM_TOKEN: ${{secrets.TELEGRAM_TOKEN}}
           API_TELEGRAM_URL: ${{secrets.API_TELEGRAM_URL}}
         run: ./mvnw clean verify -Dspring.profiles.active=test
+      - name: Upload jar artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: backend-jar
+          path: target/*.jar
   deploy:
     needs: build
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
@@ -47,7 +53,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
+      - name: Download jar
+        uses: actions/download-artifact@v8
+        with:
+          name: backend-jar
+          path: target
       - name: Deploy via Docker Compose
         run: |
-          cd docker
-          docker-compose up -d --build backend
+            cd docker
+            docker compose down
+            docker compose build --no-cache backend
+            docker compose up -d --force-recreate backend
+            docker image prune -f

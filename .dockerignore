@@ -1,0 +1,10 @@
+.git
+.github
+actions-runner
+node_modules
+target
+!target/*.jar
+.idea
+.vscode
+docker
+README.md
