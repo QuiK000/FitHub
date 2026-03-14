@@ -1,9 +1,9 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/fithub_testdb}
+    username: ${DB_USERNAME:testuser}
+    password: ${DB_PASSWORD:testpassword}
 
   jpa:
     hibernate:
@@ -52,3 +52,14 @@ logging:
     com.dev.quikkkk: DEBUG
     org.springframework.security: WARN
     org.hibernate: WARN
+
+tron:
+  api:
+    url: https://nile.trongrid.io
+  wallet:
+    address: ${TEST_WALLET}
+
+telegram:
+  bot:
+    token: ${TELEGRAM_TOKEN}
+    api-url: ${API_TELEGRAM_URL}

@@ -35,4 +35,7 @@ jobs:
           DB_URL: ${{secrets.DB_URL}}
           DB_USERNAME: ${{secrets.DB_USERNAME}}
           DB_PASSWORD: ${{secrets.DB_PASSWORD}}
+          TEST_WALLET: ${{secrets.TEST_WALLET}}
+          TELEGRAM_TOKEN: ${{secrets.TELEGRAM_TOKEN}}
+          API_TELEGRAM_URL: ${{secrets.API_TELEGRAM_URL}}
         run: ./mvnw clean verify -Dspring.profiles.active=test
