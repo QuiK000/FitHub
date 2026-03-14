@@ -30,4 +30,4 @@ jobs:
       - name: Grant execute permission for mvnw
         run: chmod +x mvnw
       - name: Build and Test with Maven
-        run: ./mvnw clean verify
+        run: ./mvnw clean verify -Dspring.profiles.active=test
