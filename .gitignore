@@ -7,6 +7,7 @@ target/
 env.properties
 src/main/resources/keys/*.pem
 logs/
+actions-runner
 
 ### STS ###
 .apt_generated

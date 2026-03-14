@@ -39,3 +39,15 @@ jobs:
           TELEGRAM_TOKEN: ${{secrets.TELEGRAM_TOKEN}}
           API_TELEGRAM_URL: ${{secrets.API_TELEGRAM_URL}}
         run: ./mvnw clean verify -Dspring.profiles.active=test
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    runs-on: self-hosted
+    environment: TEST
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: Deploy via Docker Compose
+        run: |
+          cd docker
+          docker-compose up -d --build backend
