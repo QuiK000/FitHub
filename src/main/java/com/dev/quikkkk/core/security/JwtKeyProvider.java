@@ -144,6 +144,9 @@ public class JwtKeyProvider {
     }
 
     private boolean isDevelopmentProfile(String profile) {
-        return profile.contains("dev") || profile.contains("local") || profile.equals("default");
+        return profile.contains("dev")
+                || profile.contains("local")
+                || profile.equals("default")
+                || profile.contains("test");
     }
 }
