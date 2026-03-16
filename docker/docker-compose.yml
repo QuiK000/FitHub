@@ -33,10 +33,25 @@ services:
     ports:
       - "1080:1080"
       - "1025:1025"
+  minio:
+    image: minio/minio:latest
+    container_name: fithub-minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - MINIO_ROOT=admin
+      - MINIO_ROOT_PASSWORD=password123
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - network
 
 volumes:
   pgdata:
   redis_data:
+  minio_data:
 
 networks:
   network:
