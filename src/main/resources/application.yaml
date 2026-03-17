@@ -84,7 +84,7 @@ app:
 file:
   upload:
     video-dir: uploads/videos
-    image-dir: uploads/iamges
+    image-dir: uploads/images
 
 logging:
   level:
