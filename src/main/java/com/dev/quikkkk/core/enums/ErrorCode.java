@@ -126,6 +126,9 @@ public enum ErrorCode {
     TRANSACTION_ALREADY_USED("TRANSACTION_ALREADY_USED", "Transaction is already used", HttpStatus.CONFLICT),
     CREATED_DATE_IS_NULL("CREATED_DATE_IS_NULL", "Created date is null", HttpStatus.INTERNAL_SERVER_ERROR),
     NOTIFICATION_NOT_FOUND("NOTIFICATION_NOT_FOUND", "Notification not found", NOT_FOUND),
+    CANNOT_REVIEW_SELF("CANNOT_REVIEW_SELF", "Trainer cannot review themselves", FORBIDDEN),
+    REVIEW_ALREADY_EXISTS("REVIEW_ALREADY_EXISTS", "Client has already reviewed this trainer", CONFLICT),
+    NO_PRIOR_INTERACTION("NO_PRIOR_INTERACTION", "Client has no completed sessions with this trainer", FORBIDDEN),
 
     ;
 
