@@ -1,6 +1,7 @@
 package com.dev.quikkkk.modules.user.entity;
 
 import com.dev.quikkkk.core.entity.BaseEntity;
+import com.dev.quikkkk.modules.review.entity.TrainerReview;
 import com.dev.quikkkk.modules.workout.entity.TrainingSession;
 import com.dev.quikkkk.modules.workout.entity.WorkoutPlan;
 import jakarta.persistence.CascadeType;
@@ -88,6 +89,9 @@ public class TrainerProfile extends BaseEntity {
 
     @OneToMany(mappedBy = "trainer",  cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<WorkoutPlan> workoutPlans = new HashSet<>();
+
+    @OneToMany(mappedBy = "trainer")
+    private Set<TrainerReview> trainerReviews = new HashSet<>();
 
     public void clearPersonalData() {
         this.firstname = null;

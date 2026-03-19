@@ -2,6 +2,7 @@ package com.dev.quikkkk.modules.user.entity;
 
 import com.dev.quikkkk.core.entity.BaseEntity;
 import com.dev.quikkkk.modules.progress.entity.Goal;
+import com.dev.quikkkk.modules.review.entity.TrainerReview;
 import com.dev.quikkkk.modules.user.enums.ClientGender;
 import com.dev.quikkkk.modules.membership.entity.Membership;
 import com.dev.quikkkk.modules.membership.entity.Payment;
@@ -128,6 +129,9 @@ public class ClientProfile extends BaseEntity {
 
     @OneToMany(mappedBy = "client")
     private Set<ProgressPhoto> progressPhotos = new HashSet<>();
+
+    @OneToMany(mappedBy = "reviewer")
+    private Set<TrainerReview> trainerReviews = new HashSet<>();
 
     public void clearPersonalData() {
         this.firstname = null;
