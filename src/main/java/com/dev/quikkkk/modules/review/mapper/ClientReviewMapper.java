@@ -24,8 +24,6 @@ public class ClientReviewMapper {
                 .knowledgeRating(request.getKnowledgeRating())
                 .communicationRating(request.getCommunicationRating())
                 .motivationRating(request.getMotivationRating())
-                .visible(true)
-                .edited(false)
                 .createdBy(client.getId())
                 .build();
     }
