@@ -86,4 +86,14 @@ public interface ITrainingSessionRepository extends JpaRepository<TrainingSessio
             AND ts.status = 'SCHEDULED'
             """)
     long countFutureBookings(@Param("clientId") String clientId, @Param("now") LocalDateTime now);
+
+    @Query("""
+            SELECT COUNT(s) > 0
+            FROM TrainingSession s
+            JOIN s.clients c
+            WHERE s.trainer.id = :trainerId
+                        AND c.id = :clientId
+                        AND s.status = 'COMPLETED'
+            """)
+    boolean existsCompletedSessionWithTrainer(@Param("trainerId") String trainerId, @Param("clientId") String clientId);
 }
