@@ -10,7 +10,7 @@ import com.dev.quikkkk.modules.review.dto.request.CreateTrainerReviewRequest;
 import com.dev.quikkkk.modules.review.dto.request.UpdateTrainerReviewRequest;
 import com.dev.quikkkk.modules.review.dto.response.TrainerReviewResponse;
 import com.dev.quikkkk.modules.review.entity.TrainerReview;
-import com.dev.quikkkk.modules.review.mapper.ClientReviewMapper;
+import com.dev.quikkkk.modules.review.mapper.ReviewMapper;
 import com.dev.quikkkk.modules.review.repository.IReviewRepository;
 import com.dev.quikkkk.modules.review.service.IClientReviewService;
 import com.dev.quikkkk.modules.user.entity.ClientProfile;
@@ -43,7 +43,7 @@ public class ClientReviewServiceImpl implements IClientReviewService {
     private final ITrainerProfileRepository trainerProfileRepository;
     private final IClientProfileRepository clientProfileRepository;
     private final ITrainingSessionRepository trainingSessionRepository;
-    private final ClientReviewMapper clientReviewMapper;
+    private final ReviewMapper reviewMapper;
     private final MessageMapper messageMapper;
 
     @Override
@@ -76,7 +76,7 @@ public class ClientReviewServiceImpl implements IClientReviewService {
             throw new BusinessException(NO_PRIOR_INTERACTION);
         }
 
-        TrainerReview review = clientReviewMapper.toEntity(trainer, client, request);
+        TrainerReview review = reviewMapper.toEntity(trainer, client, request);
 
         review.setVisible(true);
         review.setEdited(false);
@@ -85,7 +85,7 @@ public class ClientReviewServiceImpl implements IClientReviewService {
         reviewRepository.save(review);
         log.info("Client {} successfully created a review for trainer {}", client.getId(), trainerId);
 
-        return clientReviewMapper.toResponse(review);
+        return reviewMapper.toResponse(review);
     }
 
     @Override
@@ -100,7 +100,7 @@ public class ClientReviewServiceImpl implements IClientReviewService {
         Pageable pageable = PaginationUtils.createPageRequest(page, size, "createdDate");
         Page<TrainerReview> trainerReviewPage = reviewRepository.findAllByReviewerId(client.getId(), pageable);
 
-        return PaginationUtils.toPageResponse(trainerReviewPage, clientReviewMapper::toResponse);
+        return PaginationUtils.toPageResponse(trainerReviewPage, reviewMapper::toResponse);
     }
 
     @Override
@@ -114,7 +114,7 @@ public class ClientReviewServiceImpl implements IClientReviewService {
         TrainerReview review = reviewRepository.findByIdAndReviewerId(reviewId, client.getId())
                 .orElseThrow(() -> new BusinessException(REVIEW_NOT_FOUND));
 
-        clientReviewMapper.update(request, review);
+        reviewMapper.update(request, review);
 
         review.setEdited(true);
         review.setEditedAt(LocalDateTime.now());
