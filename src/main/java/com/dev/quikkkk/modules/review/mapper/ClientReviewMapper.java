@@ -1,6 +1,7 @@
 package com.dev.quikkkk.modules.review.mapper;
 
 import com.dev.quikkkk.modules.review.dto.request.CreateTrainerReviewRequest;
+import com.dev.quikkkk.modules.review.dto.request.UpdateTrainerReviewRequest;
 import com.dev.quikkkk.modules.review.dto.response.TrainerReviewResponse;
 import com.dev.quikkkk.modules.review.entity.TrainerReview;
 import com.dev.quikkkk.modules.user.dto.response.ClientShortResponse;
@@ -48,5 +49,15 @@ public class ClientReviewMapper {
                 .edited(review.isEdited())
                 .editedAt(review.getEditedAt())
                 .build();
+    }
+
+    public void update(UpdateTrainerReviewRequest request, TrainerReview review) {
+        if (request.getRating() != null) review.setRating(request.getRating());
+        if (request.getComment() != null) review.setComment(request.getComment());
+        if (request.getProfessionalismRating() != null)
+            review.setProfessionalismRating(request.getProfessionalismRating());
+        if (request.getKnowledgeRating() != null) review.setKnowledgeRating(request.getKnowledgeRating());
+        if (request.getCommunicationRating() != null) review.setCommunicationRating(request.getCommunicationRating());
+        if (request.getMotivationRating() != null) review.setMotivationRating(request.getMotivationRating());
     }
 }
