@@ -129,6 +129,7 @@ public enum ErrorCode {
     CANNOT_REVIEW_SELF("CANNOT_REVIEW_SELF", "Trainer cannot review themselves", FORBIDDEN),
     REVIEW_ALREADY_EXISTS("REVIEW_ALREADY_EXISTS", "Client has already reviewed this trainer", CONFLICT),
     NO_PRIOR_INTERACTION("NO_PRIOR_INTERACTION", "Client has no completed sessions with this trainer", FORBIDDEN),
+    REVIEW_NOT_FOUND("REVIEW_NOT_FOUND", "Review not found", NOT_FOUND),
 
     ;
 
