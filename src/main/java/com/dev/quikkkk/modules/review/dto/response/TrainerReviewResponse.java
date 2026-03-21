@@ -29,4 +29,8 @@ public class TrainerReviewResponse {
     private boolean edited;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime editedAt;
+    private boolean visible;
+    private String hiddenReason;
+    private String moderatedByAdminId;
+    private LocalDateTime moderatedAt;
 }

@@ -53,6 +53,10 @@ public class ReviewMapper {
                 .createdAt(review.getCreatedDate())
                 .edited(review.isEdited())
                 .editedAt(review.getEditedAt())
+                .visible(review.isVisible())
+                .hiddenReason(review.getHiddenReason())
+                .moderatedByAdminId(review.getModeratedByAdminId())
+                .moderatedAt(review.getModeratedAt())
                 .build();
     }
 
