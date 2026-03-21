@@ -122,7 +122,7 @@ public class WorkoutPlanServiceImpl implements IWorkoutPlanService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     @Caching(evict = {
             @CacheEvict(value = "workoutPlans", key = "'byId:' + #workoutPlanId"),
             @CacheEvict(value = "lists", allEntries = true)
@@ -140,7 +140,7 @@ public class WorkoutPlanServiceImpl implements IWorkoutPlanService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     @Caching(evict = {
             @CacheEvict(value = "workoutPlans", key = "'byId:' + #workoutPlanId"),
             @CacheEvict(value = "lists", allEntries = true)
