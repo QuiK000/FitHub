@@ -52,15 +52,12 @@ public class SessionLockServiceImpl implements ISessionLockService {
 
     @Override
     public <T> T executeWithLock(String sessionId, LockOperation<T> operation) {
-        String lockValue = acquireLock(sessionId);
+        String lockValue = acquireLockWithRetry(sessionId, 3, Duration.ofMillis(100));
+        if (lockValue == null) throw new BusinessException(SESSION_IS_FULL);
         try {
-            lockValue = acquireLockWithRetry(sessionId, 3, Duration.ofMillis(100));
-            if (lockValue == null) throw new BusinessException(SESSION_IS_FULL);
             return operation.execute();
         } finally {
-            if (lockValue != null) {
-                releaseLock(sessionId, lockValue);
-            }
+            releaseLock(sessionId, lockValue);
         }
     }
 
