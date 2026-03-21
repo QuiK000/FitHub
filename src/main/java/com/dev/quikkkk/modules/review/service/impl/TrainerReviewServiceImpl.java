@@ -40,7 +40,7 @@ public class TrainerReviewServiceImpl implements ITrainerReviewService {
                 .orElseThrow(() -> new BusinessException(TRAINER_PROFILE_NOT_FOUND));
 
         Pageable pageable = PaginationUtils.createPageRequest(page, size, "createdDate");
-        Page<TrainerReview> trainerReviewPage = reviewRepository.findAllByTrainerId(trainerId, pageable);
+        Page<TrainerReview> trainerReviewPage = reviewRepository.findAllPublicByTrainerId(trainerId, pageable);
 
         return PaginationUtils.toPageResponse(trainerReviewPage, reviewMapper::toResponse);
     }

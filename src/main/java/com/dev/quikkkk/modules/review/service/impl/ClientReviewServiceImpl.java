@@ -31,6 +31,7 @@ import static com.dev.quikkkk.core.enums.ErrorCode.CANNOT_REVIEW_SELF;
 import static com.dev.quikkkk.core.enums.ErrorCode.CLIENT_PROFILE_NOT_FOUND;
 import static com.dev.quikkkk.core.enums.ErrorCode.NO_PRIOR_INTERACTION;
 import static com.dev.quikkkk.core.enums.ErrorCode.REVIEW_ALREADY_EXISTS;
+import static com.dev.quikkkk.core.enums.ErrorCode.REVIEW_IS_HIDDEN_AND_CANNOT_BE_EDITED;
 import static com.dev.quikkkk.core.enums.ErrorCode.REVIEW_NOT_FOUND;
 import static com.dev.quikkkk.core.enums.ErrorCode.TRAINER_PROFILE_NOT_FOUND;
 
@@ -80,7 +81,7 @@ public class ClientReviewServiceImpl implements IClientReviewService {
 
         review.setVisible(true);
         review.setEdited(false);
-        review.setEditedAt(LocalDateTime.now());
+        review.setEditedAt(null);
 
         reviewRepository.save(review);
         log.info("Client {} successfully created a review for trainer {}", client.getId(), trainerId);
@@ -114,6 +115,7 @@ public class ClientReviewServiceImpl implements IClientReviewService {
         TrainerReview review = reviewRepository.findByIdAndReviewerId(reviewId, client.getId())
                 .orElseThrow(() -> new BusinessException(REVIEW_NOT_FOUND));
 
+        if (!review.isVisible()) throw new BusinessException(REVIEW_IS_HIDDEN_AND_CANNOT_BE_EDITED);
         reviewMapper.update(request, review);
 
         review.setEdited(true);
