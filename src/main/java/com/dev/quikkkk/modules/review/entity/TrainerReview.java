@@ -72,6 +72,15 @@ public class TrainerReview extends BaseEntity {
     @Column(name = "visible", nullable = false)
     private boolean visible;
 
+    @Column(name = "moderated_by_admin_id")
+    private String moderatedByAdminId;
+
+    @Column(name = "moderated_at")
+    private LocalDateTime moderatedAt;
+
+    @Column(name = "hidden_reason", length = 500)
+    private String hiddenReason;
+
     @Column(name = "edited", nullable = false)
     private boolean edited;
 
