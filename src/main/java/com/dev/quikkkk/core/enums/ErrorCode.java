@@ -130,6 +130,8 @@ public enum ErrorCode {
     REVIEW_ALREADY_EXISTS("REVIEW_ALREADY_EXISTS", "Client has already reviewed this trainer", CONFLICT),
     NO_PRIOR_INTERACTION("NO_PRIOR_INTERACTION", "Client has no completed sessions with this trainer", FORBIDDEN),
     REVIEW_NOT_FOUND("REVIEW_NOT_FOUND", "Review not found", NOT_FOUND),
+    REVIEW_ALREADY_HIDDEN("REVIEW_ALREADY_HIDDEN", "Review already hidden", FORBIDDEN),
+    REVIEW_ALREADY_VISIBLE("REVIEW_ALREADY_VISIBLE", "Review already visible", FORBIDDEN),
 
     ;
 
