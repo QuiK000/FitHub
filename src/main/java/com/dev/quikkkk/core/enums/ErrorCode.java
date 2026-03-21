@@ -132,6 +132,7 @@ public enum ErrorCode {
     REVIEW_NOT_FOUND("REVIEW_NOT_FOUND", "Review not found", NOT_FOUND),
     REVIEW_ALREADY_HIDDEN("REVIEW_ALREADY_HIDDEN", "Review already hidden", FORBIDDEN),
     REVIEW_ALREADY_VISIBLE("REVIEW_ALREADY_VISIBLE", "Review already visible", FORBIDDEN),
+    REVIEW_IS_HIDDEN_AND_CANNOT_BE_EDITED("REVIEW_IS_HIDDEN_AND_CANNOT_BE_EDITED", "Review is hidden and cannot be edited", FORBIDDEN),
 
     ;
 
