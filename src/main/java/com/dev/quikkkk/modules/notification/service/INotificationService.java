@@ -9,7 +9,7 @@ import com.dev.quikkkk.core.dto.PageResponse;
 import com.dev.quikkkk.modules.notification.event.NotificationEvent;
 
 public interface INotificationService {
-    PageResponse<NotificationResponse> findAllNotifications(int size, int page);
+    PageResponse<NotificationResponse> findAllNotifications(int page, int size);
 
     NotificationResponse findNotificationById(String id);
 
