@@ -3,10 +3,12 @@ package com.dev.quikkkk.modules.notification.service.impl;
 import com.dev.quikkkk.modules.notification.dto.request.BroadcastNotificationRequest;
 import com.dev.quikkkk.modules.notification.dto.request.CreateNotificationRequest;
 import com.dev.quikkkk.core.dto.MessageResponse;
+import com.dev.quikkkk.modules.notification.dto.response.NotificationRealtimeEventResponse;
 import com.dev.quikkkk.modules.notification.dto.response.NotificationResponse;
 import com.dev.quikkkk.modules.notification.dto.response.NotificationSummaryResponse;
 import com.dev.quikkkk.core.dto.PageResponse;
 import com.dev.quikkkk.modules.notification.entity.Notification;
+import com.dev.quikkkk.modules.notification.realtime.INotificationRealtimeService;
 import com.dev.quikkkk.modules.user.entity.User;
 import com.dev.quikkkk.modules.notification.event.NotificationEvent;
 import com.dev.quikkkk.core.exception.BusinessException;
@@ -42,15 +44,16 @@ public class NotificationServiceImpl implements INotificationService {
 
     private final INotificationRepository notificationRepository;
     private final IUserRepository userRepository;
+    private final INotificationRealtimeService notificationRealtimeService;
     private final NotificationMapper notificationMapper;
     private final MessageMapper messageMapper;
     private final StringRedisTemplate redisTemplate;
     private final ApplicationEventPublisher publisher;
 
     @Override
-    public PageResponse<NotificationResponse> findAllNotifications(int size, int page) {
+    public PageResponse<NotificationResponse> findAllNotifications(int page, int size) {
         String userId = SecurityUtils.getCurrentUserId();
-        Pageable notificationPage = PaginationUtils.createPageRequest(size, page, "createdDate");
+        Pageable notificationPage = PaginationUtils.createPageRequest(page, size, "createdDate");
         Page<Notification> notifications = notificationRepository.findAllByRecipientId(userId, notificationPage);
 
         return PaginationUtils.toPageResponse(notifications, notificationMapper::toResponse);
@@ -75,6 +78,12 @@ public class NotificationServiceImpl implements INotificationService {
             notification.setRead(true);
             notification.setReadAt(LocalDateTime.now());
             decrementUnreadCountInCache(userId);
+            publishRealtimeEvent(
+                    userId,
+                    "notification.read",
+                    notificationMapper.toResponse(notification),
+                    getUnreadCountForUser(userId)
+            );
         }
 
         return messageMapper.message("Notification marked as read");
@@ -87,6 +96,8 @@ public class NotificationServiceImpl implements INotificationService {
         int updated = notificationRepository.markAllAsReadByRecipientId(userId, LocalDateTime.now());
 
         if (updated > 0) redisTemplate.opsForValue().set(UNREAD_COUNT_KEY + userId, "0");
+        if (updated > 0) publishRealtimeEvent(userId, "notification.mark_all_read",  null, 0);
+
         return messageMapper.message(updated + " notifications marked as read");
     }
 
@@ -116,7 +127,15 @@ public class NotificationServiceImpl implements INotificationService {
         notification.setSent(!isScheduledForFuture);
         notificationRepository.save(notification);
 
-        if (!isScheduledForFuture) incrementUnreadCountInCache(event.getRecipientId());
+        if (!isScheduledForFuture) {
+            incrementUnreadCountInCache(event.getRecipientId());
+            publishRealtimeEvent(
+                    event.getRecipientId(),
+                    "notification.created",
+                    notificationMapper.toResponse(notification),
+                    getUnreadCountForUser(event.getRecipientId())
+            );
+        }
     }
 
     @Override
@@ -201,5 +220,21 @@ public class NotificationServiceImpl implements INotificationService {
                 redisTemplate.opsForValue().set(key, "0");
             }
         }
+    }
+
+    private void publishRealtimeEvent(
+            String userId,
+            String eventType,
+            NotificationResponse notification,
+            long unreadCount
+    ) {
+        NotificationRealtimeEventResponse event = NotificationRealtimeEventResponse.builder()
+                .eventType(eventType)
+                .notification(notification)
+                .unreadCount(unreadCount)
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        notificationRealtimeService.publishToUser(userId, event);
     }
 }
