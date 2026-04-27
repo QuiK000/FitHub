@@ -1,5 +1,8 @@
 package com.dev.quikkkk.modules.review.listener;
 
+import com.dev.quikkkk.modules.notification.dto.request.CreateNotificationRequest;
+import com.dev.quikkkk.modules.notification.enums.NotificationPriority;
+import com.dev.quikkkk.modules.notification.enums.NotificationType;
 import com.dev.quikkkk.modules.notification.service.INotificationService;
 import com.dev.quikkkk.modules.review.event.ReviewModeratedEvent;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +23,15 @@ public class ReviewModerationListener {
     public void handleReviewModerated(ReviewModeratedEvent event) {
         log.info("Client {} review was moderated. Sending notification.", event.getClientId());
 
-        // TODO: PUSH Notification
+        CreateNotificationRequest request = CreateNotificationRequest.builder()
+                .recipientId(event.getClientId())
+                .type(NotificationType.NEW_REVIEW)
+                .priority(NotificationPriority.NORMAL)
+                .title("Review moderation update")
+                .message(event.getMessage())
+                .referenceType("REVIEW")
+                .build();
+
+        notificationService.sendNotification(request);
     }
 }
