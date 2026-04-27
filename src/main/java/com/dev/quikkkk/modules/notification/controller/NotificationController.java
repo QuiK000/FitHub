@@ -2,13 +2,16 @@ package com.dev.quikkkk.modules.notification.controller;
 
 import com.dev.quikkkk.core.dto.MessageResponse;
 import com.dev.quikkkk.core.dto.PageResponse;
+import com.dev.quikkkk.core.utils.SecurityUtils;
 import com.dev.quikkkk.modules.notification.dto.request.BroadcastNotificationRequest;
 import com.dev.quikkkk.modules.notification.dto.request.CreateNotificationRequest;
 import com.dev.quikkkk.modules.notification.dto.response.NotificationResponse;
 import com.dev.quikkkk.modules.notification.dto.response.NotificationSummaryResponse;
+import com.dev.quikkkk.modules.notification.realtime.INotificationRealtimeService;
 import com.dev.quikkkk.modules.notification.service.INotificationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,12 +22,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
 @RequestMapping("/api/v1/notifications")
 @RequiredArgsConstructor
 public class NotificationController {
     private final INotificationService notificationService;
+    private final INotificationRealtimeService notificationRealtimeService;
 
     @PostMapping("/send")
     @PreAuthorize("hasRole('ADMIN')")
@@ -46,6 +51,12 @@ public class NotificationController {
             @RequestParam(defaultValue = "10") int size
     ) {
         return ResponseEntity.ok(notificationService.findAllNotifications(page, size));
+    }
+
+    @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter streamNotifications() {
+        String userId = SecurityUtils.getCurrentUserId();
+        return notificationRealtimeService.subscribe(userId);
     }
 
     @GetMapping("/{notification-id}")
