@@ -93,4 +93,7 @@ public class TrainingSession extends BaseEntity {
 
     @OneToMany(mappedBy = "session")
     private Set<Attendance> attendances = new HashSet<>();
+
+    @OneToMany(mappedBy = "session")
+    private Set<SessionWaitlist> waitlists = new HashSet<>();
 }
