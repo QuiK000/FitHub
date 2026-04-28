@@ -13,6 +13,7 @@ import com.dev.quikkkk.modules.progress.entity.PersonalRecord;
 import com.dev.quikkkk.modules.progress.entity.ProgressPhoto;
 import com.dev.quikkkk.modules.workout.entity.Attendance;
 import com.dev.quikkkk.modules.workout.entity.ClientWorkoutPlan;
+import com.dev.quikkkk.modules.workout.entity.SessionWaitlist;
 import com.dev.quikkkk.modules.workout.entity.TrainingSession;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -132,6 +133,9 @@ public class ClientProfile extends BaseEntity {
 
     @OneToMany(mappedBy = "reviewer")
     private Set<TrainerReview> trainerReviews = new HashSet<>();
+
+    @OneToMany(mappedBy = "client")
+    private Set<SessionWaitlist> waitlistEntries = new HashSet<>();
 
     public void clearPersonalData() {
         this.firstname = null;
