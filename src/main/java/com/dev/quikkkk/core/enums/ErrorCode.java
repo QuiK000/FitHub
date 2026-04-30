@@ -135,6 +135,7 @@ public enum ErrorCode {
     REVIEW_IS_HIDDEN_AND_CANNOT_BE_EDITED("REVIEW_IS_HIDDEN_AND_CANNOT_BE_EDITED", "Review is hidden and cannot be edited", FORBIDDEN),
     WAITLIST_NOT_ALLOWED_FOR_PERSONAL("WAITLIST_NOT_ALLOWED_FOR_PERSONAL", "Waitlist not allowed for personal", FORBIDDEN),
     SESSION_HAS_AVAILABLE_SLOTS("SESSION_HAS_AVAILABLE_SLOTS", "Session has available slots", CONFLICT),
+    CLIENT_ALREADY_IN_WAITLIST("CLIENT_ALREADY_IN_WAITLIST", "Client already in waitlist", CONFLICT),
 
     ;
 
