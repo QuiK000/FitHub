@@ -3,7 +3,7 @@ package com.dev.quikkkk.modules.workout.service;
 import com.dev.quikkkk.modules.workout.dto.response.WaitlistResponse;
 
 public interface IWaitlistService {
-    WaitlistResponse joinWaitlist(String sessionId, String userId);
+    WaitlistResponse joinWaitlist(String sessionId);
 
-    WaitlistResponse leaveWaitlist(String sessionId, String userId);
+    void leaveWaitlist(String sessionId);
 }
