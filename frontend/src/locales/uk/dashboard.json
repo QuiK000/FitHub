@@ -1,0 +1,52 @@
+{
+  "header": {
+    "badge": "Панель управління",
+    "title": "Ласкаво просимо, {{name}}",
+    "subtitle": "Відстежуйте свій прогрес та досягайте фітнес-цілей.",
+    "todayCheckIns": "Сьогоднішні відвідування:",
+    "startSession": "Почати нову сесію"
+  },
+  "stats": {
+    "activeClients": {
+      "label": "Активні клієнти",
+      "description": "Поточні активні членства"
+    },
+    "activeMemberships": {
+      "label": "Активні членства",
+      "description": "Діючі контракти в цьому періоді"
+    },
+    "todayCheckIns": {
+      "label": "Сьогоднішні відвідування",
+      "description": "Зареєстровані прибуття членів"
+    },
+    "monthlyRevenue": {
+      "label": "Місячний дохід",
+      "description": "Від усіх активних членств"
+    }
+  },
+  "chart": {
+    "title": "Тижнева активність",
+    "subtitle": "Щільність та потік сесій протягом тижня.",
+    "legend": "Сесій / день"
+  },
+  "capacity": {
+    "title": "Завантаженість",
+    "percentage": "86%",
+    "peakExpected": "Пік очікується через",
+    "minutes": "{{count}} хв",
+    "status": "Стабільно",
+    "topSession": "Топ сесія",
+    "attendance": "Відвідуваність",
+    "checkIns": "{{count}} відвідувань",
+    "noData": "Дані недоступні"
+  },
+  "highlights": {
+    "title": "Основне",
+    "activeClients": "Активні клієнти",
+    "todayCheckIns": "Сьогоднішні відвідування",
+    "popularSessions": "Відстежувані популярні сесії"
+  },
+  "errors": {
+    "loadFailed": "Не вдалося завантажити аналітику панелі."
+  }
+}

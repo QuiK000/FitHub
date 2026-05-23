@@ -1,0 +1,66 @@
+{
+  "header": {
+    "badge": "Профиль",
+    "title": "{{name}}",
+    "subtitle": "Управляйте личными данными и тренировочными метриками.",
+    "editButton": "Редактировать профиль"
+  },
+  "accountDetails": {
+    "title": "Детали учетной записи",
+    "subtitle": "Основная информация, используемая в FitHub.",
+    "fields": {
+      "email": "Email",
+      "phone": "Телефон",
+      "accountStatus": "Статус учетной записи",
+      "memberSince": "Член с",
+      "birthdate": "Дата рождения",
+      "gender": "Пол"
+    },
+    "status": {
+      "active": "Активный",
+      "inactive": "Неактивный"
+    },
+    "placeholders": {
+      "phone": "Добавить контактный номер",
+      "birthdate": "Добавить дату рождения",
+      "notAvailable": "Недоступно"
+    }
+  },
+  "physicalStats": {
+    "title": "Физические показатели",
+    "subtitle": "Данные, которые тренеры используют для настройки сессий.",
+    "weight": {
+      "label": "Текущий вес",
+      "value": "{{weight}} кг",
+      "placeholder": "Добавить вес"
+    },
+    "height": {
+      "label": "Рост",
+      "value": "{{height}} см",
+      "placeholder": "Добавить рост"
+    },
+    "hydration": {
+      "label": "Ежедневная цель гидратации",
+      "value": "{{target}} мл",
+      "placeholder": "Установить цель"
+    }
+  },
+  "editModal": {
+    "badge": "Редактировать профиль",
+    "subtitle": "Обновите основную информацию и метрики.",
+    "fields": {
+      "firstName": "Имя",
+      "lastName": "Фамилия",
+      "phone": "Телефон",
+      "height": "Рост (см)",
+      "weight": "Вес (кг)",
+      "waterTarget": "Цель воды (мл)"
+    },
+    "cancelButton": "Отменить",
+    "saveButton": "Сохранить изменения"
+  },
+  "loading": "Загрузка профиля...",
+  "errors": {
+    "loadFailed": "Не удалось загрузить ваш профиль."
+  }
+}

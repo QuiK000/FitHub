@@ -1,0 +1,66 @@
+{
+  "header": {
+    "badge": "Профіль",
+    "title": "{{name}}",
+    "subtitle": "Керуйте особистими даними та тренувальними метриками.",
+    "editButton": "Редагувати профіль"
+  },
+  "accountDetails": {
+    "title": "Деталі облікового запису",
+    "subtitle": "Основна інформація, що використовується в FitHub.",
+    "fields": {
+      "email": "Email",
+      "phone": "Телефон",
+      "accountStatus": "Статус облікового запису",
+      "memberSince": "Член з",
+      "birthdate": "Дата народження",
+      "gender": "Стать"
+    },
+    "status": {
+      "active": "Активний",
+      "inactive": "Неактивний"
+    },
+    "placeholders": {
+      "phone": "Додати контактний номер",
+      "birthdate": "Додати дату народження",
+      "notAvailable": "Недоступно"
+    }
+  },
+  "physicalStats": {
+    "title": "Фізичні показники",
+    "subtitle": "Дані, які тренери використовують для налаштування сесій.",
+    "weight": {
+      "label": "Поточна вага",
+      "value": "{{weight}} кг",
+      "placeholder": "Додати вагу"
+    },
+    "height": {
+      "label": "Зріст",
+      "value": "{{height}} см",
+      "placeholder": "Додати зріст"
+    },
+    "hydration": {
+      "label": "Щоденна ціль гідратації",
+      "value": "{{target}} мл",
+      "placeholder": "Встановити ціль"
+    }
+  },
+  "editModal": {
+    "badge": "Редагувати профіль",
+    "subtitle": "Оновіть основну інформацію та метрики.",
+    "fields": {
+      "firstName": "Ім'я",
+      "lastName": "Прізвище",
+      "phone": "Телефон",
+      "height": "Зріст (см)",
+      "weight": "Вага (кг)",
+      "waterTarget": "Ціль води (мл)"
+    },
+    "cancelButton": "Скасувати",
+    "saveButton": "Зберегти зміни"
+  },
+  "loading": "Завантаження профілю...",
+  "errors": {
+    "loadFailed": "Не вдалося завантажити ваш профіль."
+  }
+}

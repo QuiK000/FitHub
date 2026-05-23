@@ -1,0 +1,52 @@
+{
+  "header": {
+    "badge": "Dashboard",
+    "title": "Welcome back, {{name}}",
+    "subtitle": "Track your progress and stay on top of your fitness goals.",
+    "todayCheckIns": "Today's check-ins:",
+    "startSession": "Start new session"
+  },
+  "stats": {
+    "activeClients": {
+      "label": "Active clients",
+      "description": "Currently engaged memberships"
+    },
+    "activeMemberships": {
+      "label": "Active memberships",
+      "description": "Running contracts in this period"
+    },
+    "todayCheckIns": {
+      "label": "Today's check-ins",
+      "description": "Member arrivals logged"
+    },
+    "monthlyRevenue": {
+      "label": "Monthly revenue",
+      "description": "From all active memberships"
+    }
+  },
+  "chart": {
+    "title": "Weekly Activity",
+    "subtitle": "Session density and flow across the week.",
+    "legend": "Sessions / day"
+  },
+  "capacity": {
+    "title": "Capacity",
+    "percentage": "86%",
+    "peakExpected": "Peak expected in",
+    "minutes": "{{count}} min",
+    "status": "Stable",
+    "topSession": "Top session",
+    "attendance": "Attendance",
+    "checkIns": "{{count}} check-ins",
+    "noData": "Data not available"
+  },
+  "highlights": {
+    "title": "Highlights",
+    "activeClients": "Active clients",
+    "todayCheckIns": "Today's check-ins",
+    "popularSessions": "Popular sessions tracked"
+  },
+  "errors": {
+    "loadFailed": "Unable to load dashboard analytics."
+  }
+}

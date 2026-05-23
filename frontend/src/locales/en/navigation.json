@@ -1,0 +1,25 @@
+{
+  "sidebar": {
+    "brand": "FitHub",
+    "subtitle": "Dashboard",
+    "items": {
+      "dashboard": "Dashboard",
+      "workouts": "Workouts",
+      "memberships": "Memberships",
+      "profile": "Profile",
+      "analytics": "Analytics"
+    },
+    "trainingLoad": {
+      "label": "Training Load",
+      "value": "Weekly: {{percentage}}%"
+    },
+    "signOut": "Sign out"
+  },
+  "header": {
+    "todayOverview": "Today's Overview",
+    "performanceHub": "Performance Hub",
+    "liveMembers": "Live members",
+    "online": "{{count}} online",
+    "member": "Member"
+  }
+}
