@@ -1,4 +1,5 @@
-import {FormEvent, useState} from 'react'
+import {useState} from 'react'
+import type {FormEvent} from 'react'
 import {useNavigate} from 'react-router-dom'
 import {motion} from 'framer-motion'
 import {Activity, Droplets, Ruler, UserRound, Weight} from 'lucide-react'

@@ -1,179 +1,187 @@
-import {FormEvent, useMemo, useState} from 'react'
-import {Link, useNavigate, useSearchParams} from 'react-router-dom'
-import {CheckCircle2, Mail, RotateCcw, ShieldCheck} from 'lucide-react'
-import {motion} from 'framer-motion'
-import {resendVerification, verifyEmail} from '../services/auth.service'
-import {Button} from '../components/ui/button'
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '../components/ui/card'
-import {Input} from '../components/ui/input'
-import {Label} from '../components/ui/label'
+import { useMemo, useState } from 'react'
+import type { FormEvent } from 'react'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { CheckCircle2, Mail, RotateCcw, ShieldCheck } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { resendVerification, verifyEmail } from '../services/auth.service'
+import ThemeToggle from '../components/ThemeToggle'
 
 const VerifyEmail = () => {
-    const navigate = useNavigate()
-    const [searchParams] = useSearchParams()
+  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
 
-    const [token, setToken] = useState(searchParams.get('token') ?? '')
-    const [email, setEmail] = useState(searchParams.get('email') ?? '')
-    const [isSubmitting, setIsSubmitting] = useState(false)
-    const [isResending, setIsResending] = useState(false)
-    const [error, setError] = useState<string | null>(null)
-    const [success, setSuccess] = useState<string | null>(null)
-    const [resendSuccess, setResendSuccess] = useState<string | null>(null)
+  const [token, setToken] = useState(searchParams.get('token') ?? '')
+  const [email, setEmail] = useState(searchParams.get('email') ?? '')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isResending, setIsResending] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
+  const [resendSuccess, setResendSuccess] = useState<string | null>(null)
 
-    const tokenPreview = useMemo(() => {
-        if (!token) return '—'
-        if (token.length <= 8) return token
-        return `${token.slice(0, 4)}••••${token.slice(-4)}`
-    }, [token])
+  const tokenPreview = useMemo(() => {
+    if (!token) return '—'
+    if (token.length <= 8) return token
+    return `${token.slice(0, 4)}••••${token.slice(-4)}`
+  }, [token])
 
-    const handleVerify = async (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault()
-        setError(null)
-        setSuccess(null)
-        setIsSubmitting(true)
+  const handleVerify = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setError(null)
+    setSuccess(null)
+    setIsSubmitting(true)
 
-        try {
-            const response = await verifyEmail({token: token.trim()})
-            setSuccess(response.message || 'Email verified successfully. Redirecting...')
-            window.setTimeout(() => {
-                navigate('/login', {replace: true})
-            }, 1000)
-        } catch (err) {
-            console.error(err)
-            setError('Verification failed. Please check the code and try again.')
-        } finally {
-            setIsSubmitting(false)
-        }
+    try {
+      const response = await verifyEmail({ token: token.trim() })
+      setSuccess(response.message || 'Email verified successfully. Redirecting...')
+      window.setTimeout(() => {
+        navigate('/login', { replace: true })
+      }, 1000)
+    } catch (err) {
+      console.error(err)
+      setError('Verification failed. Please check the code and try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleResend = async () => {
+    if (!email.trim()) {
+      setError('Please enter your account email to resend your verification code.')
+      return
     }
 
-    const handleResend = async () => {
-        if (!email.trim()) {
-            setError('Please enter your account email to resend your verification code.')
-            return
-        }
+    setError(null)
+    setResendSuccess(null)
+    setIsResending(true)
 
-        setError(null)
-        setResendSuccess(null)
-        setIsResending(true)
-
-        try {
-            const response = await resendVerification({email: email.trim()})
-            setResendSuccess(response.message || 'Verification code resent successfully.')
-        } catch (err) {
-            console.error(err)
-            setError('Could not resend verification code. Please try again shortly.')
-        } finally {
-            setIsResending(false)
-        }
+    try {
+      const response = await resendVerification({ email: email.trim() })
+      setResendSuccess(response.message || 'Verification code resent successfully.')
+    } catch (err) {
+      console.error(err)
+      setError('Could not resend verification code. Please try again shortly.')
+    } finally {
+      setIsResending(false)
     }
+  }
 
-    return (
-        <div
-            className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 px-4 py-10 text-slate-50">
-            <motion.div
-                initial={{opacity: 0, y: 20}}
-                animate={{opacity: 1, y: 0}}
-                transition={{duration: 0.45, ease: 'easeOut'}}
-                className="w-full max-w-lg"
-            >
-                <Card
-                    className="border-slate-800/80 bg-slate-950/80 shadow-[0_30px_80px_rgba(15,23,42,0.9)] backdrop-blur-2xl">
-                    <CardHeader className="space-y-4">
-                        <div
-                            className="inline-flex w-fit items-center gap-2 rounded-full border border-slate-800 bg-slate-900/80 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-slate-400">
-                            <ShieldCheck className="h-3.5 w-3.5 text-emerald-400"/>
-                            Secure verification
-                        </div>
-                        <div>
-                            <CardTitle>Verify your email address</CardTitle>
-                            <CardDescription>
-                                Enter the verification token sent to your inbox to activate your account.
-                            </CardDescription>
-                        </div>
-                    </CardHeader>
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
+      <div className="absolute right-4 top-4">
+        <ThemeToggle />
+      </div>
 
-                    <CardContent className="space-y-5">
-                        <form onSubmit={handleVerify} className="space-y-4">
-                            <div className="space-y-1.5">
-                                <Label htmlFor="token">Verification token</Label>
-                                <Input
-                                    id="token"
-                                    value={token}
-                                    onChange={(event) => setToken(event.target.value)}
-                                    placeholder="Paste your token"
-                                    required
-                                />
-                                <p className="text-xs text-slate-500">Token preview: {tokenPreview}</p>
-                            </div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-lg"
+      >
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-soft-lg">
+          <div className="mb-6">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-muted px-3 py-1 text-xs text-muted-foreground">
+              <ShieldCheck className="h-3.5 w-3.5 text-success" />
+              Secure verification
+            </div>
+            <h1 className="text-2xl font-bold text-card-foreground">
+              Verify your email address
+            </h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Enter the verification token sent to your inbox to activate your
+              account.
+            </p>
+          </div>
 
-                            <Button type="submit" className="w-full" disabled={isSubmitting || !token.trim()}>
-                                {isSubmitting ? 'Verifying…' : 'Verify email'}
-                            </Button>
-                        </form>
+          <div className="space-y-5">
+            <form onSubmit={handleVerify} className="space-y-4">
+              <div className="space-y-2">
+                <label htmlFor="token" className="text-sm font-medium text-foreground">
+                  Verification token
+                </label>
+                <input
+                  id="token"
+                  value={token}
+                  onChange={(event) => setToken(event.target.value)}
+                  placeholder="Paste your token"
+                  required
+                  className="flex h-10 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground shadow-soft transition-all placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Token preview: {tokenPreview}
+                </p>
+              </div>
 
-                        <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-4">
-                            <div className="mb-3 flex items-center gap-2 text-sm text-slate-200">
-                                <Mail className="h-4 w-4 text-cyan-400"/>
-                                Didn&apos;t receive a code?
-                            </div>
+              <button
+                type="submit"
+                disabled={isSubmitting || !token.trim()}
+                className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-soft transition-all hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isSubmitting ? 'Verifying...' : 'Verify email'}
+              </button>
+            </form>
 
-                            <div className="space-y-3">
-                                <div className="space-y-1.5">
-                                    <Label htmlFor="email">Account email</Label>
-                                    <Input
-                                        id="email"
-                                        type="email"
-                                        value={email}
-                                        onChange={(event) => setEmail(event.target.value)}
-                                        placeholder="you@example.com"
-                                    />
-                                </div>
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    className="w-full"
-                                    disabled={isResending}
-                                    onClick={handleResend}
-                                >
-                                    <RotateCcw className="h-4 w-4"/>
-                                    {isResending ? 'Sending…' : 'Resend code'}
-                                </Button>
-                            </div>
-                        </div>
+            <div className="rounded-xl border border-border bg-muted p-4">
+              <div className="mb-3 flex items-center gap-2 text-sm text-foreground">
+                <Mail className="h-4 w-4 text-primary" />
+                Didn&apos;t receive a code?
+              </div>
 
-                        {error && (
-                            <div
-                                className="rounded-xl border border-red-500/40 bg-red-500/10 px-3 py-2 text-xs text-red-200">
-                                {error}
-                            </div>
-                        )}
+              <div className="space-y-3">
+                <div className="space-y-2">
+                  <label htmlFor="email" className="text-sm font-medium text-foreground">
+                    Account email
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    placeholder="you@example.com"
+                    className="flex h-10 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground shadow-soft transition-all placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
+                  />
+                </div>
+                <button
+                  type="button"
+                  disabled={isResending}
+                  onClick={handleResend}
+                  className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 text-sm font-semibold text-foreground transition-all hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  {isResending ? 'Sending...' : 'Resend code'}
+                </button>
+              </div>
+            </div>
 
-                        {success && (
-                            <div
-                                className="flex items-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200">
-                                <CheckCircle2 className="h-4 w-4"/>
-                                {success}
-                            </div>
-                        )}
+            {error && (
+              <div className="rounded-xl border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                {error}
+              </div>
+            )}
 
-                        {resendSuccess && (
-                            <div
-                                className="rounded-xl border border-cyan-500/40 bg-cyan-500/10 px-3 py-2 text-xs text-cyan-100">
-                                {resendSuccess}
-                            </div>
-                        )}
+            {success && (
+              <div className="flex items-center gap-2 rounded-xl border border-success/40 bg-success/10 px-3 py-2 text-sm text-success">
+                <CheckCircle2 className="h-4 w-4" />
+                {success}
+              </div>
+            )}
 
-                        <p className="text-center text-xs text-slate-500">
-                            Already verified?{' '}
-                            <Link to="/login" className="text-slate-200 underline-offset-2 hover:underline">
-                                Continue to login
-                            </Link>
-                        </p>
-                    </CardContent>
-                </Card>
-            </motion.div>
+            {resendSuccess && (
+              <div className="rounded-xl border border-primary/40 bg-primary/10 px-3 py-2 text-sm text-primary">
+                {resendSuccess}
+              </div>
+            )}
+
+            <p className="text-center text-sm text-muted-foreground">
+              Already verified?{' '}
+              <Link to="/login" className="font-medium text-primary hover:underline">
+                Continue to login
+              </Link>
+            </p>
+          </div>
         </div>
-    )
+      </motion.div>
+    </div>
+  )
 }
 
 export default VerifyEmail

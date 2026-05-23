@@ -138,7 +138,11 @@ const WorkoutCard = ({ assignment }: WorkoutCardProps) => {
       <div className="mt-4 flex items-center justify-between">
         <div className="inline-flex items-center gap-2 rounded-full bg-slate-900/90 px-3 py-1 text-[11px] text-slate-300">
           <User2 className="h-3.5 w-3.5 text-slate-500" />
-          <span>{plan.trainer.fullName}</span>
+          <span>
+            {[plan.trainer.firstname, plan.trainer.lastname]
+              .filter(Boolean)
+              .join(' ') || 'Trainer'}
+          </span>
         </div>
         <Link
           to={`/workouts/${assignment.id}`}

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { Activity, Clock, Dumbbell, PauseCircle } from 'lucide-react'
 import {
   type ClientWorkoutPlanResponse,
+  type WorkoutPlanExerciseResponse,
   type WorkoutPlanResponse,
   getMyAssignmentById,
   getWorkoutPlanById,
