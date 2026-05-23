@@ -1,153 +1,330 @@
-import {NavLink, Outlet, useNavigate} from 'react-router-dom'
-import {Activity, BarChart3, Dumbbell, LogOut, Settings, User2, Users2,} from 'lucide-react'
-import {useAuthStore} from "../store/useAuthStore.ts";
+import { useMemo, useState, type ComponentType, type SVGProps } from 'react'
+import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import {
+  Activity,
+  BarChart3,
+  Bell,
+  CalendarDays,
+  CreditCard,
+  Dumbbell,
+  LogOut,
+  Menu,
+  ShieldCheck,
+  Target,
+  User2,
+  Users2,
+  Utensils,
+  X,
+} from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { useAuthStore } from '../store/useAuthStore'
+import ThemeToggle from '../components/ThemeToggle'
+import LanguageSwitcher from '../components/LanguageSwitcher'
+import type { RoleName } from '../types/user.types'
 
-const navItems = [
-    {to: '/', label: 'Dashboard', icon: BarChart3},
-    {to: '/workouts', label: 'Workouts', icon: Dumbbell},
-    {to: '/memberships', label: 'Memberships', icon: Users2},
-    {to: '/profile', label: 'Profile', icon: User2},
-    {to: '/analytics', label: 'Analytics', icon: Activity},
-]
+type NavItem = {
+  to: string
+  label: string
+  icon: ComponentType<SVGProps<SVGSVGElement>>
+  roles?: RoleName[]
+}
 
 const MainLayout = () => {
-    const navigate = useNavigate()
-    const logout = useAuthStore((state) => state.logout)
+  const navigate = useNavigate()
+  const logout = useAuthStore((state) => state.logout)
+  const user = useAuthStore((state) => state.user)
+  const roles = useAuthStore((state) => state.roles)
+  const { t } = useTranslation(['navigation'])
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
-    const handleLogout = () => {
-        logout()
-        navigate('/login', {replace: true})
-    }
+  const navItems = useMemo<NavItem[]>(
+    () => [
+      {
+        to: '/dashboard',
+        label: t('navigation:sidebar.items.dashboard'),
+        icon: BarChart3,
+      },
+      {
+        to: '/workouts',
+        label: t('navigation:sidebar.items.workouts'),
+        icon: Dumbbell,
+        roles: ['CLIENT', 'TRAINER'],
+      },
+      {
+        to: '/nutrition',
+        label: 'Nutrition',
+        icon: Utensils,
+        roles: ['CLIENT'],
+      },
+      {
+        to: '/progress',
+        label: 'Progress',
+        icon: Target,
+        roles: ['CLIENT'],
+      },
+      {
+        to: '/memberships',
+        label: t('navigation:sidebar.items.memberships'),
+        icon: CreditCard,
+        roles: ['CLIENT', 'ADMIN'],
+      },
+      {
+        to: '/trainers',
+        label: 'Trainers',
+        icon: Users2,
+        roles: ['CLIENT', 'TRAINER', 'ADMIN'],
+      },
+      {
+        to: '/sessions',
+        label: 'Sessions',
+        icon: CalendarDays,
+        roles: ['CLIENT', 'TRAINER'],
+      },
+      {
+        to: '/analytics',
+        label: t('navigation:sidebar.items.analytics'),
+        icon: Activity,
+        roles: ['TRAINER', 'ADMIN'],
+      },
+      {
+        to: '/notifications',
+        label: 'Notifications',
+        icon: Bell,
+      },
+      {
+        to: '/admin',
+        label: 'Admin',
+        icon: ShieldCheck,
+        roles: ['ADMIN'],
+      },
+      {
+        to: '/profile',
+        label: t('navigation:sidebar.items.profile'),
+        icon: User2,
+      },
+    ],
+    [t],
+  )
 
-    return (
-        <div className="flex min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-50">
-            {/* Sidebar */}
-            <aside
-                className="hidden w-64 flex-col border-r border-slate-800/80 bg-slate-950/70 px-4 py-6 backdrop-blur-xl md:flex">
-                <div className="mb-8 flex items-center gap-3 px-2">
-                    <div
-                        className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-tr from-emerald-400 via-cyan-400 to-sky-500 shadow-soft-glow">
-                        <Dumbbell className="h-5 w-5 text-slate-950"/>
-                    </div>
-                    <div>
-                        <p className="text-xs uppercase tracking-[0.25em] text-slate-500">
-                            FitHub
-                        </p>
-                        <p className="text-sm font-medium text-slate-100">
-                            Studio Command Center
-                        </p>
-                    </div>
-                </div>
+  const visibleNavItems = navItems.filter((item) => {
+    if (!item.roles?.length) return true
+    if (!roles.length) return false
+    return item.roles.some((role) => roles.includes(role))
+  })
 
-                <nav className="space-y-1 text-sm font-medium text-slate-400">
-                    {navItems.map((item) => {
-                        const Icon = item.icon
-                        return (
-                            <NavLink
-                                key={item.to}
-                                to={item.to}
-                                className={({isActive}) =>
-                                    [
-                                        'group flex items-center gap-3 rounded-xl px-3 py-2 transition-colors',
-                                        isActive
-                                            ? 'bg-emerald-500/10 text-emerald-300'
-                                            : 'hover:bg-slate-800/70 hover:text-slate-100',
-                                    ].join(' ')
-                                }
-                            >
-                                <Icon className="h-4 w-4 text-slate-500 group-hover:text-emerald-300"/>
-                                <span>{item.label}</span>
-                            </NavLink>
-                        )
-                    })}
-                </nav>
+  const handleLogout = async () => {
+    await logout()
+    setIsMobileMenuOpen(false)
+    navigate('/login', { replace: true })
+  }
 
-                <div className="mt-auto space-y-4 border-t border-slate-800/80 pt-4">
-                    <div className="flex items-center justify-between rounded-xl bg-slate-900/80 px-3 py-3">
-                        <div>
-                            <p className="text-xs font-medium text-slate-400">Training Load</p>
-                            <p className="text-sm font-semibold text-slate-100">Weekly: 78%</p>
-                        </div>
-                        <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-emerald-400 to-cyan-400 p-[2px]">
-                            <div className="flex h-full w-full items-center justify-center rounded-full bg-slate-950">
-                                <Activity className="h-4 w-4 text-emerald-300"/>
-                            </div>
-                        </div>
-                    </div>
+  const fullName = [
+    user?.clientProfile?.firstname ?? user?.trainerProfile?.firstname,
+    user?.clientProfile?.lastname ?? user?.trainerProfile?.lastname,
+  ]
+    .filter(Boolean)
+    .join(' ')
 
-                    <button
-                        type="button"
-                        onClick={handleLogout}
-                        className="flex w-full items-center justify-between rounded-xl border border-slate-800/80 bg-slate-900/80 px-3 py-2 text-xs font-medium text-slate-400 transition hover:border-red-500/60 hover:bg-red-500/5 hover:text-red-300"
-                    >
-            <span className="flex items-center gap-2">
-              <LogOut className="h-3.5 w-3.5"/>
-              Sign out
-            </span>
-                        <span className="rounded-full bg-slate-800/80 px-2 py-0.5 text-[10px] uppercase tracking-wide">
-              Esc
-            </span>
-                    </button>
-                </div>
-            </aside>
+  const userName = fullName || user?.email?.split('@')[0] || 'FitHub member'
+  const roleLabel = roles.length ? roles.join(' / ') : 'Member'
+  const initials = (fullName || user?.email || 'FH')
+    .split(/[\s@.]+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join('')
 
-            {/* Main content */}
-            <div className="flex min-h-screen flex-1 flex-col">
-                {/* Top navbar */}
-                <header className="sticky top-0 z-20 border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-xl">
-                    <div className="flex items-center justify-between px-4 py-3 md:px-8">
-                        <div className="flex items-center gap-3">
-                            <div
-                                className="flex h-9 w-9 items-center justify-center rounded-2xl bg-slate-900/90 md:hidden">
-                                <Dumbbell className="h-4 w-4 text-emerald-300"/>
-                            </div>
-                            <div>
-                                <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-                                    Today&apos;s Overview
-                                </p>
-                                <p className="text-sm font-semibold text-slate-100">
-                                    Central Performance Hub
-                                </p>
-                            </div>
-                        </div>
+  const renderNav = (mobile = false) => (
+    <nav className="space-y-1 text-sm font-medium">
+      {visibleNavItems.map((item) => {
+        const Icon = item.icon
+        return (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            onClick={() => mobile && setIsMobileMenuOpen(false)}
+            className={({ isActive }) =>
+              [
+                'group flex items-center gap-3 rounded-xl px-3 py-2 transition-colors',
+                isActive
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+              ].join(' ')
+            }
+          >
+            <Icon className="h-4 w-4" />
+            <span>{item.label}</span>
+          </NavLink>
+        )
+      })}
+    </nav>
+  )
 
-                        <div className="flex items-center gap-3">
-                            <div
-                                className="hidden items-center gap-2 rounded-full border border-slate-800/80 bg-slate-900/80 px-3 py-1.5 text-xs text-slate-400 md:flex">
-                                <span
-                                    className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_0_6px_rgba(16,185,129,0.35)]"/>
-                                Live members
-                                <span className="rounded-full bg-slate-800 px-2 py-0.5 text-[10px] text-slate-200">
-                  128 online
-                </span>
-                            </div>
-
-                            <button
-                                className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-800/80 bg-slate-900/90 text-slate-400 transition hover:border-slate-700 hover:text-slate-100">
-                                <Settings className="h-4 w-4"/>
-                            </button>
-
-                            <div
-                                className="flex items-center gap-2 rounded-full border border-slate-800/80 bg-slate-900/90 px-2 py-1">
-                                <div
-                                    className="h-7 w-7 rounded-full bg-gradient-to-tr from-slate-700 via-slate-500 to-slate-300"/>
-                                <div className="hidden text-xs leading-tight text-slate-300 md:block">
-                                    <p className="font-medium">Alex Trainer</p>
-                                    <p className="text-[11px] text-slate-500">Head Coach</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </header>
-
-                {/* Routed content */}
-                <main className="flex-1 px-4 py-6 md:px-8 md:py-8">
-                    <Outlet/>
-                </main>
-            </div>
+  const accountSummary = (
+    <div className="rounded-xl border border-border bg-background px-3 py-3">
+      <div className="flex items-center gap-3">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+          {initials || 'FH'}
         </div>
-    )
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold text-foreground">
+            {userName}
+          </p>
+          <p className="truncate text-xs text-muted-foreground">{roleLabel}</p>
+        </div>
+      </div>
+      {user?.email && (
+        <p className="mt-3 truncate text-xs text-muted-foreground">
+          {user.email}
+        </p>
+      )}
+    </div>
+  )
+
+  return (
+    <div className="flex min-h-screen bg-background text-foreground">
+      <aside className="hidden w-64 flex-col border-r border-border bg-card px-4 py-6 md:flex">
+        <div className="mb-8 flex items-center gap-3 px-2">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary">
+            <Dumbbell className="h-5 w-5 text-primary-foreground" />
+          </div>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              {t('navigation:sidebar.brand')}
+            </p>
+            <p className="text-sm font-medium text-foreground">
+              {t('navigation:sidebar.subtitle')}
+            </p>
+          </div>
+        </div>
+
+        {renderNav()}
+
+        <div className="mt-auto space-y-4 border-t border-border pt-4">
+          {accountSummary}
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="flex w-full items-center justify-between rounded-xl border border-border bg-background px-3 py-2 text-xs font-medium text-muted-foreground transition hover:border-destructive/60 hover:bg-destructive/5 hover:text-destructive"
+          >
+            <span className="flex items-center gap-2">
+              <LogOut className="h-3.5 w-3.5" />
+              {t('navigation:sidebar.signOut')}
+            </span>
+          </button>
+        </div>
+      </aside>
+
+      {isMobileMenuOpen && (
+        <button
+          type="button"
+          aria-label="Close navigation overlay"
+          className="fixed inset-0 z-30 bg-background/70 backdrop-blur-sm md:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      <aside
+        className={[
+          'fixed inset-y-0 left-0 z-40 flex w-80 max-w-[86vw] flex-col border-r border-border bg-card px-4 py-5 shadow-soft-lg transition-transform md:hidden',
+          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full',
+        ].join(' ')}
+        aria-hidden={!isMobileMenuOpen}
+      >
+        <div className="mb-6 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary">
+              <Dumbbell className="h-5 w-5 text-primary-foreground" />
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                {t('navigation:sidebar.brand')}
+              </p>
+              <p className="text-sm font-medium text-foreground">
+                {t('navigation:sidebar.subtitle')}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            aria-label="Close navigation"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-background text-muted-foreground transition hover:bg-accent hover:text-foreground"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        {renderNav(true)}
+
+        <div className="mt-auto space-y-4 border-t border-border pt-4">
+          {accountSummary}
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="flex w-full items-center justify-between rounded-xl border border-border bg-background px-3 py-2 text-xs font-medium text-muted-foreground transition hover:border-destructive/60 hover:bg-destructive/5 hover:text-destructive"
+          >
+            <span className="flex items-center gap-2">
+              <LogOut className="h-3.5 w-3.5" />
+              {t('navigation:sidebar.signOut')}
+            </span>
+          </button>
+        </div>
+      </aside>
+
+      <div className="flex min-h-screen flex-1 flex-col">
+        <header className="sticky top-0 z-20 border-b border-border bg-card/80 backdrop-blur-xl">
+          <div className="flex items-center justify-between px-4 py-3 md:px-8">
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                aria-label="Open navigation"
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-background text-muted-foreground transition hover:bg-accent hover:text-foreground md:hidden"
+              >
+                <Menu className="h-4 w-4" />
+              </button>
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary md:hidden">
+                <Dumbbell className="h-4 w-4 text-primary-foreground" />
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  {roleLabel}
+                </p>
+                <p className="text-sm font-semibold text-foreground">
+                  {userName}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <LanguageSwitcher />
+              <ThemeToggle />
+
+              <div className="hidden items-center gap-2 rounded-full border border-border bg-muted px-2 py-1 md:flex">
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                  {initials || 'FH'}
+                </div>
+                <div className="hidden text-xs leading-tight lg:block">
+                  <p className="max-w-32 truncate font-medium text-foreground">
+                    {userName}
+                  </p>
+                  <p className="max-w-32 truncate text-[11px] text-muted-foreground">
+                    {user?.email ?? roleLabel}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <main className="flex-1 px-4 py-6 md:px-8 md:py-8">
+          <Outlet />
+        </main>
+      </div>
+    </div>
+  )
 }
 
 export default MainLayout
-
