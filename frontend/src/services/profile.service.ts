@@ -1,30 +1,15 @@
 import api from './api'
+import type {
+    ClientProfileResponse,
+    CreateClientProfileRequest,
+} from '../types/user.types'
 
-export type ClientGender = 'MALE' | 'FEMALE' | 'OTHER'
-
-export interface CreateClientProfileRequest {
-    firstname: string
-    lastname: string
-    phone: string
-    birthdate: string | null
-    height: number
-    weight: number
-    dailyWaterTarget: number
-    gender: ClientGender
-}
-
-export interface ClientProfileResponse {
-    firstname: string
-    lastname: string
-    phone: string
-    birthdate: string | null
-    height: number | null
-    weight: number | null
-    dailyWaterTarget: number | null
-    gender: ClientGender | null
-    active: boolean
-    createdAt: string
-}
+export type {
+    ClientGender,
+    ClientProfileResponse,
+    CreateClientProfileRequest,
+    UpdateClientProfileRequest,
+} from '../types/user.types'
 
 export const getMyClientProfile = async (): Promise<ClientProfileResponse> => {
     const {data} = await api.get<ClientProfileResponse>('/profile/client/me')

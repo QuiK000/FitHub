@@ -1,23 +1,14 @@
 import api from './api'
+import type {
+  AttendanceStatsResponse,
+  DashboardAnalyticsResponse,
+} from '../types/dashboard.types'
 
-export interface PopularSessionResponse {
-  sessionId: string
-  trainerName: string
-  attendanceCount: number
-}
-
-export interface DashboardAnalyticsResponse {
-  activeClients: number
-  activeMemberships: number
-  revenue: number
-  todayCheckIns: number
-  popularSessions: PopularSessionResponse[]
-}
-
-export interface AttendanceStatsResponse {
-  date: string
-  checkIns: number
-}
+export type {
+  AttendanceStatsResponse,
+  DashboardAnalyticsResponse,
+  PopularSessionResponse,
+} from '../types/dashboard.types'
 
 export const getDashboardAnalytics =
   async (): Promise<DashboardAnalyticsResponse> => {
@@ -34,4 +25,3 @@ export const getAttendanceStats = async (
   })
   return data
 }
-

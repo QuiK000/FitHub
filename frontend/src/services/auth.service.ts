@@ -1,34 +1,27 @@
 import api from './api'
+import type {
+    AuthenticationResponse,
+    ForgotPasswordRequest,
+    LoginRequest,
+    MessageResponse,
+    RefreshTokenRequest,
+    RegistrationRequest,
+    ResendVerificationRequest,
+    ResetPasswordRequest,
+    VerifyEmailRequest,
+} from '../types/auth.types'
 
-export interface LoginRequest {
-    email: string
-    password: string
-}
-
-export interface AuthenticationResponse {
-    accessToken: string
-    refreshToken: string
-    tokenType: string
-}
-
-export interface RegistrationRequest {
-    email: string
-    password: string
-    confirmPassword: string
-}
-
-export interface MessageResponse {
-    message: string
-    timestamp: string
-}
-
-export interface VerifyEmailRequest {
-    token: string
-}
-
-export interface ResendVerificationRequest {
-    email: string
-}
+export type {
+    AuthenticationResponse,
+    ForgotPasswordRequest,
+    LoginRequest,
+    MessageResponse,
+    RefreshTokenRequest,
+    RegistrationRequest,
+    ResendVerificationRequest,
+    ResetPasswordRequest,
+    VerifyEmailRequest,
+} from '../types/auth.types'
 
 export const login = async (
     payload: LoginRequest,
@@ -68,3 +61,36 @@ export const resendVerification = async (
     return data
 }
 
+export const forgotPassword = async (
+    payload: ForgotPasswordRequest,
+): Promise<MessageResponse> => {
+    const {data} = await api.get<MessageResponse>('/account-action/forgot-password', {
+        params: payload,
+    })
+    return data
+}
+
+export const resetPassword = async (
+    payload: ResetPasswordRequest,
+): Promise<MessageResponse> => {
+    const {data} = await api.post<MessageResponse>(
+        '/account-action/reset-password',
+        payload,
+    )
+    return data
+}
+
+export const refreshToken = async (
+    payload: RefreshTokenRequest,
+): Promise<AuthenticationResponse> => {
+    const {data} = await api.post<AuthenticationResponse>(
+        '/auth/refresh-token',
+        payload,
+    )
+    return data
+}
+
+export const logout = async (): Promise<MessageResponse> => {
+    const {data} = await api.post<MessageResponse>('/auth/logout')
+    return data
+}

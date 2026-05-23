@@ -1,29 +1,9 @@
 import api from './api'
+import type { UserResponse } from '../types/user.types'
 
-export interface ClientProfileResponse {
-  firstname: string
-  lastname: string
-  phone: string
-  birthdate: string | null
-  height: number | null
-  weight: number | null
-  dailyWaterTarget: number | null
-  gender: string | null
-  active: boolean
-  createdAt: string
-}
-
-export interface UserResponse {
-  id: string
-  email: string
-  enabled: boolean
-  roles: string[]
-  trainerProfile?: unknown | null
-  clientProfile?: ClientProfileResponse | null
-}
+export type { ClientProfileResponse, UserResponse } from '../types/user.types'
 
 export const getCurrentUser = async (): Promise<UserResponse> => {
   const { data } = await api.get<UserResponse>('/users/me')
   return data
 }
-

@@ -1,95 +1,49 @@
 import api from './api'
+import type {
+    ClientWorkoutPlanResponse,
+    LogWorkoutRequest,
+    WorkoutLogResponse,
+    WorkoutPlanResponse,
+} from '../types/workout.types'
 
-// Enums mirrored from backend; keep as string unions for type-safety
-export type DifficultyLevel = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | string
-export type ClientWorkoutStatus =
-    | 'PENDING'
-    | 'IN_PROGRESS'
-    | 'COMPLETED'
-    | 'CANCELLED'
-    | string
-
-export interface TrainerShortResponse {
-    id: string
-    fullName: string
-}
-
-export interface WorkoutPlanShortResponse {
-    id: string
-    name: string
-    difficultyLevel: DifficultyLevel
-    durationWeeks: number
-    sessionsPerWeek: number
-    trainer: TrainerShortResponse
-}
-
-export interface ExerciseShortResponse {
-    exerciseId: string
-    name: string
-    category: string
-    primaryMuscleGroup: string
-    imageUrl: string | null
-}
-
-export interface WorkoutPlanExerciseResponse {
-    id: string
-    exercise: ExerciseShortResponse
-    dayNumber: number
-    orderIndex: number
-    sets: number | null
-    reps: number | null
-    durationSeconds: number | null
-    restSeconds: number | null
-    notes: string | null
-}
-
-export interface WorkoutPlanResponse {
-    id: string
-    name: string
-    description: string
-    difficultyLevel: DifficultyLevel
-    durationWeeks: number
-    sessionsPerWeek: number
-    active: boolean
-    trainer: TrainerShortResponse
-    exercises: WorkoutPlanExerciseResponse[]
-    createdAt: string
-}
-
-export interface ClientWorkoutPlanResponse {
-    id: string
-    workoutPlan: WorkoutPlanShortResponse
-    assignedDate: string
-    startDate: string | null
-    endDate: string | null
-    status: ClientWorkoutStatus
-    completionPercentage: number | null
-    totalWorkouts: number | null
-    completedWorkouts: number | null
-}
-
-export interface LogWorkoutRequest {
-    exerciseId: string
-    clientWorkoutPlanId: string
-    setsCompleted?: number
-    repsCompleted?: number
-    weightUsed?: number
-    durationSeconds?: number
-    difficultRating?: number
-    notes?: string
-}
-
-export interface WorkoutLogResponse {
-    id: string
-    exercise: ExerciseShortResponse
-    workoutDate: string
-    setsCompleted: number
-    repsCompleted: number
-    weightUsed: number
-    durationSeconds: number
-    difficultyRating: number
-    notes: string | null
-}
+export type {
+    AddExerciseToPlanRequest,
+    AssignWorkoutPlanRequest,
+    AttendanceResponse,
+    AttendanceSessionResponse,
+    AttendanceStatsResponse,
+    CheckInResponse,
+    CheckInTrainingSessionRequest,
+    ClientWorkoutPlanResponse,
+    ClientWorkoutStatus,
+    CreateExerciseRequest,
+    CreateTrainingSessionRequest,
+    CreateWorkoutPlanRequest,
+    DifficultyLevel,
+    ExerciseCategory,
+    ExerciseResponse,
+    ExerciseShortResponse,
+    LogWorkoutRequest,
+    MuscleGroup,
+    ReorderWorkoutPlanExerciseItem,
+    ReorderWorkoutPlanExerciseRequest,
+    SessionShortResponse,
+    TrainingSessionResponse,
+    TrainingStatus,
+    TrainingType,
+    UpdateExerciseRequest,
+    UpdateLogWorkoutRequest,
+    UpdatePlanExerciseRequest,
+    UpdateTrainingSessionRequest,
+    UpdateWorkoutPlanRequest,
+    WaitlistResponse,
+    WaitlistStatus,
+    WorkoutExerciseDetailsRequest,
+    WorkoutLogResponse,
+    WorkoutPlanExerciseResponse,
+    WorkoutPlanResponse,
+    WorkoutPlanShortResponse,
+} from '../types/workout.types'
 
 export const getMyActiveAssignments =
     async (): Promise<ClientWorkoutPlanResponse[]> => {
