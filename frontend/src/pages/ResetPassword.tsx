@@ -1,0 +1,188 @@
+import type { FormEvent } from 'react'
+import { useMemo, useState } from 'react'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { motion } from 'framer-motion'
+import { ArrowLeft, Dumbbell, Lock, ShieldCheck } from 'lucide-react'
+import ThemeToggle from '../components/ThemeToggle'
+import { resetPassword } from '../services/auth.service'
+import { getApiErrorMessage } from '../utils/errorHandler'
+import toast from '../utils/toast'
+
+const ResetPassword = () => {
+  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const [token, setToken] = useState(searchParams.get('token') ?? '')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
+
+  const tokenPreview = useMemo(() => {
+    if (!token) return 'No token provided'
+    if (token.length <= 8) return token
+    return `${token.slice(0, 4)}••••${token.slice(-4)}`
+  }, [token])
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setError(null)
+    setSuccess(null)
+
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters long.')
+      return
+    }
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.')
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      const response = await resetPassword({
+        token: token.trim(),
+        password,
+        confirmPassword,
+      })
+      const message = response.message || 'Your password has been reset.'
+      setSuccess(message)
+      toast.success(message)
+      window.setTimeout(() => {
+        navigate('/login', { replace: true })
+      }, 1200)
+    } catch (err) {
+      console.error(err)
+      const message = getApiErrorMessage(err, 'Unable to reset your password.')
+      setError(message)
+      toast.error(message)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-8">
+      <div className="absolute right-4 top-4">
+        <ThemeToggle />
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md"
+      >
+        <div className="mb-8 text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
+            <Dumbbell className="h-6 w-6 text-primary-foreground" />
+          </div>
+          <h1 className="text-2xl font-bold text-foreground">
+            Choose a new password
+          </h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Use the reset token from your email to secure your FitHub account.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-soft-lg">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="rounded-xl border border-border bg-muted px-3 py-2 text-xs text-muted-foreground">
+              Token preview: {tokenPreview}
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="token" className="text-sm font-medium text-foreground">
+                Reset token
+              </label>
+              <input
+                id="token"
+                required
+                value={token}
+                onChange={(event) => setToken(event.target.value)}
+                className="flex h-10 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground shadow-soft transition-all placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
+                placeholder="Paste your reset token"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="password" className="text-sm font-medium text-foreground">
+                New password
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  id="password"
+                  type="password"
+                  autoComplete="new-password"
+                  required
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  className="flex h-10 w-full rounded-xl border border-border bg-background pl-10 pr-3 text-sm text-foreground shadow-soft transition-all placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
+                  placeholder="At least 8 characters"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label
+                htmlFor="confirmPassword"
+                className="text-sm font-medium text-foreground"
+              >
+                Confirm new password
+              </label>
+              <div className="relative">
+                <ShieldCheck className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  id="confirmPassword"
+                  type="password"
+                  autoComplete="new-password"
+                  required
+                  value={confirmPassword}
+                  onChange={(event) => setConfirmPassword(event.target.value)}
+                  className="flex h-10 w-full rounded-xl border border-border bg-background pl-10 pr-3 text-sm text-foreground shadow-soft transition-all placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
+                  placeholder="Repeat your password"
+                />
+              </div>
+            </div>
+
+            {error && (
+              <div className="rounded-xl border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                {error}
+              </div>
+            )}
+
+            {success && (
+              <div className="rounded-xl border border-success/40 bg-success/10 px-3 py-2 text-sm text-success">
+                {success}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isSubmitting || !token.trim()}
+              className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-soft transition-all hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isSubmitting && (
+                <span className="inline-flex h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+              )}
+              <span>{isSubmitting ? 'Resetting...' : 'Reset password'}</span>
+            </button>
+          </form>
+
+          <Link
+            to="/login"
+            className="mt-6 inline-flex w-full items-center justify-center gap-2 text-sm font-medium text-primary hover:underline"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to sign in
+          </Link>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
+export default ResetPassword
