@@ -42,7 +42,6 @@ public class TrainerProfileController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENT', 'TRAINER')")
     public ResponseEntity<PageResponse<TrainerProfileResponse>> getTrainers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
