@@ -2,6 +2,7 @@ package com.dev.quikkkk.modules.storage.utils;
 
 import com.dev.quikkkk.core.enums.ErrorCode;
 import com.dev.quikkkk.core.exception.BusinessException;
+import lombok.NonNull;
 import org.apache.tomcat.util.http.fileupload.util.LimitedInputStream;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -19,6 +20,7 @@ import java.util.Map;
 
 public class FileHandlerUtils {
     private static final Map<String, String> VIDEO_MIME_TYPES = Map.ofEntries(
+            Map.entry("mp4", "video/mp4"),
             Map.entry("webm", "video/webm"),
             Map.entry("ogg", "video/ogg"),
             Map.entry("mkv", "video/x-matroska"),
@@ -33,9 +35,13 @@ public class FileHandlerUtils {
     );
 
     private static final Map<String, String> IMAGE_MIME_TYPES = Map.ofEntries(
+            Map.entry("jpg", "image/jpeg"),
+            Map.entry("jpeg", "image/jpeg"),
             Map.entry("png", "image/png"),
             Map.entry("gif", "image/gif"),
-            Map.entry("webp", "image/webp")
+            Map.entry("webp", "image/webp"),
+            Map.entry("svg", "image/svg+xml"),
+            Map.entry("avif", "image/avif")
     );
 
     public static String extractFileExtension(String originalFilename) {
@@ -74,10 +80,13 @@ public class FileHandlerUtils {
     }
 
     public static long[] parseRangeHeader(String rangeHeader, long fileLength) {
-        String[] ranges = rangeHeader.replace("bytes=", "").split("_");
+        String rangeValue = rangeHeader.replace("bytes=", "").trim();
+        String[] parts = rangeValue.split("-", 2);
 
-        long rangeStart = Long.parseLong(ranges[0]);
-        long rangeEnd = ranges.length > 1 && !ranges[1].isEmpty() ? Long.parseLong(ranges[1]) : fileLength;
+        long rangeStart = parts[0].isEmpty() ? 0L : Long.parseLong(parts[0].trim());
+        long rangeEnd = (parts.length > 1 && !parts[1].trim().isEmpty())
+                ? Long.parseLong(parts[1].trim())
+                : fileLength - 1;
 
         return new long[]{rangeStart, rangeEnd};
     }
@@ -93,7 +102,7 @@ public class FileHandlerUtils {
         InputStream stream = Channels.newInputStream(channel);
         InputStream limitedStream = new LimitedInputStream(stream, rangeLength) {
             @Override
-            protected void raiseError(long pSizeMax, long pCount) throws IOException {
+            protected void raiseError(long pSizeMax, long pCount) {
                 throw new BusinessException(ErrorCode.INVALID_FILE_RANGE);
             }
         };
@@ -102,6 +111,12 @@ public class FileHandlerUtils {
             @Override
             public long contentLength() {
                 return rangeLength;
+            }
+
+            @Override
+            @NonNull
+            public String getDescription() {
+                return "Range resource [" + rangeStart + ", " + (rangeStart + rangeLength - 1) + "]";
             }
         };
     }
