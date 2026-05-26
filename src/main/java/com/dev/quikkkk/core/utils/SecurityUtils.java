@@ -1,17 +1,15 @@
 package com.dev.quikkkk.core.utils;
 
-import com.dev.quikkkk.modules.workout.entity.WorkoutPlan;
 import com.dev.quikkkk.core.enums.ErrorCode;
 import com.dev.quikkkk.core.exception.BusinessException;
-import com.dev.quikkkk.modules.workout.repository.IWorkoutPlanRepository;
 import com.dev.quikkkk.core.security.UserPrincipal;
+import com.dev.quikkkk.modules.workout.entity.WorkoutPlan;
+import com.dev.quikkkk.modules.workout.repository.IWorkoutPlanRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Component("securityUtils")
 @RequiredArgsConstructor
@@ -43,25 +41,24 @@ public class SecurityUtils {
     }
 
     public static boolean isAdmin() {
-        return currentUser().roles().contains("ROLE_ADMIN");
+        return currentUser().roles().contains("ADMIN");
     }
 
     public static boolean isTrainer() {
-        return currentUser().roles().contains("ROLE_TRAINER");
+        return currentUser().roles().contains("TRAINER");
     }
 
     public static boolean isClient() {
-        return currentUser().roles().contains("ROLE_CLIENT");
+        return currentUser().roles().contains("CLIENT");
     }
 
     @Transactional(readOnly = true)
     public boolean isPlanOwner(String planId) {
         if (isAdmin()) return true;
-        Optional<WorkoutPlan> plan = workoutPlanRepository.findById(planId);
+        WorkoutPlan plan = workoutPlanRepository
+                .findById(planId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.WORKOUT_PLAN_NOT_FOUND));
 
-        if (plan.isEmpty()) return true;
-
-        String planOwnerId = plan.get().getTrainer().getUser().getId();
-        return planOwnerId.equals(getCurrentUserId());
+        return plan.getTrainer().getUser().getId().equals(getCurrentUserId());
     }
 }
