@@ -7,7 +7,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.Executor;
-import java.util.concurrent.ThreadPoolExecutor;
 
 @Configuration
 @EnableAsync
@@ -23,22 +22,22 @@ public class AsyncConfig {
         executor.setQueueCapacity(100);
         executor.setKeepAliveSeconds(60);
 
+        executor.setAllowCoreThreadTimeOut(true);
+
         executor.setThreadNamePrefix("email-");
         executor.setWaitForTasksToCompleteOnShutdown(true);
 
         executor.setAwaitTerminationSeconds(60);
-        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
 
-
-        executor.setRejectedExecutionHandler((r, e) -> {
-            log.warn("Email task rejected, executing in caller thread. Queue size: {}", e.getQueue().size());
-            if (!e.isShutdown()) {
-                r.run();
+        executor.setRejectedExecutionHandler((runnable, pool) -> {
+            log.warn("Email task rejected, executing in caller thread. Queue size: {}", pool.getQueue().size());
+            if (!pool.isShutdown()) {
+                runnable.run();
             }
         });
 
         executor.initialize();
-        log.info("Email TaskExecutor initialized with corePoolSize={}, maxPoolSize={}, queueCapcity={}",
+        log.info("Email TaskExecutor initialized with corePoolSize={}, maxPoolSize={}, queueCapacity={}",
                 executor.getCorePoolSize(),
                 executor.getMaxPoolSize(),
                 executor.getQueueCapacity()
