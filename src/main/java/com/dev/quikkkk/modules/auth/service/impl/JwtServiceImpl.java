@@ -1,18 +1,20 @@
 package com.dev.quikkkk.modules.auth.service.impl;
 
-import com.dev.quikkkk.modules.user.entity.Role;
-import com.dev.quikkkk.modules.user.entity.User;
-import com.dev.quikkkk.modules.auth.enums.JwtTokenType;
 import com.dev.quikkkk.core.exception.BusinessException;
 import com.dev.quikkkk.core.security.JwtKeyProvider;
+import com.dev.quikkkk.modules.auth.enums.JwtTokenType;
 import com.dev.quikkkk.modules.auth.service.IJwtService;
+import com.dev.quikkkk.modules.user.entity.Role;
+import com.dev.quikkkk.modules.user.entity.User;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +27,7 @@ import static com.dev.quikkkk.core.enums.ErrorCode.TOKEN_INVALID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class JwtServiceImpl implements IJwtService {
     private static final String TOKEN_TYPE = "token_type";
     private static final String USER_ID = "user_id";
@@ -32,14 +35,14 @@ public class JwtServiceImpl implements IJwtService {
 
     private final JwtKeyProvider provider;
     private final Cache<@NonNull String, Claims> claimsCache = Caffeine.newBuilder()
-            .maximumSize(10000)
-            .expireAfterWrite(5, TimeUnit.MINUTES)
+            .maximumSize(5_000)
+            .expireAfterWrite(1, TimeUnit.MINUTES)
             .build();
 
-    @Value("${app.security.jwt.access-token-expiration:860000}")
+    @Value("${app.security.jwt.access-token-expiration:3600000}")
     private long accessTokenExpiration;
 
-    @Value("${app.security.jwt.refresh-token-expiration:860000}")
+    @Value("${app.security.jwt.refresh-token-expiration:86400000}")
     private long refreshTokenExpiration;
 
     @Override
@@ -88,7 +91,10 @@ public class JwtServiceImpl implements IJwtService {
         if (!(raw instanceof List<?> list)) throw new BusinessException(TOKEN_INVALID);
 
         return list.stream()
-                .map(String::valueOf)
+                .map(element -> {
+                    if (!(element instanceof String)) throw new BusinessException(TOKEN_INVALID);
+                    return (String) element;
+                })
                 .toList();
     }
 
@@ -97,10 +103,10 @@ public class JwtServiceImpl implements IJwtService {
         return getCachedClaims(token).getExpiration();
     }
 
-    private String buildToken(String email, Map<String, Object> claims, long expiration) {
+    private String buildToken(String subject, Map<String, Object> claims, long expiration) {
         return Jwts.builder()
                 .claims(claims)
-                .subject(email)
+                .subject(subject)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(provider.getPrivateKey())
@@ -130,7 +136,10 @@ public class JwtServiceImpl implements IJwtService {
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
-        } catch (JwtException e) {
+        } catch (ExpiredJwtException e) {
+            log.debug("Parsing claims from expired JWT token");
+            return e.getClaims();
+        } catch (JwtException e){
             throw new BusinessException(TOKEN_INVALID);
         }
     }
