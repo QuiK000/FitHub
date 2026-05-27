@@ -9,14 +9,13 @@ import com.dev.quikkkk.modules.membership.enums.PaymentStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Currency;
 
 @Service
 public class PaymentMapper {
     public Payment toEntity(CreatePaymentRequest request, Membership membership) {
         return Payment.builder()
                 .amount(request.getAmount())
-                .currency(Currency.getInstance(request.getCurrency()))
+                .currency(request.getCurrency())
                 .status(PaymentStatus.PAID)
                 .paymentDate(LocalDateTime.now())
                 .client(membership.getClient())
