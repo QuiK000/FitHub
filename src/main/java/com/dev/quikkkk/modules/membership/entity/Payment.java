@@ -1,12 +1,11 @@
 package com.dev.quikkkk.modules.membership.entity;
 
 import com.dev.quikkkk.core.entity.BaseEntity;
-import com.dev.quikkkk.modules.user.entity.ClientProfile;
+import com.dev.quikkkk.modules.membership.enums.PaymentCurrency;
 import com.dev.quikkkk.modules.membership.enums.PaymentStatus;
-import com.dev.quikkkk.modules.membership.utils.CurrencyConverter;
+import com.dev.quikkkk.modules.user.entity.ClientProfile;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -23,7 +22,6 @@ import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Currency;
 
 @Entity
 @Table(name = "payments")
@@ -36,9 +34,9 @@ public class Payment extends BaseEntity {
     @Column(name = "amount", nullable = false)
     private BigDecimal amount;
 
-    @Convert(converter = CurrencyConverter.class)
+    @Enumerated(EnumType.STRING)
     @Column(name = "currency", nullable = false)
-    private Currency currency;
+    private PaymentCurrency currency;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status", nullable = false)
@@ -47,7 +45,7 @@ public class Payment extends BaseEntity {
     @Column(name = "payment_date", nullable = false)
     private LocalDateTime paymentDate;
 
-    @Column(name = "transaction_hash")
+    @Column(name = "transaction_hash", unique = true)
     private String transactionHash;
 
     @ManyToOne(fetch = FetchType.LAZY)
