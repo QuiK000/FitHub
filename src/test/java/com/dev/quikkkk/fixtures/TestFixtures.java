@@ -1,32 +1,32 @@
 package com.dev.quikkkk.fixtures;
 
-import com.dev.quikkkk.modules.user.dto.request.CreateClientProfileRequest;
-import com.dev.quikkkk.modules.membership.dto.request.CreateMembershipRequest;
-import com.dev.quikkkk.modules.user.dto.request.CreateTrainerProfileRequest;
-import com.dev.quikkkk.modules.workout.dto.request.CreateTrainingSessionRequest;
 import com.dev.quikkkk.modules.auth.dto.request.LoginRequest;
 import com.dev.quikkkk.modules.auth.dto.request.RegistrationRequest;
-import com.dev.quikkkk.modules.user.entity.ClientProfile;
-import com.dev.quikkkk.modules.workout.entity.Exercise;
+import com.dev.quikkkk.modules.membership.dto.request.CreateMembershipRequest;
 import com.dev.quikkkk.modules.membership.entity.Membership;
 import com.dev.quikkkk.modules.membership.entity.Payment;
+import com.dev.quikkkk.modules.membership.enums.MembershipStatus;
+import com.dev.quikkkk.modules.membership.enums.MembershipType;
+import com.dev.quikkkk.modules.membership.enums.PaymentCurrency;
+import com.dev.quikkkk.modules.membership.enums.PaymentStatus;
+import com.dev.quikkkk.modules.user.dto.request.CreateClientProfileRequest;
+import com.dev.quikkkk.modules.user.dto.request.CreateTrainerProfileRequest;
+import com.dev.quikkkk.modules.user.entity.ClientProfile;
 import com.dev.quikkkk.modules.user.entity.Role;
 import com.dev.quikkkk.modules.user.entity.Specialization;
 import com.dev.quikkkk.modules.user.entity.TrainerProfile;
-import com.dev.quikkkk.modules.workout.entity.TrainingSession;
 import com.dev.quikkkk.modules.user.entity.User;
+import com.dev.quikkkk.modules.workout.dto.request.CreateTrainingSessionRequest;
+import com.dev.quikkkk.modules.workout.entity.Exercise;
+import com.dev.quikkkk.modules.workout.entity.TrainingSession;
 import com.dev.quikkkk.modules.workout.enums.ExerciseCategory;
-import com.dev.quikkkk.modules.membership.enums.MembershipStatus;
-import com.dev.quikkkk.modules.membership.enums.MembershipType;
 import com.dev.quikkkk.modules.workout.enums.MuscleGroup;
-import com.dev.quikkkk.modules.membership.enums.PaymentStatus;
 import com.dev.quikkkk.modules.workout.enums.TrainingStatus;
 import com.dev.quikkkk.modules.workout.enums.TrainingType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Currency;
 import java.util.Set;
 import java.util.UUID;
 
@@ -181,7 +181,7 @@ public class TestFixtures {
         return Payment.builder()
                 .id(UUID.randomUUID().toString())
                 .amount(new BigDecimal("100.00"))
-                .currency(Currency.getInstance("USD"))
+                .currency(PaymentCurrency.TRX)
                 .status(PaymentStatus.PAID)
                 .paymentDate(LocalDateTime.now())
                 .client(client)
