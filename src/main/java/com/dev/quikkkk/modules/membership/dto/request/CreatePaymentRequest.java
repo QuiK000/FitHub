@@ -1,5 +1,6 @@
 package com.dev.quikkkk.modules.membership.dto.request;
 
+import com.dev.quikkkk.modules.membership.enums.PaymentCurrency;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -24,8 +25,8 @@ public class CreatePaymentRequest {
     @Positive(message = "VALIDATION.CREATE.PAYMENT.AMOUNT.MUST_BE_POSITIVE")
     private BigDecimal amount;
 
-    @NotBlank(message = "VALIDATION.CREATE.PAYMENT.CURRENCY.NOT_BLANK")
-    private String currency;
+    @NotNull(message = "VALIDATION.CREATE.PAYMENT.CURRENCY.NOT_BLANK")
+    private PaymentCurrency currency;
 
     private String transactionHash;
 }
