@@ -1,26 +1,27 @@
 package com.dev.quikkkk.modules.nutrition.service.impl;
 
+import com.dev.quikkkk.core.dto.MessageResponse;
+import com.dev.quikkkk.core.exception.BusinessException;
+import com.dev.quikkkk.core.functional.MacroExtractor;
+import com.dev.quikkkk.core.mapper.MessageMapper;
+import com.dev.quikkkk.core.utils.SecurityUtils;
 import com.dev.quikkkk.modules.nutrition.dto.request.CreateMealRequest;
 import com.dev.quikkkk.modules.nutrition.dto.request.MealFoodRequest;
 import com.dev.quikkkk.modules.nutrition.dto.request.UpdateMealRequest;
 import com.dev.quikkkk.modules.nutrition.dto.response.MealResponse;
-import com.dev.quikkkk.core.dto.MessageResponse;
-import com.dev.quikkkk.modules.user.entity.ClientProfile;
 import com.dev.quikkkk.modules.nutrition.entity.Food;
 import com.dev.quikkkk.modules.nutrition.entity.MacroNutrients;
 import com.dev.quikkkk.modules.nutrition.entity.Meal;
 import com.dev.quikkkk.modules.nutrition.entity.MealFood;
 import com.dev.quikkkk.modules.nutrition.entity.MealPlan;
-import com.dev.quikkkk.core.exception.BusinessException;
 import com.dev.quikkkk.modules.nutrition.mapper.MealFoodMapper;
 import com.dev.quikkkk.modules.nutrition.mapper.MealMapper;
-import com.dev.quikkkk.core.mapper.MessageMapper;
 import com.dev.quikkkk.modules.nutrition.repository.IFoodRepository;
 import com.dev.quikkkk.modules.nutrition.repository.IMealPlanRepository;
 import com.dev.quikkkk.modules.nutrition.repository.IMealRepository;
 import com.dev.quikkkk.modules.nutrition.service.IMealService;
+import com.dev.quikkkk.modules.user.entity.ClientProfile;
 import com.dev.quikkkk.modules.user.utils.ClientProfileUtils;
-import com.dev.quikkkk.core.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -134,91 +135,76 @@ public class MealServiceImpl implements IMealService {
     }
 
     private void validateAccess(Meal meal) {
-        String userId = SecurityUtils.getCurrentUserId();
-        if (!meal.getCreatedBy().equals(userId)) {
+        ClientProfile client = clientProfileUtils.getCurrentClientProfile();
+        if (!meal.getMealPlan().getClient().getId().equals(client.getId())) {
+            log.warn("Access denied for meal {} for client {}", meal.getId(), client.getId());
             throw new BusinessException(FORBIDDEN_ACCESS);
         }
     }
 
     private void calculateMealNutrition(Meal meal) {
         int totalCalories = meal.getFoods().stream()
-                .mapToInt(MealFood::getTotalCalories)
+                .mapToInt(mf -> mf.getTotalCalories() != null ? mf.getTotalCalories() : 0)
                 .sum();
 
-        MacroNutrients totalMacros = calculateTotalMacros(meal.getFoods());
-
         meal.setCalories(totalCalories);
-        meal.setMacros(totalMacros);
+        meal.setMacros(calculateTotalMacros(meal.getFoods()));
     }
 
     private void updateMealPlanStatistics(MealPlan mealPlan) {
         int totalCalories = mealPlan.getMeals().stream()
-                .mapToInt(Meal::getCalories)
+                .mapToInt(mf -> mf.getCalories() != null ? mf.getCalories() : 0)
                 .sum();
 
-        MacroNutrients totalMacros = calculatePlanMacros(mealPlan.getMeals());
-
         mealPlan.setTotalCalories(totalCalories);
-        mealPlan.setMacros(totalMacros);
+        mealPlan.setMacros(calculatePlanMacros(mealPlan.getMeals()));
     }
 
     private MacroNutrients calculatePlanMacros(Set<Meal> meals) {
-        double totalProtein = meals.stream()
-                .mapToDouble(m -> m.getMacros().getProtein())
-                .sum();
-
-        double totalCarbs = meals.stream()
-                .mapToDouble(m -> m.getMacros().getCarbs())
-                .sum();
-
-        double totalFats = meals.stream()
-                .mapToDouble(m -> m.getMacros().getFats())
-                .sum();
-
-        double totalFiber = meals.stream()
-                .mapToDouble(m -> m.getMacros().getFiber())
-                .sum();
-
-        double totalSugar = meals.stream()
-                .mapToDouble(m -> m.getMacros().getSugar())
-                .sum();
+        double protein = meals.stream()
+                .mapToDouble(m -> safeDouble(m.getMacros(), MacroNutrients::getProtein)).sum();
+        double carbs = meals.stream()
+                .mapToDouble(m -> safeDouble(m.getMacros(), MacroNutrients::getCarbs)).sum();
+        double fats = meals.stream()
+                .mapToDouble(m -> safeDouble(m.getMacros(), MacroNutrients::getFats)).sum();
+        double fiber = meals.stream()
+                .mapToDouble(m -> safeDouble(m.getMacros(), MacroNutrients::getFiber)).sum();
+        double sugar = meals.stream()
+                .mapToDouble(m -> safeDouble(m.getMacros(), MacroNutrients::getSugar)).sum();
 
         return MacroNutrients.builder()
-                .protein(totalProtein)
-                .carbs(totalCarbs)
-                .fats(totalFats)
-                .fiber(totalFiber)
-                .sugar(totalSugar)
+                .protein(protein)
+                .carbs(carbs)
+                .fats(fats)
+                .fiber(fiber)
+                .sugar(sugar)
                 .build();
     }
 
     private MacroNutrients calculateTotalMacros(Set<MealFood> mealFoods) {
-        double totalProtein = mealFoods.stream()
-                .mapToDouble(mf -> mf.getTotalMacros().getProtein())
-                .sum();
-
-        double totalCarbs = mealFoods.stream()
-                .mapToDouble(mf -> mf.getTotalMacros().getCarbs())
-                .sum();
-
-        double totalFats = mealFoods.stream()
-                .mapToDouble(mf -> mf.getTotalMacros().getFats())
-                .sum();
-
-        double totalFiber = mealFoods.stream()
-                .mapToDouble(mf -> mf.getTotalMacros().getFiber())
-                .sum();
-
-        double totalSugar = mealFoods.stream()
-                .mapToDouble(mf -> mf.getTotalMacros().getSugar())
-                .sum();
+        double protein = mealFoods.stream()
+                .mapToDouble(mf -> safeDouble(mf.getTotalMacros(), MacroNutrients::getProtein)).sum();
+        double carbs = mealFoods.stream()
+                .mapToDouble(mf -> safeDouble(mf.getTotalMacros(), MacroNutrients::getCarbs)).sum();
+        double fats = mealFoods.stream()
+                .mapToDouble(mf -> safeDouble(mf.getTotalMacros(), MacroNutrients::getFats)).sum();
+        double fiber = mealFoods.stream()
+                .mapToDouble(mf -> safeDouble(mf.getTotalMacros(), MacroNutrients::getFiber)).sum();
+        double sugar = mealFoods.stream()
+                .mapToDouble(mf -> safeDouble(mf.getTotalMacros(), MacroNutrients::getSugar)).sum();
 
         return MacroNutrients.builder()
-                .protein(totalProtein)
-                .carbs(totalCarbs)
-                .fats(totalFats)
-                .sugar(totalSugar)
-                .fiber(totalFiber)
+                .protein(protein)
+                .carbs(carbs)
+                .fats(fats)
+                .fiber(fiber)
+                .sugar(sugar)
                 .build();
+    }
+
+    private double safeDouble(MacroNutrients macros, MacroExtractor extractor) {
+        if (macros == null) return 0.0;
+        Double value = extractor.get(macros);
+        return value != null ? value : 0.0;
     }
 }
