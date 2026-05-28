@@ -101,6 +101,7 @@ const MainLayout = () => {
         to: '/profile',
         label: t('navigation:sidebar.items.profile'),
         icon: User2,
+        roles: ['CLIENT'],
       },
     ],
     [t],
