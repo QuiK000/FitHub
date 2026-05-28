@@ -1,5 +1,4 @@
 import { useEffect } from 'react'
-import axios from 'axios'
 import {
     BarChart3,
     Bell,
@@ -15,8 +14,6 @@ import {
     Navigate,
     Route,
     Routes,
-    useLocation,
-    useNavigate,
 } from 'react-router-dom'
 import { Toaster } from 'sonner'
 
@@ -35,19 +32,15 @@ import ResetPassword from './pages/ResetPassword'
 import ShellPage from './pages/ShellPage'
 
 import ProtectedRoute from './components/ProtectedRoute'
+import ClientOnboardingGate from './components/ClientOnboardingGate'
 
-import { getMyClientProfile } from './services/profile.service'
 import { useAuthStore } from './store/useAuthStore'
 import { ThemeProvider } from './contexts/ThemeContext'
 
 const AppRoutes = () => {
     const token = useAuthStore((state) => state.token)
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
-    const roles = useAuthStore((state) => state.roles)
     const fetchCurrentUser = useAuthStore((state) => state.fetchCurrentUser)
-
-    const navigate = useNavigate()
-    const location = useLocation()
 
     useEffect(() => {
         if (!token && !isAuthenticated) {
@@ -55,26 +48,7 @@ const AppRoutes = () => {
         }
 
         void fetchCurrentUser()
-
-        if (
-            location.pathname === '/onboarding' ||
-            !roles.includes('CLIENT')
-        ) {
-            return
-        }
-
-        void getMyClientProfile().catch((profileErr) => {
-            if (
-                axios.isAxiosError(profileErr) &&
-                (profileErr.response?.status === 404 ||
-                    profileErr.response?.status === 500)
-            ) {
-                navigate('/onboarding', { replace: true })
-            } else {
-                console.error('Unexpected profile lookup error', profileErr)
-            }
-        })
-    }, [fetchCurrentUser, isAuthenticated, location.pathname, navigate, roles, token])
+    }, [fetchCurrentUser, isAuthenticated, token])
 
     return (
         <Routes>
@@ -86,10 +60,13 @@ const AppRoutes = () => {
             <Route path="/reset-password" element={<ResetPassword />} />
 
             <Route element={<ProtectedRoute />}>
+                <Route element={<ClientOnboardingGate />}>
                 <Route element={<MainLayout />}>
                     <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/onboarding" element={<Onboarding />} />
+                    <Route element={<ProtectedRoute allowedRoles={['CLIENT']} />}>
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/onboarding" element={<Onboarding />} />
+                    </Route>
                     <Route
                         path="/trainers"
                         element={
@@ -170,6 +147,7 @@ const AppRoutes = () => {
                             }
                         />
                     </Route>
+                </Route>
                 </Route>
             </Route>
 
