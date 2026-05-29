@@ -16,6 +16,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -67,6 +68,7 @@ public class ClientWorkoutPlan extends BaseEntity {
     private Double completionPercentage;
 
     @OneToMany(mappedBy = "clientWorkoutPlan", cascade = CascadeType.ALL)
+    @Builder.Default
     private Set<WorkoutLog> workoutLogs = new HashSet<>();
 
     public void start() {

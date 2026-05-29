@@ -17,6 +17,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -89,11 +90,14 @@ public class TrainingSession extends BaseEntity {
                     @Index(name = "idx_training_client_client", columnList = "client_id")
             }
     )
+    @Builder.Default
     private Set<ClientProfile> clients = new HashSet<>();
 
     @OneToMany(mappedBy = "session")
+    @Builder.Default
     private Set<Attendance> attendances = new HashSet<>();
 
     @OneToMany(mappedBy = "session")
+    @Builder.Default
     private Set<SessionWaitlist> waitlists = new HashSet<>();
 }

@@ -15,6 +15,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -56,6 +57,7 @@ public class Exercise extends BaseEntity {
     @CollectionTable(name = "exercise_secondary_muscles", joinColumns = @JoinColumn(name = "exercise_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "muscle_group")
+    @Builder.Default
     private Set<MuscleGroup> secondaryMuscleGroups = new HashSet<>();
 
     @Column(name = "video_url")
@@ -71,8 +73,10 @@ public class Exercise extends BaseEntity {
     private boolean active;
 
     @OneToMany(mappedBy = "exercise")
+    @Builder.Default
     private Set<WorkoutLog> workoutLogs = new HashSet<>();
 
     @OneToMany(mappedBy = "exercise")
+    @Builder.Default
     private Set<PersonalRecord> personalRecords = new HashSet<>();
 }

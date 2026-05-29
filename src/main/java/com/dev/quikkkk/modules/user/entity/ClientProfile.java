@@ -27,6 +27,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -102,39 +103,51 @@ public class ClientProfile extends BaseEntity {
     private List<Membership> memberships;
 
     @ManyToMany(mappedBy = "clients")
+    @Builder.Default
     private Set<TrainingSession> trainingSessions = new HashSet<>();
 
     @OneToMany(mappedBy = "client")
+    @Builder.Default
     private Set<Attendance> attendances = new HashSet<>();
 
     @OneToMany(mappedBy = "client")
+    @Builder.Default
     private Set<Payment> payments = new HashSet<>();
 
     @OneToMany(mappedBy = "client")
+    @Builder.Default
     private Set<ClientWorkoutPlan> workoutPlans = new HashSet<>();
 
     @OneToMany(mappedBy = "client")
+    @Builder.Default
     private Set<MealPlan> mealPlans = new HashSet<>();
 
     @OneToMany(mappedBy = "client")
+    @Builder.Default
     private Set<WaterIntake> waterIntakes = new HashSet<>();
 
     @OneToMany(mappedBy = "client")
+    @Builder.Default
     private Set<BodyMeasurement> bodyMeasurements = new HashSet<>();
 
     @OneToMany(mappedBy = "client")
+    @Builder.Default
     private Set<Goal> goals = new HashSet<>();
 
     @OneToMany(mappedBy = "client")
+    @Builder.Default
     private Set<PersonalRecord> personalRecords = new HashSet<>();
 
     @OneToMany(mappedBy = "client")
+    @Builder.Default
     private Set<ProgressPhoto> progressPhotos = new HashSet<>();
 
     @OneToMany(mappedBy = "reviewer")
+    @Builder.Default
     private Set<TrainerReview> trainerReviews = new HashSet<>();
 
     @OneToMany(mappedBy = "client")
+    @Builder.Default
     private Set<SessionWaitlist> waitlistEntries = new HashSet<>();
 
     public void clearPersonalData() {

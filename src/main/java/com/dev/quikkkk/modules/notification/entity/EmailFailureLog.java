@@ -8,6 +8,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -40,9 +41,11 @@ public class EmailFailureLog extends BaseEntity {
     private String errorMessage;
 
     @Column(name = "attempt_count", nullable = false)
+    @Builder.Default
     private Integer attemptCount = 0;
 
     @Column(name = "retry_scheduled", nullable = false)
+    @Builder.Default
     private Boolean retryScheduled = false;
 
     @Column(name = "next_retry_at")

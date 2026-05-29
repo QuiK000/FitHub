@@ -26,6 +26,7 @@ public class CreateTrainerProfileRequest {
     private String lastname;
 
     @NotEmpty(message = "VALIDATION.CREATE.TRAINER.PROFILE.SPECIALIZATION.NOT_NULL")
+    @Builder.Default
     private Set<String> specializationIds = new HashSet<>();
 
     @Positive(message = "VALIDATION.CREATE.TRAINER.PROFILE.EXPERIENCE.YEARS.MUST.BE.POSITIVE")

@@ -16,6 +16,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -69,6 +70,7 @@ public class TrainerProfile extends BaseEntity {
                     @Index(name = "idx_trainer_spec_spec", columnList = "specialization_id")
             }
     )
+    @Builder.Default
     private Set<Specialization> specialization = new HashSet<>();
 
     @Column(name = "experience_years")
@@ -85,12 +87,15 @@ public class TrainerProfile extends BaseEntity {
     private User user;
 
     @OneToMany(mappedBy = "trainer", fetch = FetchType.LAZY)
+    @Builder.Default
     private Set<TrainingSession> trainingSessions = new HashSet<>();
 
     @OneToMany(mappedBy = "trainer",  cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private Set<WorkoutPlan> workoutPlans = new HashSet<>();
 
     @OneToMany(mappedBy = "trainer")
+    @Builder.Default
     private Set<TrainerReview> trainerReviews = new HashSet<>();
 
     public void clearPersonalData() {

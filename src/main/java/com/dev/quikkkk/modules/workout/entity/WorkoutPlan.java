@@ -67,5 +67,6 @@ public class WorkoutPlan extends BaseEntity {
     private Set<WorkoutPlanExercise> exercises = new HashSet<>();
 
     @OneToMany(mappedBy = "workoutPlan")
+    @Builder.Default
     private Set<ClientWorkoutPlan> clientAssignments = new HashSet<>();
 }
