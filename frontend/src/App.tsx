@@ -6,7 +6,6 @@ import {
     CreditCard,
     ShieldCheck,
     Target,
-    Utensils,
     Users,
 } from 'lucide-react'
 import {
@@ -25,6 +24,7 @@ import Register from './pages/Register'
 import Profile from './pages/Profile'
 import Workouts from './pages/Workouts'
 import WorkoutDetail from './pages/WorkoutDetail'
+import Nutrition from './pages/Nutrition'
 import VerifyEmail from './pages/VerifyEmail'
 import Onboarding from './pages/Onboarding'
 import ForgotPassword from './pages/ForgotPassword'
@@ -102,16 +102,7 @@ const AppRoutes = () => {
                         />
                     </Route>
                     <Route element={<ProtectedRoute allowedRoles={['CLIENT']} />}>
-                        <Route
-                            path="/nutrition"
-                            element={
-                                <ShellPage
-                                    title="Nutrition"
-                                    description="Meal plans, food search, water intake, and weekly macro tracking will live here."
-                                    icon={Utensils}
-                                />
-                            }
-                        />
+                        <Route path="/nutrition" element={<Nutrition />} />
                         <Route
                             path="/progress"
                             element={
