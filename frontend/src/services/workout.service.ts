@@ -1,7 +1,9 @@
 import api from './api'
+import type { PageResponse } from '../types/common.types'
 import type {
     ClientWorkoutPlanResponse,
     LogWorkoutRequest,
+    TrainingSessionResponse,
     WorkoutLogResponse,
     WorkoutPlanResponse,
 } from '../types/workout.types'
@@ -73,6 +75,14 @@ export const getMyAssignmentById = async (
     return data
 }
 
+export const getMyAssignments =
+    async (): Promise<ClientWorkoutPlanResponse[]> => {
+        const {data} = await api.get<ClientWorkoutPlanResponse[]>(
+            '/workout-plans/my-assignments',
+        )
+        return data
+    }
+
 export const getWorkoutPlanById = async (
     workoutPlanId: string,
 ): Promise<WorkoutPlanResponse> => {
@@ -92,3 +102,29 @@ export const logWorkout = async (
     return data
 }
 
+export const getMyWorkoutLogs = async (
+    page = 0,
+    size = 10,
+): Promise<PageResponse<WorkoutLogResponse>> => {
+    const {data} = await api.get<PageResponse<WorkoutLogResponse>>(
+        '/workout-logs/my-logs',
+        {
+            params: {page, size},
+        },
+    )
+    return data
+}
+
+export const getTrainingSessions = async (
+    page = 0,
+    size = 10,
+    search?: string,
+): Promise<PageResponse<TrainingSessionResponse>> => {
+    const {data} = await api.get<PageResponse<TrainingSessionResponse>>(
+        '/sessions',
+        {
+            params: {page, size, search},
+        },
+    )
+    return data
+}
