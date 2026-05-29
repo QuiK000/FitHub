@@ -15,6 +15,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -57,6 +58,9 @@ public class User extends BaseEntity {
     @Column(name = "user_enabled", nullable = false)
     private boolean enabled;
 
+    @Column(name = "telegram_chat_id", unique = true)
+    private String telegramChatId;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_roles",
@@ -67,9 +71,11 @@ public class User extends BaseEntity {
                     @Index(name = "idx_user_roles_role", columnList = "role_id")
             }
     )
+    @Builder.Default
     private Set<Role> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @Builder.Default
     private Set<VerificationToken> verificationTokens = new HashSet<>();
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
