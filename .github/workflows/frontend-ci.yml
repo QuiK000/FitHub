@@ -1,0 +1,51 @@
+name: Frontend CI/CD
+on:
+  push:
+    branches: [ "main", "master" ]
+    paths:
+      - 'frontend/**
+      - '.github/workflows/frontend-ci.yml'
+  pull_request:
+    branches: [ "main", "master" ]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend-ci.yml'
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  validate-and-build:
+    name: Validate & Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          cache-dependency-path: './frontend/package-lock.json'
+      - name: Install dependencies
+        run : npm ci
+      - name: Check vulnerabilities (Audit)
+        run: npm audit --audit-level=high
+        continue-on-error: true
+      - name: Run Linter
+        run: npm run lint
+      - name: Run Type Check
+        run: npx tsc --noEmit
+      - name: Run Tests
+        run: npm run test --if-present
+      - name: Build Application
+        run: npm run build
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v7
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/head/master')
+        with:
+          name: frontend-dist
+          path: ./frontend/dist
+          retention-days: 7
