@@ -1,19 +1,19 @@
 package com.dev.quikkkk.modules.auth.service.impl;
 
-import com.dev.quikkkk.modules.auth.dto.request.ResetPasswordRequest;
 import com.dev.quikkkk.core.dto.MessageResponse;
-import com.dev.quikkkk.modules.user.entity.User;
-import com.dev.quikkkk.modules.auth.entity.VerificationToken;
-import com.dev.quikkkk.modules.auth.enums.TokenType;
 import com.dev.quikkkk.core.exception.BusinessException;
 import com.dev.quikkkk.core.mapper.MessageMapper;
-import com.dev.quikkkk.modules.user.repository.IUserRepository;
+import com.dev.quikkkk.core.ratelimit.IRateLimitService;
+import com.dev.quikkkk.core.utils.ServiceUtils;
+import com.dev.quikkkk.modules.auth.dto.request.ResetPasswordRequest;
+import com.dev.quikkkk.modules.auth.entity.VerificationToken;
+import com.dev.quikkkk.modules.auth.enums.TokenType;
 import com.dev.quikkkk.modules.auth.repository.IVerificationTokenRepository;
 import com.dev.quikkkk.modules.auth.service.IAccountActionService;
-import com.dev.quikkkk.modules.notification.service.IEmailService;
-import com.dev.quikkkk.core.ratelimit.IRateLimitService;
 import com.dev.quikkkk.modules.auth.service.IVerificationTokenService;
-import com.dev.quikkkk.core.utils.ServiceUtils;
+import com.dev.quikkkk.modules.notification.service.IEmailService;
+import com.dev.quikkkk.modules.user.entity.User;
+import com.dev.quikkkk.modules.user.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -53,6 +53,7 @@ public class AccountActionServiceImpl implements IAccountActionService {
         userRepository.save(user);
         tokenRepository.save(verificationToken);
 
+        log.info("Email verified for user: {}", user.getEmail());
         return messageMapper.message("Email verified successfully!");
     }
 
@@ -74,6 +75,7 @@ public class AccountActionServiceImpl implements IAccountActionService {
         userRepository.findByEmailIgnoreCase(email).ifPresent(user -> {
             String token = verificationTokenService.createVerificationCode(TokenType.PASSWORD_RESET, user.getId());
             emailService.sendForgotPasswordEmail(email, token);
+            log.info("Password reset email dispatched for: {}", email);
         });
 
         return messageMapper.message("If an account with this email exists, a password link has been sent.");
@@ -81,6 +83,8 @@ public class AccountActionServiceImpl implements IAccountActionService {
 
     @Override
     public MessageResponse resetPassword(ResetPasswordRequest request) {
+        if (!request.getPassword().equals(request.getConfirmPassword())) throw new BusinessException(PASSWORD_MISMATCH);
+
         VerificationToken verificationToken = getValidResetToken(request.getToken(), TokenType.PASSWORD_RESET);
         User user = verificationToken.getUser();
 
@@ -89,19 +93,25 @@ public class AccountActionServiceImpl implements IAccountActionService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         verificationToken.setUsed(true);
 
+        userRepository.save(user);
+        tokenRepository.save(verificationToken);
+
+        log.info("Password reset successfully for user: {}", user.getEmail());
         return messageMapper.message("Password has been reset successfully!");
     }
 
-    private VerificationToken getValidResetToken(String token, TokenType type) {
-        VerificationToken verificationToken = tokenRepository.findByTokenAndUsedFalse(token)
+    private VerificationToken getValidResetToken(String token, TokenType expectedType) {
+        VerificationToken verificationToken = tokenRepository
+                .findByTokenAndUsedFalse(token)
                 .orElseThrow(() -> new BusinessException(VERIFICATION_TOKEN_INVALID));
 
-        if (verificationToken.getType() != type) {
-            log.error("Invalid token type");
+        if (verificationToken.getType() != expectedType) {
+            log.warn("Token type mismatch: expected={}, actual={}", expectedType, verificationToken.getType());
             throw new BusinessException(VERIFICATION_TOKEN_TYPE_INVALID);
         }
+
         if (verificationToken.getExpiresAt().isBefore(LocalDateTime.now())) {
-            log.error("Invalid token expires at");
+            log.warn("Token expired at: {}", verificationToken.getExpiresAt());
             throw new BusinessException(VERIFICATION_TOKEN_EXPIRED);
         }
 
