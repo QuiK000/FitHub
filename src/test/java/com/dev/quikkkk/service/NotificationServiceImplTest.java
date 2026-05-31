@@ -1,6 +1,7 @@
 package com.dev.quikkkk.service;
 
 import com.dev.quikkkk.modules.notification.entity.Notification;
+import com.dev.quikkkk.modules.notification.realtime.INotificationRealtimeService;
 import com.dev.quikkkk.modules.user.entity.User;
 import com.dev.quikkkk.modules.notification.enums.NotificationType;
 import com.dev.quikkkk.modules.notification.event.NotificationEvent;
@@ -43,6 +44,9 @@ class NotificationServiceImplTest {
 
     @Mock
     private ValueOperations<String, String> valueOperations;
+
+    @Mock
+    private INotificationRealtimeService notificationRealtimeService;
 
     @InjectMocks
     private NotificationServiceImpl notificationService;
