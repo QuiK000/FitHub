@@ -47,10 +47,19 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        try {
-            String jwt = authHeader.substring(BEARER_PREFIX.length()).trim();
+        String jwt = authHeader.substring(BEARER_PREFIX.length()).trim();
 
+        try {
             if (!JwtTokenType.ACCESS.name().equals(jwtService.extractTokenType(jwt))) {
+                log.debug("Non-access token type for request: {}", request.getRequestURI());
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            if (tokenBlacklistService.isTokenBlacklisted(jwt)) {
+                log.debug("JWT token is blacklisted for request: {}", request.getRequestURI());
+                SecurityContextHolder.clearContext();
+
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -62,14 +71,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
             if (jwtService.isTokenExpired(jwt)) {
                 log.debug("JWT token is expired for request: {}", request.getRequestURI());
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-            if (tokenBlacklistService.isTokenBlacklisted(jwt)) {
-                log.debug("JWT token is blacklisted for request: {}", request.getRequestURI());
-                SecurityContextHolder.clearContext();
-
                 filterChain.doFilter(request, response);
                 return;
             }
