@@ -15,6 +15,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -40,7 +41,8 @@ public class Payment extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status", nullable = false)
-    private PaymentStatus status;
+    @Builder.Default
+    private PaymentStatus status = PaymentStatus.PENDING;
 
     @Column(name = "payment_date", nullable = false)
     private LocalDateTime paymentDate;
