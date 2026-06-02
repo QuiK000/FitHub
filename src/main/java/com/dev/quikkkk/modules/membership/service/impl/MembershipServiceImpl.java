@@ -1,22 +1,24 @@
 package com.dev.quikkkk.modules.membership.service.impl;
 
+import com.dev.quikkkk.core.dto.PageResponse;
+import com.dev.quikkkk.core.exception.BusinessException;
+import com.dev.quikkkk.core.utils.PaginationUtils;
 import com.dev.quikkkk.modules.membership.dto.request.CreateMembershipRequest;
 import com.dev.quikkkk.modules.membership.dto.request.ExtendMembershipRequest;
 import com.dev.quikkkk.modules.membership.dto.response.MembershipHistoryResponse;
 import com.dev.quikkkk.modules.membership.dto.response.MembershipResponse;
 import com.dev.quikkkk.modules.membership.dto.response.MembershipValidationResponse;
-import com.dev.quikkkk.core.dto.PageResponse;
-import com.dev.quikkkk.modules.user.entity.ClientProfile;
 import com.dev.quikkkk.modules.membership.entity.Membership;
+import com.dev.quikkkk.modules.membership.entity.Payment;
 import com.dev.quikkkk.modules.membership.enums.MembershipStatus;
 import com.dev.quikkkk.modules.membership.enums.MembershipType;
-import com.dev.quikkkk.core.exception.BusinessException;
+import com.dev.quikkkk.modules.membership.enums.PaymentStatus;
 import com.dev.quikkkk.modules.membership.mapper.MembershipMapper;
-import com.dev.quikkkk.modules.user.repository.IClientProfileRepository;
 import com.dev.quikkkk.modules.membership.repository.IMembershipRepository;
 import com.dev.quikkkk.modules.membership.service.IMembershipService;
+import com.dev.quikkkk.modules.user.entity.ClientProfile;
+import com.dev.quikkkk.modules.user.repository.IClientProfileRepository;
 import com.dev.quikkkk.modules.user.utils.ClientProfileUtils;
-import com.dev.quikkkk.core.utils.PaginationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -93,8 +95,9 @@ public class MembershipServiceImpl implements IMembershipService {
     public MembershipResponse activateMembership(String membershipId) {
         Membership membership = findMembershipById(membershipId);
 
-        if (membership.getStatus() != MembershipStatus.CREATED)
+        if (membership.getStatus() != MembershipStatus.CREATED) {
             throw new BusinessException(MEMBERSHIP_STATUS_NOT_ACTIVATABLE);
+        }
 
         boolean hasActive = membershipRepository.existsByClientIdAndStatus(
                 membership.getClient().getId(),
@@ -107,11 +110,11 @@ public class MembershipServiceImpl implements IMembershipService {
         membership.setStartDate(LocalDateTime.now());
 
         if (membership.getType() != MembershipType.VISITS) {
-            if (membership.getDurationMonths() == null) throw new BusinessException(MEMBERSHIP_DURATION_REQUIRED);
+            if (membership.getDurationMonths() == null) {
+                throw new BusinessException(MEMBERSHIP_DURATION_REQUIRED);
+            }
 
-            membership.setEndDate(
-                    membership.getStartDate().plusMonths(membership.getDurationMonths())
-            );
+            membership.setEndDate(membership.getStartDate().plusMonths(membership.getDurationMonths()));
         }
 
         membershipRepository.save(membership);
@@ -272,6 +275,20 @@ public class MembershipServiceImpl implements IMembershipService {
                 .build();
     }
 
+    @Override
+    @Transactional
+    public void processSuccessfulPayment(String membershipId, Payment payment) {
+        Membership membership = findMembershipById(membershipId);
+        membership.setPayment(payment);
+
+        if (payment.getStatus() == PaymentStatus.PAID) {
+            activateMembershipInternal(membership);
+        }
+
+        membershipRepository.save(membership);
+        log.info("Payment {} linked to membership {}", payment.getId(), membershipId);
+    }
+
     private void validateCreateRequest(CreateMembershipRequest request) {
         switch (request.getType()) {
             case VISITS -> {
@@ -285,6 +302,43 @@ public class MembershipServiceImpl implements IMembershipService {
                 }
             }
         }
+    }
+
+    private void activateMembershipInternal(Membership membership) {
+        validateMembershipCanBeActivated(membership);
+        validateClientHasNoActiveMembership(membership);
+
+        membership.setStatus(MembershipStatus.ACTIVE);
+        membership.setStartDate(LocalDateTime.now());
+
+        if (membership.getType() != MembershipType.VISITS) {
+            initializeMembershipPeriod(membership);
+        }
+    }
+
+    private void validateMembershipCanBeActivated(Membership membership) {
+        if (membership.getStatus() != MembershipStatus.CREATED) {
+            throw new BusinessException(MEMBERSHIP_STATUS_NOT_ACTIVATABLE);
+        }
+    }
+
+    private void validateClientHasNoActiveMembership(Membership membership) {
+        boolean hasActive = membershipRepository.existsByClientIdAndStatus(
+                membership.getClient().getId(),
+                MembershipStatus.ACTIVE
+        );
+
+        if (hasActive) {
+            throw new BusinessException(CLIENT_ALREADY_HAS_ACTIVE_MEMBERSHIP);
+        }
+    }
+
+    private void initializeMembershipPeriod(Membership membership) {
+        if (membership.getDurationMonths() == null) {
+            throw new BusinessException(MEMBERSHIP_DURATION_REQUIRED);
+        }
+
+        membership.setEndDate(membership.getStartDate().plusMonths(membership.getDurationMonths()));
     }
 
     private Membership findMembershipById(String membershipId) {

@@ -6,6 +6,7 @@ import com.dev.quikkkk.modules.membership.dto.response.MembershipHistoryResponse
 import com.dev.quikkkk.modules.membership.dto.response.MembershipResponse;
 import com.dev.quikkkk.modules.membership.dto.response.MembershipValidationResponse;
 import com.dev.quikkkk.core.dto.PageResponse;
+import com.dev.quikkkk.modules.membership.entity.Payment;
 
 public interface IMembershipService {
     MembershipResponse createMembership(CreateMembershipRequest request);
@@ -27,4 +28,6 @@ public interface IMembershipService {
     MembershipHistoryResponse getMembershipClientHistory();
 
     MembershipValidationResponse validateMembership(String clientId);
+
+    void processSuccessfulPayment(String membershipId, Payment payment);
 }

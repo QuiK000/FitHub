@@ -36,6 +36,7 @@ import static com.dev.quikkkk.core.enums.ErrorCode.MEMBERSHIP_FROZEN;
 import static com.dev.quikkkk.core.enums.ErrorCode.MEMBERSHIP_NOT_FOUND;
 import static com.dev.quikkkk.core.enums.ErrorCode.PAYMENT_VALIDATION_ERROR;
 import static com.dev.quikkkk.core.enums.ErrorCode.TRANSACTION_ALREADY_USED;
+import static com.dev.quikkkk.core.enums.ErrorCode.UNSUPPORTED_CURRENCY;
 
 @Service
 @RequiredArgsConstructor
@@ -53,50 +54,19 @@ public class PaymentServiceImpl implements IPaymentService {
     @Transactional
     public PaymentResponse createPayment(CreatePaymentRequest request) {
         ClientProfile client = clientProfileUtils.getCurrentClientProfile();
-        Membership membership = membershipRepository.findById(request.getMembershipId())
+        Membership membership = membershipRepository
+                .findById(request.getMembershipId())
                 .orElseThrow(() -> new BusinessException(MEMBERSHIP_NOT_FOUND));
 
-        if (!membership.getClient().getId().equals(client.getId()))
-            throw new BusinessException(CLIENT_MEMBERSHIP_NOT_FOUND);
+        validateMembershipOwnership(membership, client);
+        validateMembershipStatus(membership);
 
-        switch (membership.getStatus()) {
-            case ACTIVE -> throw new BusinessException(MEMBERSHIP_ALREADY_ACTIVATED);
-            case EXPIRED -> throw new BusinessException(MEMBERSHIP_EXPIRED);
-            case CANCELLED -> throw new BusinessException(MEMBERSHIP_CANCELLED);
-            case FROZEN -> throw new BusinessException(MEMBERSHIP_FROZEN);
-        }
+        Payment payment = preparePayment(request, membership, client);
+        payment = savePayment(payment);
 
-        Payment payment = paymentMapper.toEntity(request, membership);
+        membershipService.processSuccessfulPayment(membership.getId(), payment);
+        log.info("Payment {} successfully processed for membership {}", payment.getId(), membership.getId());
 
-        payment.setClient(client);
-        payment.setPaymentDate(LocalDateTime.now());
-
-        switch (request.getCurrency()) {
-            case TRX -> processTronPayment(request, payment);
-            case BTC, ETH, USDT -> log.debug("BTC, ETH, USDT"); // TODO
-            case USD, EUR, UAH -> log.debug("USD, EUR, UAH"); // TODO
-            default -> {
-                log.warn("Unsupported currency attempted: {}", request.getCurrency());
-                throw new BusinessException(PAYMENT_VALIDATION_ERROR);
-            }
-        }
-
-        try {
-            payment = paymentRepository.saveAndFlush(payment);
-        } catch (DataIntegrityViolationException e) {
-            log.error("Transaction hash collision detected for hash: {}", request.getTransactionHash());
-            throw new BusinessException(TRANSACTION_ALREADY_USED);
-        }
-
-        membership.setPayment(payment);
-        membershipRepository.save(membership);
-
-        if (PaymentStatus.PAID.equals(payment.getStatus())) {
-            membershipService.activateMembership(membership.getId());
-            log.info("Membership {} automatically activated via service.", membership.getId());
-        }
-
-        log.info("Payment process completed successfully for membership id: {}", membership.getId());
         return paymentMapper.toResponse(payment);
     }
 
@@ -113,7 +83,8 @@ public class PaymentServiceImpl implements IPaymentService {
     @Override
     @Transactional(readOnly = true)
     public PageResponse<PaymentResponse> getPaymentsByClientId(String clientId, int page, int size) {
-        ClientProfile client = clientProfileRepository.findById(clientId)
+        ClientProfile client = clientProfileRepository
+                .findById(clientId)
                 .orElseThrow(() -> new BusinessException(CLIENT_PROFILE_NOT_FOUND));
         Pageable pageable = PaginationUtils.createPageRequest(page, size, "paymentDate");
         Page<Payment> paymentPage = paymentRepository.findPaymentsByClientId(client.getId(), pageable);
@@ -121,18 +92,58 @@ public class PaymentServiceImpl implements IPaymentService {
         return PaginationUtils.toPageResponse(paymentPage, paymentMapper::toResponse);
     }
 
-    private void processTronPayment(CreatePaymentRequest request, Payment payment) {
-        if (request.getTransactionHash() == null || request.getTransactionHash().isBlank())
-            throw new BusinessException(PAYMENT_VALIDATION_ERROR);
+    private Payment preparePayment(CreatePaymentRequest request, Membership membership, ClientProfile client) {
+        Payment payment = paymentMapper.toEntity(request, membership);
 
-        if (paymentRepository.existsByTransactionHash(request.getTransactionHash()))
-            throw new BusinessException(TRANSACTION_ALREADY_USED);
+        payment.setClient(client);
+        payment.setPaymentDate(LocalDateTime.now());
+        payment.setStatus(PaymentStatus.PENDING);
 
-        tronPaymentValidator.validateTransaction(request.getTransactionHash(), request.getAmount());
+        switch (request.getCurrency()) {
+            case TRX -> processTrxPayment(request, payment);
+            case BTC, ETH, USDT -> log.debug("Crypto payment pending implementation: {}", request.getCurrency());
+            case USD, EUR, UAH -> log.debug("Fiat payment pending implementation: {}", request.getCurrency());
+            default -> throw new BusinessException(UNSUPPORTED_CURRENCY);
+        }
 
+        return payment;
+    }
+
+    private void processTrxPayment(CreatePaymentRequest request, Payment payment) {
+        validateTronPayment(request);
         payment.setTransactionHash(request.getTransactionHash());
         payment.setStatus(PaymentStatus.PAID);
+    }
 
-        log.info("TRX payment validated successfully: {}", request.getTransactionHash());
+    private Payment savePayment(Payment payment) {
+        try {
+            return paymentRepository.saveAndFlush(payment);
+        } catch (DataIntegrityViolationException e) {
+            throw new BusinessException(TRANSACTION_ALREADY_USED);
+        }
+    }
+
+    private void validateTronPayment(CreatePaymentRequest request) {
+        if (request.getTransactionHash() == null || request.getTransactionHash().isBlank()) {
+            throw new BusinessException(PAYMENT_VALIDATION_ERROR);
+        }
+
+        tronPaymentValidator.validateTransaction(request.getTransactionHash(), request.getAmount());
+    }
+
+    private void validateMembershipOwnership(Membership membership, ClientProfile client) {
+        if (!membership.getClient().getId().equals(client.getId())) {
+            throw new BusinessException(CLIENT_MEMBERSHIP_NOT_FOUND);
+        }
+    }
+
+    private void validateMembershipStatus(Membership membership) {
+        switch (membership.getStatus()) {
+            case ACTIVE -> throw new BusinessException(MEMBERSHIP_ALREADY_ACTIVATED);
+            case EXPIRED -> throw new BusinessException(MEMBERSHIP_EXPIRED);
+            case CANCELLED -> throw new BusinessException(MEMBERSHIP_CANCELLED);
+            case FROZEN -> throw new BusinessException(MEMBERSHIP_FROZEN);
+            default -> { /* CREATED - proceed */ }
+        }
     }
 }

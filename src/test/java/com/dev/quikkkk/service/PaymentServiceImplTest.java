@@ -31,11 +31,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-
 
 @ExtendWith(MockitoExtension.class)
 public class PaymentServiceImplTest {
@@ -60,60 +61,150 @@ public class PaymentServiceImplTest {
     @InjectMocks
     private PaymentServiceImpl paymentService;
 
-    private ClientProfile mockClient;
-    private Membership mockMembership;
-    private CreatePaymentRequest mockRequest;
+    private ClientProfile client;
+    private Membership membership;
+    private CreatePaymentRequest request;
 
     @BeforeEach
     void setUp() {
-        mockClient = new ClientProfile();
-        mockClient.setId("client-123");
+        client = new ClientProfile();
+        client.setId("client-123");
 
-        mockMembership = new Membership();
-        mockMembership.setId("mem-123");
-        mockMembership.setClient(mockClient);
-        mockMembership.setStatus(MembershipStatus.CREATED);
+        membership = new Membership();
+        membership.setId("membership-123");
+        membership.setClient(client);
+        membership.setStatus(MembershipStatus.CREATED);
 
-        mockRequest = new CreatePaymentRequest();
-        mockRequest.setMembershipId("mem-123");
-        mockRequest.setCurrency(PaymentCurrency.TRX);
-        mockRequest.setTransactionHash("hash-123");
-        mockRequest.setAmount(BigDecimal.valueOf(100.0));
+        request = new CreatePaymentRequest();
+        request.setMembershipId("membership-123");
+        request.setCurrency(PaymentCurrency.TRX);
+        request.setTransactionHash("trx-hash");
+        request.setAmount(BigDecimal.valueOf(100));
     }
 
     @Test
-    void createPayment_Success_ActivatesMembership() {
-        Payment mockPayment = new Payment();
-        mockPayment.setStatus(PaymentStatus.PENDING);
+    void createPayment_ShouldProcessSuccessfulPayment() {
+        Payment payment = new Payment();
 
-        when(clientProfileUtils.getCurrentClientProfile()).thenReturn(mockClient);
-        when(membershipRepository.findById("mem-123")).thenReturn(Optional.of(mockMembership));
-        when(paymentMapper.toEntity(any(), any())).thenReturn(mockPayment);
-        when(paymentRepository.existsByTransactionHash(anyString())).thenReturn(false);
-        when(paymentRepository.saveAndFlush(any())).thenReturn(mockPayment);
+        when(clientProfileUtils.getCurrentClientProfile()).thenReturn(client);
+        when(membershipRepository.findById(membership.getId())).thenReturn(Optional.of(membership));
 
-        paymentService.createPayment(mockRequest);
+        when(paymentMapper.toEntity(any(), any())).thenReturn(payment);
+        when(paymentRepository.saveAndFlush(any(Payment.class))).thenReturn(payment);
 
-        assertEquals("hash-123", mockPayment.getTransactionHash());
-        assertEquals(PaymentStatus.PAID, mockPayment.getStatus());
+        paymentService.createPayment(request);
 
-        verify(membershipService, times(1)).activateMembership("mem-123");
-        verify(membershipRepository, times(1)).save(mockMembership);
+        assertEquals(PaymentStatus.PAID, payment.getStatus());
+        assertEquals("trx-hash", payment.getTransactionHash());
+
+        verify(tronPaymentValidator).validateTransaction(request.getTransactionHash(), request.getAmount());
+        verify(membershipService).processSuccessfulPayment(eq(membership.getId()), same(payment));
     }
 
     @Test
-    void createPayment_RaceConditionDetected_ThrowsException() {
-        Payment mockPayment = new Payment();
+    void createPayment_ShouldThrowWhenMembershipNotFound() {
+        when(clientProfileUtils.getCurrentClientProfile()).thenReturn(client);
+        when(membershipRepository.findById(anyString())).thenReturn(Optional.empty());
 
-        when(clientProfileUtils.getCurrentClientProfile()).thenReturn(mockClient);
-        when(membershipRepository.findById("mem-123")).thenReturn(Optional.of(mockMembership));
-        when(paymentMapper.toEntity(any(), any())).thenReturn(mockPayment);
-        when(paymentRepository.existsByTransactionHash(anyString())).thenReturn(false);
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> paymentService.createPayment(request));
+        assertEquals(ErrorCode.MEMBERSHIP_NOT_FOUND, exception.getErrorCode());
 
-        when(paymentRepository.saveAndFlush(any())).thenThrow(DataIntegrityViolationException.class);
-        BusinessException exception = assertThrows(BusinessException.class, () -> paymentService.createPayment(mockRequest));
+        verifyNoInteractions(paymentRepository);
+        verifyNoInteractions(membershipService);
+    }
+
+    @Test
+    void createPayment_ShouldThrowWhenMembershipBelongsToAnotherClient() {
+        ClientProfile anotherClient = new ClientProfile();
+
+        anotherClient.setId("another-client");
+        membership.setClient(anotherClient);
+
+        when(clientProfileUtils.getCurrentClientProfile()).thenReturn(client);
+        when(membershipRepository.findById(membership.getId())).thenReturn(Optional.of(membership));
+
+        BusinessException exception = assertThrows(BusinessException.class, () -> paymentService.createPayment(request));
+
+        assertEquals(ErrorCode.CLIENT_MEMBERSHIP_NOT_FOUND, exception.getErrorCode());
+        verifyNoInteractions(paymentRepository);
+    }
+
+    @Test
+    void createPayment_ShouldThrowWhenMembershipAlreadyActive() {
+        membership.setStatus(MembershipStatus.ACTIVE);
+
+        when(clientProfileUtils.getCurrentClientProfile()).thenReturn(client);
+        when(membershipRepository.findById(membership.getId())).thenReturn(Optional.of(membership));
+
+        BusinessException exception = assertThrows(BusinessException.class, () -> paymentService.createPayment(request));
+
+        assertEquals(ErrorCode.MEMBERSHIP_ALREADY_ACTIVATED, exception.getErrorCode());
+        verifyNoInteractions(paymentRepository);
+    }
+
+    @Test
+    void createPayment_ShouldThrowWhenTransactionHashIsBlank() {
+        request.setTransactionHash(" ");
+        Payment payment = new Payment();
+
+        when(clientProfileUtils.getCurrentClientProfile()).thenReturn(client);
+        when(membershipRepository.findById(membership.getId())).thenReturn(Optional.of(membership));
+
+        when(paymentMapper.toEntity(any(), any())).thenReturn(payment);
+        BusinessException exception = assertThrows(BusinessException.class, () -> paymentService.createPayment(request));
+
+        assertEquals(ErrorCode.PAYMENT_VALIDATION_ERROR, exception.getErrorCode());
+        verify(paymentRepository, never()).saveAndFlush(any());
+    }
+
+    @Test
+    void createPayment_ShouldThrowWhenTransactionAlreadyUsed() {
+        Payment payment = new Payment();
+
+        when(clientProfileUtils.getCurrentClientProfile()).thenReturn(client);
+        when(membershipRepository.findById(membership.getId())).thenReturn(Optional.of(membership));
+
+        when(paymentMapper.toEntity(any(), any())).thenReturn(payment);
+        when(paymentRepository.saveAndFlush(any(Payment.class)))
+                .thenThrow(new DataIntegrityViolationException("duplicate key"));
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> paymentService.createPayment(request));
 
         assertEquals(ErrorCode.TRANSACTION_ALREADY_USED, exception.getErrorCode());
-        verify(membershipService, never()).activateMembership(anyString());
+        verify(membershipService, never()).processSuccessfulPayment(anyString(), any());
+    }
+
+    @Test
+    void createPayment_ShouldThrowWhenMembershipExpired() {
+        membership.setStatus(MembershipStatus.EXPIRED);
+
+        when(clientProfileUtils.getCurrentClientProfile()).thenReturn(client);
+        when(membershipRepository.findById(membership.getId())).thenReturn(Optional.of(membership));
+
+        BusinessException exception = assertThrows(BusinessException.class, () -> paymentService.createPayment(request));
+        assertEquals(ErrorCode.MEMBERSHIP_EXPIRED, exception.getErrorCode());
+    }
+
+    @Test
+    void createPayment_ShouldThrowWhenMembershipFrozen() {
+        membership.setStatus(MembershipStatus.FROZEN);
+
+        when(clientProfileUtils.getCurrentClientProfile()).thenReturn(client);
+        when(membershipRepository.findById(membership.getId())).thenReturn(Optional.of(membership));
+
+        BusinessException exception = assertThrows(BusinessException.class, () -> paymentService.createPayment(request));
+        assertEquals(ErrorCode.MEMBERSHIP_FROZEN, exception.getErrorCode());
+    }
+
+    @Test
+    void createPayment_ShouldThrowWhenMembershipCancelled() {
+        membership.setStatus(MembershipStatus.CANCELLED);
+
+        when(clientProfileUtils.getCurrentClientProfile()).thenReturn(client);
+        when(membershipRepository.findById(membership.getId())).thenReturn(Optional.of(membership));
+
+        BusinessException exception = assertThrows(BusinessException.class, () -> paymentService.createPayment(request));
+        assertEquals(ErrorCode.MEMBERSHIP_CANCELLED, exception.getErrorCode());
     }
 }
