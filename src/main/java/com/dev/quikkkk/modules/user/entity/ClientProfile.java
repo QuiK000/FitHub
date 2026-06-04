@@ -158,8 +158,8 @@ public class ClientProfile extends BaseEntity {
     }
 
     public int resolveDailyWaterTarget() {
-        if (dailyWaterTarget != null) return dailyWaterTarget;
-        if (weight > 0) return (int) (weight * 35);
+        if (dailyWaterTarget != null && dailyWaterTarget > 0) return dailyWaterTarget;
+        if (weight != null && weight > 0) return (int) (weight * 35);
         return 2500;
     }
 }
