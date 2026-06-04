@@ -1,9 +1,9 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/fithub_testdb}?prepareThreshold=0
-    username: ${DB_USERNAME:testuser}
-    password: ${DB_PASSWORD:testpassword}
+    url: jdbc:postgresql://localhost:5432/fithub_testdb?prepareThreshold=0
+    username: testuser
+    password: testpassword
 
   jpa:
     hibernate:
@@ -20,7 +20,7 @@ spring:
     redis:
       host: localhost
       port: 6379
-      password: testPassword
+      password:
 
   mail:
     host: localhost
@@ -45,6 +45,8 @@ app:
       access-token-expiration: 3600000
       refresh-token-expiration: 86400000
     disposable-email: mailinator,tempmail,guerrillamail
+  cors:
+    allowed-origins: http://localhost:4200,http://localhost:5173
 
 logging:
   level:
@@ -57,9 +59,9 @@ tron:
   api:
     url: https://nile.trongrid.io
   wallet:
-    address: ${TEST_WALLET}
+    address: ${TEST_WALLET:}
 
 telegram:
   bot:
-    token: ${TELEGRAM_TOKEN}
-    api-url: ${API_TELEGRAM_URL}
+    token: ${TELEGRAM_TOKEN:}
+    api-url: ${API_TELEGRAM_URL:https://api.telegram.org/bot}

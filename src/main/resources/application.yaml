@@ -1,26 +1,15 @@
 spring:
   application:
     name: FitHub
+  profiles:
+    default: dev
   config:
     import: optional:file:env.properties
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: ${DB_URL}?prepareThreshold=0
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    hikari:
-      maximum-pool-size: 10
-      minimum-idle: 5
-      connection-timeout: 30000
-      idle-timeout: 600000
-      max-lifetime: 1800000
   jpa:
-    show-sql: true
     hibernate:
       ddl-auto: validate
     properties:
       hibernate:
-        format_sql: true
         jdbc:
           batch_size: 20
         order_updates: true
@@ -34,32 +23,6 @@ spring:
     sql-migration-separator: __
     sql-migration-suffixes: .sql
     table: flyway_schema_history
-  mail:
-    host: ${MAIL_HOST}
-    port: ${MAIL_PORT}
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: false
-          starttls:
-            enabled: false
-            required: false
-          connectiontimeout: 5000
-          timeout: 5000
-          writetimeout: 5000
-  data:
-    redis:
-      host: ${REDIS_HOST}
-      password: ${REDIS_PASSWORD}
-      timeout: 2000ms
-      lettuce:
-        pool:
-          max-active: 20
-          max-idle: 10
-          min-idle: 5
-          max-wait: -1ms
   task:
     execution:
       pool:
@@ -72,13 +35,7 @@ app:
   email:
     max-retry-attempts: 3
     retry-delay-minutes: 5
-  frontend:
-    url: ${FRONTEND_URL}
   security:
-    jwt:
-      auto-generate: true
-      access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
-      refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
     disposable-email: 10minutemail,20minutemail,33mail,5ymail,anonbox,guerrillamail,mailinator,maildrop,mailnesia,moakt,my10minutemail,throwawaymail,trashmail,temp-mail,tempmail,truemail,yopmail
 
 file:
@@ -87,12 +44,6 @@ file:
     image-dir: uploads/images
 
 logging:
-  level:
-    root: INFO
-    com.dev.quikkkk: DEBUG
-    org.springframework.security: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
   pattern:
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
   file:
@@ -102,12 +53,12 @@ tron:
   api:
     url: https://nile.trongrid.io
   wallet:
-    address: ${TEST_WALLET}
+    address: ${TEST_WALLET:}
 
 telegram:
   bot:
-    token: ${TELEGRAM_TOKEN}
-    api-url: ${API_TELEGRAM_URL}
+    token: ${TELEGRAM_TOKEN:}
+    api-url: ${API_TELEGRAM_URL:https://api.telegram.org/bot}
 
 management:
   endpoints:

@@ -1,0 +1,63 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/fithub_db}?prepareThreshold=0
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1025}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enabled: false
+            required: false
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:password123}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 20
+          max-idle: 10
+          min-idle: 5
+          max-wait: -1ms
+
+app:
+  frontend:
+    url: ${FRONTEND_URL:http://localhost:5173}
+  security:
+    jwt:
+      auto-generate: true
+      access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:86400000}
+      refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:684000000}
+  cors:
+    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:4200,http://localhost:5173}
+
+logging:
+  level:
+    root: INFO
+    com.dev.quikkkk: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
