@@ -88,8 +88,6 @@ public class AccountActionServiceImpl implements IAccountActionService {
         VerificationToken verificationToken = getValidResetToken(request.getToken(), TokenType.PASSWORD_RESET);
         User user = verificationToken.getUser();
 
-        if (!request.getPassword().equals(request.getConfirmPassword())) throw new BusinessException(PASSWORD_MISMATCH);
-
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         verificationToken.setUsed(true);
 
