@@ -497,6 +497,7 @@ cp env.example env.properties
 For the development compose file, these values are enough to boot locally:
 
 ```properties
+SPRING_PROFILES_ACTIVE=dev
 DB_URL=jdbc:postgresql://localhost:5432/fithub_db
 DB_USERNAME=postgres
 DB_PASSWORD=postgres
@@ -505,10 +506,12 @@ MAIL_PORT=1025
 MAIL_USERNAME=
 MAIL_PASSWORD=
 REDIS_HOST=localhost
+REDIS_PORT=6379
 REDIS_PASSWORD=password123
 JWT_ACCESS_TOKEN_EXPIRATION=86400000
 JWT_REFRESH_TOKEN_EXPIRATION=684000000
 FRONTEND_URL=http://localhost:5173
+APP_CORS_ALLOWED_ORIGINS=http://localhost:4200,http://localhost:5173
 TEST_WALLET=
 TELEGRAM_TOKEN=
 API_TELEGRAM_URL=https://api.telegram.org/bot
@@ -555,10 +558,29 @@ VITE_API_BASE_URL=http://localhost:8080/api/v1
 
 ## Configuration
 
-Backend configuration is loaded from `src/main/resources/application.yaml` and optionally imports the root-level `env.properties` file.
+Backend configuration is loaded from `src/main/resources/application.yaml` and optionally imports the root-level `env.properties` file. Spring profiles are split into:
+
+| Profile | File | Use case |
+| --- | --- | --- |
+| `dev` | `application-dev.yaml` | Local development. This is the default profile when no profile is provided. |
+| `prod` | `application-prod.yaml` | Production/container runtime with stricter logging and JWT auto-generation disabled. |
+| `test` | `application-test.yaml` | Automated tests and integration tests. |
+
+Run a specific profile with:
+
+```bash
+SPRING_PROFILES_ACTIVE=prod ./mvnw spring-boot:run
+```
+
+On Windows:
+
+```powershell
+$env:SPRING_PROFILES_ACTIVE="prod"; .\mvnw.cmd spring-boot:run
+```
 
 | Variable | Required | Description |
 | --- | --- | --- |
+| `SPRING_PROFILES_ACTIVE` | Optional | Active Spring profile. Defaults to `dev` locally; the Docker image sets `prod`. |
 | `DB_URL` | Yes | PostgreSQL JDBC URL without the `prepareThreshold=0` suffix. The app appends it in `application.yaml`. |
 | `DB_USERNAME` | Yes | PostgreSQL username. |
 | `DB_PASSWORD` | Yes | PostgreSQL password. |
@@ -567,10 +589,12 @@ Backend configuration is loaded from `src/main/resources/application.yaml` and o
 | `MAIL_USERNAME` | Yes | SMTP username. Can be empty for MailDev. |
 | `MAIL_PASSWORD` | Yes | SMTP password. Can be empty for MailDev. |
 | `REDIS_HOST` | Yes | Redis host. |
+| `REDIS_PORT` | Optional | Redis port. Defaults to `6379`. |
 | `REDIS_PASSWORD` | Yes | Redis password. |
 | `JWT_ACCESS_TOKEN_EXPIRATION` | Yes | Access token TTL in milliseconds. |
 | `JWT_REFRESH_TOKEN_EXPIRATION` | Yes | Refresh token TTL in milliseconds. |
 | `FRONTEND_URL` | Yes | Frontend origin used for CORS-related flows and email links. |
+| `APP_CORS_ALLOWED_ORIGINS` | Optional | Comma-separated list of allowed frontend origins. Defaults to local frontend origins in `dev`. |
 | `TEST_WALLET` | Optional | Wallet address used by TRON payment validation helpers. |
 | `TELEGRAM_TOKEN` | Optional | Telegram bot token. |
 | `API_TELEGRAM_URL` | Optional | Telegram API base URL, usually `https://api.telegram.org/bot`. |
