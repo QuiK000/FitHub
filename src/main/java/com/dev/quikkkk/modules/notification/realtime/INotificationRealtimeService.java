@@ -7,4 +7,6 @@ public interface INotificationRealtimeService {
     SseEmitter subscribe(String userId);
 
     void publishToUser(String userId, NotificationRealtimeEventResponse event);
+
+    void sendHeartbeat();
 }

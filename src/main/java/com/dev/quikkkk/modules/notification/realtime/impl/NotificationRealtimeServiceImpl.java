@@ -54,6 +54,25 @@ public class NotificationRealtimeServiceImpl implements INotificationRealtimeSer
         for (SseEmitter emitter : emitters) sendSafely(userId, emitter, event);
     }
 
+    @Override
+    public void sendHeartbeat() {
+        emittersByUser.forEach((userId, emitters) -> {
+            for (SseEmitter emitter : emitters) {
+                try {
+                    emitter.send(SseEmitter.event().comment("heartbeat"));
+                } catch (IOException e) {
+                    log.debug("Heartbeat failed for user {}: {}", userId, e.getMessage());
+                    removeEmitter(userId, emitter);
+
+                    try {
+                        emitter.completeWithError(e);
+                    } catch (Exception ignored) {
+                    }
+                }
+            }
+        });
+    }
+
     private void removeEmitter(String userId, SseEmitter emitter) {
         List<SseEmitter> emitters = emittersByUser.get(userId);
         if (emitters == null) return;
