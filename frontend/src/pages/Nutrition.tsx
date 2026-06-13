@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type ComponentType, type FormEvent, type SVGProps } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import {
   ArrowRight,
@@ -46,6 +47,7 @@ const todayIso = () => new Date().toISOString().slice(0, 10)
 const quickWaterAmounts = [250, 400, 500, 750]
 
 const Nutrition = () => {
+  const { t } = useTranslation('nutrition')
   const profile = useAuthStore((state) => state.user?.clientProfile)
   const [state, setState] = useState<NutritionState>({
     todayWater: null,
@@ -123,7 +125,7 @@ const Nutrition = () => {
 
   const handleLogWater = async (amountMl: number) => {
     if (!Number.isFinite(amountMl) || amountMl <= 0) {
-      toast.error('Enter a positive water amount.')
+      toast.error(t('common:toast.waterAmountError'))
       return
     }
 
@@ -152,7 +154,7 @@ const Nutrition = () => {
     const calories = targetCalories.trim() ? Number(targetCalories) : undefined
 
     if (calories !== undefined && (!Number.isFinite(calories) || calories <= 0)) {
-      toast.error('Target calories must be a positive number.')
+      toast.error(t('common:toast.caloriesError'))
       return
     }
 
@@ -170,7 +172,7 @@ const Nutrition = () => {
           sugar: null,
         },
       })
-      toast.success('Meal plan created for today.')
+      toast.success(t('common:toast.mealPlanCreated'))
       setTargetCalories('')
       await loadNutrition()
     } catch (error) {
@@ -186,13 +188,13 @@ const Nutrition = () => {
       <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Nutrition
+            {t('title')}
           </p>
           <h1 className="mt-2 text-2xl font-bold text-foreground md:text-3xl">
-            Fuel and hydration
+            {t('title')}
           </h1>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            Track today&apos;s water, meal plan, calories, and weekly consistency.
+            {t('subtitle')}
           </p>
         </div>
         <Link
@@ -200,7 +202,7 @@ const Nutrition = () => {
           className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 text-sm font-semibold text-foreground shadow-soft transition-all hover:bg-accent"
         >
           <Target className="h-4 w-4" />
-          Edit targets
+          {t('editTargets')}
         </Link>
       </div>
 
@@ -622,11 +624,13 @@ const EmptyState = ({
   title,
   description,
   actionLabel,
+  onClick,
 }: {
   icon: IconType
   title: string
   description: string
-  actionLabel: string
+  actionLabel?: string
+  onClick?: () => void
 }) => (
   <div className="rounded-2xl border border-dashed border-border bg-muted/30 p-5">
     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-background">
@@ -634,10 +638,16 @@ const EmptyState = ({
     </div>
     <p className="mt-4 text-sm font-semibold text-foreground">{title}</p>
     <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-    <p className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
-      {actionLabel}
-      <ArrowRight className="h-4 w-4" />
-    </p>
+    {actionLabel && (
+      <button
+        type="button"
+        onClick={onClick}
+        className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+      >
+        {actionLabel}
+        <ArrowRight className="h-4 w-4" />
+      </button>
+    )}
   </div>
 )
 

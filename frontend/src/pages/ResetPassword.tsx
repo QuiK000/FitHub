@@ -1,5 +1,6 @@
 import type { FormEvent } from 'react'
 import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Dumbbell, Lock, ShieldCheck } from 'lucide-react'
@@ -9,6 +10,7 @@ import { getApiErrorMessage } from '../utils/errorHandler'
 import toast from '../utils/toast'
 
 const ResetPassword = () => {
+  const { t } = useTranslation('auth')
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const [token, setToken] = useState(searchParams.get('token') ?? '')
@@ -80,10 +82,10 @@ const ResetPassword = () => {
             <Dumbbell className="h-6 w-6 text-primary-foreground" />
           </div>
           <h1 className="text-2xl font-bold text-foreground">
-            Choose a new password
+            {t('resetPassword.title')}
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Use the reset token from your email to secure your FitHub account.
+            {t('resetPassword.subtitle')}
           </p>
         </div>
 
@@ -95,7 +97,7 @@ const ResetPassword = () => {
 
             <div className="space-y-2">
               <label htmlFor="token" className="text-sm font-medium text-foreground">
-                Reset token
+                {t('resetPassword.tokenLabel')}
               </label>
               <input
                 id="token"
@@ -103,13 +105,13 @@ const ResetPassword = () => {
                 value={token}
                 onChange={(event) => setToken(event.target.value)}
                 className="flex h-10 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground shadow-soft transition-all placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
-                placeholder="Paste your reset token"
+                placeholder={t('resetPassword.tokenPlaceholder')}
               />
             </div>
 
             <div className="space-y-2">
               <label htmlFor="password" className="text-sm font-medium text-foreground">
-                New password
+                {t('resetPassword.passwordLabel')}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -121,7 +123,7 @@ const ResetPassword = () => {
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   className="flex h-10 w-full rounded-xl border border-border bg-background pl-10 pr-3 text-sm text-foreground shadow-soft transition-all placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
-                  placeholder="At least 8 characters"
+                  placeholder={t('resetPassword.passwordPlaceholder')}
                 />
               </div>
             </div>
@@ -131,7 +133,7 @@ const ResetPassword = () => {
                 htmlFor="confirmPassword"
                 className="text-sm font-medium text-foreground"
               >
-                Confirm new password
+                {t('resetPassword.confirmPasswordLabel')}
               </label>
               <div className="relative">
                 <ShieldCheck className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -143,7 +145,7 @@ const ResetPassword = () => {
                   value={confirmPassword}
                   onChange={(event) => setConfirmPassword(event.target.value)}
                   className="flex h-10 w-full rounded-xl border border-border bg-background pl-10 pr-3 text-sm text-foreground shadow-soft transition-all placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
-                  placeholder="Repeat your password"
+                  placeholder={t('resetPassword.confirmPasswordPlaceholder')}
                 />
               </div>
             </div>
@@ -168,7 +170,7 @@ const ResetPassword = () => {
               {isSubmitting && (
                 <span className="inline-flex h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
               )}
-              <span>{isSubmitting ? 'Resetting...' : 'Reset password'}</span>
+              <span>{isSubmitting ? t('resetPassword.submittingButton') : t('resetPassword.submitButton')}</span>
             </button>
           </form>
 
@@ -177,7 +179,7 @@ const ResetPassword = () => {
             className="mt-6 inline-flex w-full items-center justify-center gap-2 text-sm font-medium text-primary hover:underline"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to sign in
+            {t('resetPassword.backToLogin')}
           </Link>
         </div>
       </motion.div>

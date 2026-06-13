@@ -1,5 +1,6 @@
 import type { FormEvent } from 'react'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Dumbbell, Mail, Send } from 'lucide-react'
@@ -9,6 +10,7 @@ import { getApiErrorMessage } from '../utils/errorHandler'
 import toast from '../utils/toast'
 
 const ForgotPassword = () => {
+  const { t } = useTranslation('auth')
   const [email, setEmail] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -57,10 +59,10 @@ const ForgotPassword = () => {
             <Dumbbell className="h-6 w-6 text-primary-foreground" />
           </div>
           <h1 className="text-2xl font-bold text-foreground">
-            Reset your password
+            {t('forgotPassword.title')}
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Enter your account email and we will send recovery instructions.
+            {t('forgotPassword.subtitle')}
           </p>
         </div>
 
@@ -68,7 +70,7 @@ const ForgotPassword = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium text-foreground">
-                Email address
+                {t('forgotPassword.emailLabel')}
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -80,7 +82,7 @@ const ForgotPassword = () => {
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                   className="flex h-10 w-full rounded-xl border border-border bg-background pl-10 pr-3 text-sm text-foreground shadow-soft transition-all placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
-                  placeholder="you@example.com"
+                  placeholder={t('forgotPassword.emailPlaceholder')}
                 />
               </div>
             </div>
@@ -107,7 +109,7 @@ const ForgotPassword = () => {
               ) : (
                 <Send className="h-4 w-4" />
               )}
-              <span>{isSubmitting ? 'Sending...' : 'Send reset email'}</span>
+              <span>{isSubmitting ? t('forgotPassword.submittingButton') : t('forgotPassword.submitButton')}</span>
             </button>
           </form>
 
@@ -116,7 +118,7 @@ const ForgotPassword = () => {
             className="mt-6 inline-flex w-full items-center justify-center gap-2 text-sm font-medium text-primary hover:underline"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to sign in
+            {t('forgotPassword.backToLogin')}
           </Link>
         </div>
       </motion.div>

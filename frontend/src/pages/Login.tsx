@@ -1,5 +1,6 @@
 import type { FormEvent } from 'react'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Dumbbell, Lock, Mail } from 'lucide-react'
@@ -13,6 +14,7 @@ import { getApiErrorMessage } from '../utils/errorHandler'
 import toast from '../utils/toast'
 
 const Login = () => {
+  const { t } = useTranslation('auth')
   const navigate = useNavigate()
   const { setAuth, token, isAuthenticated } = useAuthStore()
   const [email, setEmail] = useState('')
@@ -89,10 +91,10 @@ const Login = () => {
             <Dumbbell className="h-6 w-6 text-primary-foreground" />
           </div>
           <h1 className="text-2xl font-bold text-foreground">
-            Welcome back to FitHub
+            {t('login.title')}
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Sign in to continue your fitness journey
+            {t('login.subtitle')}
           </p>
         </div>
 
@@ -100,7 +102,7 @@ const Login = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium text-foreground">
-                Email address
+                {t('login.emailLabel')}
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -112,14 +114,14 @@ const Login = () => {
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                   className="flex h-10 w-full rounded-xl border border-border bg-background pl-10 pr-3 text-sm text-foreground shadow-soft transition-all placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
-                  placeholder="you@example.com"
+                  placeholder={t('login.emailPlaceholder')}
                 />
               </div>
             </div>
 
             <div className="space-y-2">
               <label htmlFor="password" className="text-sm font-medium text-foreground">
-                Password
+                {t('login.passwordLabel')}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -131,7 +133,7 @@ const Login = () => {
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   className="flex h-10 w-full rounded-xl border border-border bg-background pl-10 pr-3 text-sm text-foreground shadow-soft transition-all placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
-                  placeholder="••••••••"
+                  placeholder={t('login.passwordPlaceholder')}
                 />
               </div>
             </div>
@@ -150,7 +152,7 @@ const Login = () => {
               {isSubmitting && (
                 <span className="inline-flex h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
               )}
-              <span>{isSubmitting ? 'Signing in...' : 'Sign in'}</span>
+              <span>{isSubmitting ? t('login.submittingButton') : t('login.submitButton')}</span>
             </button>
           </form>
 
@@ -159,26 +161,26 @@ const Login = () => {
               to="/forgot-password"
               className="mb-3 block font-medium text-primary hover:underline"
             >
-              Forgot your password?
+              {t('login.forgotPassword')}
             </Link>
-            Don&apos;t have an account?{' '}
+            {t('login.noAccount')}{' '}
             <Link
               to="/register"
               className="font-medium text-primary hover:underline"
             >
-              Create one
+              {t('login.createAccount')}
             </Link>
           </div>
         </div>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          By continuing, you agree to our{' '}
-          <span className="cursor-pointer text-foreground hover:underline">
-            Terms of Service
+          {t('login.termsPrefix')}{' '}
+          <span className="cursor-pointer font-medium text-foreground hover:underline">
+            {t('login.termsLink')}
           </span>{' '}
-          and{' '}
-          <span className="cursor-pointer text-foreground hover:underline">
-            Privacy Policy
+          {t('login.and')}{' '}
+          <span className="cursor-pointer font-medium text-foreground hover:underline">
+            {t('login.privacyLink')}
           </span>
           .
         </p>

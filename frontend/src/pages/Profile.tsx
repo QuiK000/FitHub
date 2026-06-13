@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import { Calendar, Droplets, Mail, Phone, User2, Weight, X } from 'lucide-react'
 import { useAuthStore } from '../store/useAuthStore'
@@ -49,6 +50,7 @@ const createFormFromProfile = (
 })
 
 const Profile = () => {
+  const { t } = useTranslation('profile')
   const { user, fetchCurrentUser } = useAuthStore()
   const [profile, setProfile] = useState<ClientProfileResponse | null>(null)
   const [form, setForm] = useState<ProfileForm>(() => createFormFromProfile(null))
@@ -130,7 +132,7 @@ const Profile = () => {
     setFormErrors(errors)
 
     if (Object.keys(errors).length > 0) {
-      toast.error('Please fix the highlighted profile fields.')
+      toast.error(t('errors.fixFields', { ns: 'common' }))
       return
     }
 
@@ -168,13 +170,13 @@ const Profile = () => {
       <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Profile
+            {t('badge')}
           </p>
           <h1 className="mt-2 text-2xl font-bold text-foreground md:text-3xl">
             {fullName}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Manage your personal details and training metrics.
+            {t('subtitle')}
           </p>
         </div>
 
@@ -198,10 +200,10 @@ const Profile = () => {
             <div className="mb-6 flex items-center justify-between gap-3">
               <div>
                 <h2 className="text-lg font-semibold text-card-foreground">
-                  Account details
+                  {t('accountDetails.title')}
                 </h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Core information used across your FitHub experience.
+                  {t('accountDetails.subtitle')}
                 </p>
               </div>
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
@@ -210,18 +212,18 @@ const Profile = () => {
             </div>
             <div className="grid gap-4 md:grid-cols-2">
               <ProfileField
-                label="Email"
-                value={user?.email ?? 'Not available'}
+                label={t('accountDetails.email')}
+                value={user?.email ?? t('accountDetails.notAvailable')}
                 icon={<Mail className="h-4 w-4 text-muted-foreground" />}
               />
               <ProfileField
-                label="Phone"
-                value={profile?.phone ?? 'Add a contact number'}
+                label={t('accountDetails.phone')}
+                value={profile?.phone ?? t('accountDetails.phonePlaceholder')}
                 icon={<Phone className="h-4 w-4 text-muted-foreground" />}
               />
               <ProfileField
-                label="Account status"
-                value={profile?.active ? 'Active' : 'Inactive'}
+                label={t('accountDetails.accountStatus')}
+                value={profile?.active ? t('accountDetails.active') : t('accountDetails.inactive')}
                 badgeClassName={
                   profile?.active
                     ? 'bg-success/10 text-success'
@@ -229,16 +231,16 @@ const Profile = () => {
                 }
               />
               <ProfileField
-                label="Member since"
+                label={t('accountDetails.memberSince')}
                 value={formattedCreatedAt ?? '-'}
                 icon={<Calendar className="h-4 w-4 text-muted-foreground" />}
               />
               <ProfileField
-                label="Birthdate"
-                value={formattedBirthdate ?? 'Add your birthdate'}
+                label={t('accountDetails.birthdate')}
+                value={formattedBirthdate ?? t('accountDetails.birthdatePlaceholder')}
                 icon={<Calendar className="h-4 w-4 text-muted-foreground" />}
               />
-              <ProfileField label="Gender" value={profile?.gender ?? '-'} />
+              <ProfileField label={t('accountDetails.gender')} value={profile?.gender ?? '-'} />
             </div>
           </div>
         </motion.div>
@@ -251,29 +253,29 @@ const Profile = () => {
         >
           <div className="rounded-2xl border border-border bg-card p-6 shadow-soft">
             <h2 className="text-lg font-semibold text-card-foreground">
-              Physical stats
+              {t('physicalStats.title')}
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Data your trainers use to tailor your sessions.
+              {t('physicalStats.subtitle')}
             </p>
             <div className="mt-6 space-y-3">
               <StatRow
                 icon={<Weight className="h-4 w-4 text-muted-foreground" />}
-                label="Current weight"
-                value={profile?.weight ? `${profile.weight} kg` : 'Add weight'}
+                label={t('physicalStats.currentWeight')}
+                value={profile?.weight ? t('physicalStats.weightValue', { weight: profile.weight }) : t('physicalStats.weightPlaceholder')}
               />
               <StatRow
                 icon={<HeightIcon />}
-                label="Height"
-                value={profile?.height ? `${profile.height} cm` : 'Add height'}
+                label={t('physicalStats.height')}
+                value={profile?.height ? t('physicalStats.heightValue', { height: profile.height }) : t('physicalStats.heightPlaceholder')}
               />
               <StatRow
                 icon={<Droplets className="h-4 w-4 text-primary" />}
-                label="Daily hydration target"
+                label={t('physicalStats.hydrationTarget')}
                 value={
                   profile?.dailyWaterTarget
-                    ? `${profile.dailyWaterTarget} ml`
-                    : 'Set your target'
+                    ? t('physicalStats.hydrationValue', { target: profile.dailyWaterTarget })
+                    : t('physicalStats.hydrationPlaceholder')
                 }
               />
             </div>
@@ -307,7 +309,7 @@ const Profile = () => {
             <div className="mb-4 flex items-center justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Edit profile
+          {t('editButton')}
                 </p>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Update your basic information and metrics.

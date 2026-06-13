@@ -1,4 +1,5 @@
 import { useMemo, useState, type FormEvent, type ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Activity, Droplets, Ruler, UserRound, Weight } from 'lucide-react'
@@ -43,6 +44,7 @@ const genderOptions: { label: string; value: ClientGender }[] = [
 ]
 
 const Onboarding = () => {
+  const { t } = useTranslation('onboarding')
   const navigate = useNavigate()
   const fetchCurrentUser = useAuthStore((state) => state.fetchCurrentUser)
   const [form, setForm] = useState<OnboardingForm>({
@@ -78,7 +80,7 @@ const Onboarding = () => {
     setErrors(nextErrors)
 
     if (Object.keys(nextErrors).length > 0) {
-      toast.error('Please complete the highlighted onboarding fields.')
+      toast.error(t('errors.fillFields', { ns: 'common' }))
       return
     }
 
@@ -98,7 +100,7 @@ const Onboarding = () => {
     try {
       await createClientProfile(payload)
       await fetchCurrentUser()
-      toast.success('Profile created. Welcome to FitHub.')
+      toast.success(t('success.created', { ns: 'common' }))
       navigate('/dashboard', { replace: true })
     } catch (err) {
       console.error(err)
@@ -125,12 +127,12 @@ const Onboarding = () => {
           <CardHeader className="space-y-4">
             <div className="inline-flex w-fit items-center gap-2 rounded-full border border-border bg-muted px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
               <Activity className="h-3.5 w-3.5 text-primary" />
-              Client onboarding
+              {t('badge')}
             </div>
             <div>
-              <CardTitle>Complete your profile</CardTitle>
+              <CardTitle>{t('title')}</CardTitle>
               <CardDescription>
-                Add your details to personalize your training dashboard and daily targets.
+                {t('subtitle')}
               </CardDescription>
             </div>
           </CardHeader>
@@ -240,7 +242,7 @@ const Onboarding = () => {
                 {isSubmitting && (
                   <span className="mr-2 inline-flex h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
                 )}
-                {isSubmitting ? 'Creating profile...' : 'Finish onboarding'}
+                {isSubmitting ? t('submitting') : t('submit')}
               </Button>
             </form>
           </CardContent>

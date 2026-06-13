@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNavigate, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Dumbbell, Mail, Lock } from 'lucide-react'
@@ -7,6 +8,7 @@ import { register } from '../services/auth.service'
 import ThemeToggle from '../components/ThemeToggle'
 
 const Register = () => {
+  const { t } = useTranslation('auth')
   const navigate = useNavigate()
 
   const [email, setEmail] = useState('')
@@ -74,10 +76,10 @@ const Register = () => {
             <Dumbbell className="h-6 w-6 text-primary-foreground" />
           </div>
           <h1 className="text-2xl font-bold text-foreground">
-            Create your FitHub account
+            {t('register.title')}
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Start tracking your fitness journey today
+            {t('register.subtitle')}
           </p>
         </div>
 
@@ -85,7 +87,7 @@ const Register = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium text-foreground">
-                Email address
+                {t('register.emailLabel')}
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -97,14 +99,14 @@ const Register = () => {
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                   className="flex h-10 w-full rounded-xl border border-border bg-background pl-10 pr-3 text-sm text-foreground shadow-soft transition-all placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
-                  placeholder="you@example.com"
+                  placeholder={t('register.emailPlaceholder')}
                 />
               </div>
             </div>
 
             <div className="space-y-2">
               <label htmlFor="password" className="text-sm font-medium text-foreground">
-                Password
+                {t('register.passwordLabel')}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -116,7 +118,7 @@ const Register = () => {
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   className="flex h-10 w-full rounded-xl border border-border bg-background pl-10 pr-3 text-sm text-foreground shadow-soft transition-all placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
-                  placeholder="At least 8 characters"
+                  placeholder={t('register.passwordPlaceholder')}
                 />
               </div>
             </div>
@@ -126,7 +128,7 @@ const Register = () => {
                 htmlFor="confirmPassword"
                 className="text-sm font-medium text-foreground"
               >
-                Confirm password
+                {t('register.confirmPasswordLabel')}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -138,7 +140,7 @@ const Register = () => {
                   value={confirmPassword}
                   onChange={(event) => setConfirmPassword(event.target.value)}
                   className="flex h-10 w-full rounded-xl border border-border bg-background pl-10 pr-3 text-sm text-foreground shadow-soft transition-all placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
-                  placeholder="Repeat your password"
+                  placeholder={t('register.confirmPasswordPlaceholder')}
                 />
               </div>
             </div>
@@ -158,27 +160,27 @@ const Register = () => {
                 <span className="inline-flex h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
               )}
               <span>
-                {isSubmitting ? 'Creating account...' : 'Create account'}
+                {isSubmitting ? t('register.submittingButton') : t('register.submitButton')}
               </span>
             </button>
           </form>
 
           <div className="mt-6 text-center text-sm text-muted-foreground">
-            Already have an account?{' '}
+            {t('register.haveAccount')}{' '}
             <Link to="/login" className="font-medium text-primary hover:underline">
-              Sign in
+              {t('register.signIn')}
             </Link>
           </div>
         </div>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          By creating an account, you agree to our{' '}
+          {t('register.termsPrefix')}{' '}
           <span className="cursor-pointer text-foreground hover:underline">
-            Terms of Service
+            {t('register.termsLink')}
           </span>{' '}
-          and{' '}
+          {t('register.and')}{' '}
           <span className="cursor-pointer text-foreground hover:underline">
-            Privacy Policy
+            {t('register.privacyLink')}
           </span>
           .
         </p>

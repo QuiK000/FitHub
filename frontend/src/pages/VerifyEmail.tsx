@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { CheckCircle2, Mail, RotateCcw, ShieldCheck } from 'lucide-react'
 import { motion } from 'framer-motion'
@@ -7,6 +8,7 @@ import { resendVerification, verifyEmail } from '../services/auth.service'
 import ThemeToggle from '../components/ThemeToggle'
 
 const VerifyEmail = () => {
+  const { t } = useTranslation('auth')
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
 
@@ -81,14 +83,13 @@ const VerifyEmail = () => {
           <div className="mb-6">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-muted px-3 py-1 text-xs text-muted-foreground">
               <ShieldCheck className="h-3.5 w-3.5 text-success" />
-              Secure verification
+              {t('verifyEmail.badge')}
             </div>
             <h1 className="text-2xl font-bold text-card-foreground">
-              Verify your email address
+              {t('verifyEmail.title')}
             </h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Enter the verification token sent to your inbox to activate your
-              account.
+              {t('verifyEmail.subtitle')}
             </p>
           </div>
 
@@ -96,18 +97,18 @@ const VerifyEmail = () => {
             <form onSubmit={handleVerify} className="space-y-4">
               <div className="space-y-2">
                 <label htmlFor="token" className="text-sm font-medium text-foreground">
-                  Verification token
+                  {t('verifyEmail.tokenLabel')}
                 </label>
                 <input
                   id="token"
                   value={token}
                   onChange={(event) => setToken(event.target.value)}
-                  placeholder="Paste your token"
+                  placeholder={t('verifyEmail.tokenPlaceholder')}
                   required
                   className="flex h-10 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground shadow-soft transition-all placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Token preview: {tokenPreview}
+                  {t('verifyEmail.tokenPreview', { preview: tokenPreview })}
                 </p>
               </div>
 
@@ -116,27 +117,27 @@ const VerifyEmail = () => {
                 disabled={isSubmitting || !token.trim()}
                 className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-soft transition-all hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {isSubmitting ? 'Verifying...' : 'Verify email'}
+                {isSubmitting ? t('verifyEmail.verifyingButton') : t('verifyEmail.verifyButton')}
               </button>
             </form>
 
             <div className="rounded-xl border border-border bg-muted p-4">
               <div className="mb-3 flex items-center gap-2 text-sm text-foreground">
                 <Mail className="h-4 w-4 text-primary" />
-                Didn&apos;t receive a code?
+                {t('verifyEmail.resendSection.title')}
               </div>
 
               <div className="space-y-3">
                 <div className="space-y-2">
                   <label htmlFor="email" className="text-sm font-medium text-foreground">
-                    Account email
+                    {t('verifyEmail.resendSection.emailLabel')}
                   </label>
                   <input
                     id="email"
                     type="email"
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
-                    placeholder="you@example.com"
+                    placeholder={t('verifyEmail.resendSection.emailPlaceholder')}
                     className="flex h-10 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground shadow-soft transition-all placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
                   />
                 </div>
@@ -147,7 +148,7 @@ const VerifyEmail = () => {
                   className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 text-sm font-semibold text-foreground transition-all hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <RotateCcw className="h-4 w-4" />
-                  {isResending ? 'Sending...' : 'Resend code'}
+                  {isResending ? t('verifyEmail.resendSection.resendingButton') : t('verifyEmail.resendSection.resendButton')}
                 </button>
               </div>
             </div>
@@ -172,9 +173,9 @@ const VerifyEmail = () => {
             )}
 
             <p className="text-center text-sm text-muted-foreground">
-              Already verified?{' '}
+              {t('verifyEmail.alreadyVerified')}{' '}
               <Link to="/login" className="font-medium text-primary hover:underline">
-                Continue to login
+                {t('verifyEmail.continueToLogin')}
               </Link>
             </p>
           </div>

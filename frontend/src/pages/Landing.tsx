@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
@@ -13,6 +14,7 @@ import ThemeToggle from '../components/ThemeToggle'
 import LanguageSwitcher from '../components/LanguageSwitcher'
 
 const Landing = () => {
+  const { t } = useTranslation('landing')
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -22,7 +24,7 @@ const Landing = () => {
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary">
               <Dumbbell className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold text-foreground">FitHub</span>
+            <span className="text-xl font-bold text-foreground">{t('header.brand')}</span>
           </div>
 
           <div className="flex items-center gap-3">
@@ -32,13 +34,13 @@ const Landing = () => {
               to="/login"
               className="rounded-xl px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
             >
-              Sign in
+              {t('header.signIn')}
             </Link>
             <Link
               to="/register"
               className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-soft transition-all hover:bg-primary/90"
             >
-              Get started
+              {t('header.getStarted')}
             </Link>
           </div>
         </div>
@@ -54,19 +56,18 @@ const Landing = () => {
         >
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-muted px-4 py-1.5 text-sm text-muted-foreground">
             <Zap className="h-4 w-4" />
-            Your complete fitness companion
+            {t('hero.badge')}
           </div>
 
           <h1 className="mb-6 text-4xl font-bold leading-tight text-foreground md:text-6xl">
-            Transform your fitness journey with{' '}
+            {t('hero.title')}{' '}
             <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent dark:from-emerald-400 dark:via-cyan-400 dark:to-sky-500">
-              intelligent tracking
+              {t('hero.titleHighlight')}
             </span>
           </h1>
 
           <p className="mb-10 text-lg text-muted-foreground md:text-xl">
-            Track workouts, monitor progress, and achieve your fitness goals with
-            our comprehensive platform designed for athletes and fitness enthusiasts.
+            {t('hero.subtitle')}
           </p>
 
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -74,19 +75,19 @@ const Landing = () => {
               to="/register"
               className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-primary px-8 text-base font-semibold text-primary-foreground shadow-soft-md transition-all hover:bg-primary/90 hover:shadow-soft-lg"
             >
-              Start tracking free
+              {t('hero.ctaPrimary')}
               <TrendingUp className="h-5 w-5" />
             </Link>
             <Link
               to="/login"
               className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-border bg-background px-8 text-base font-semibold text-foreground transition-all hover:bg-accent"
             >
-              Sign in
+              {t('hero.ctaSecondary')}
             </Link>
           </div>
 
           <p className="mt-6 text-sm text-muted-foreground">
-            No credit card required • Free forever • Cancel anytime
+            {t('hero.benefits')}
           </p>
         </motion.div>
 
@@ -131,11 +132,10 @@ const Landing = () => {
             className="mx-auto mb-16 max-w-3xl text-center"
           >
             <h2 className="mb-4 text-3xl font-bold text-foreground md:text-4xl">
-              Everything you need to succeed
+              {t('features.title')}
             </h2>
             <p className="text-lg text-muted-foreground">
-              Powerful features designed to help you track, analyze, and optimize
-              your fitness journey.
+              {t('features.subtitle')}
             </p>
           </motion.div>
 
@@ -191,17 +191,16 @@ const Landing = () => {
             className="mx-auto max-w-4xl rounded-3xl border border-border bg-card p-8 text-center shadow-soft-lg md:p-16"
           >
             <h2 className="mb-4 text-3xl font-bold text-card-foreground md:text-4xl">
-              Ready to start your fitness journey?
+              {t('cta.title')}
             </h2>
             <p className="mb-8 text-lg text-muted-foreground">
-              Join thousands of athletes and fitness enthusiasts who trust FitHub
-              to track their progress and achieve their goals.
+              {t('cta.subtitle')}
             </p>
             <Link
               to="/register"
               className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-primary px-8 text-base font-semibold text-primary-foreground shadow-soft-md transition-all hover:bg-primary/90 hover:shadow-soft-lg"
             >
-              Create your free account
+              {t('cta.button')}
               <TrendingUp className="h-5 w-5" />
             </Link>
           </motion.div>
@@ -216,10 +215,10 @@ const Landing = () => {
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
                 <Dumbbell className="h-4 w-4 text-primary-foreground" />
               </div>
-              <span className="font-semibold text-foreground">FitHub</span>
+              <span className="font-semibold text-foreground">{t('footer.brand')}</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              © 2026 FitHub. All rights reserved.
+              {t('footer.copyright')}
             </p>
           </div>
         </div>
