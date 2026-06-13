@@ -1,66 +1,55 @@
 {
-  "header": {
-    "badge": "Profile",
-    "title": "{{name}}",
-    "subtitle": "Manage your personal details and training metrics.",
-    "editButton": "Edit profile"
-  },
+  "badge": "Profile",
+  "title": "{{name}}",
+  "subtitle": "Manage your personal details and training metrics.",
+  "editButton": "Edit profile",
   "accountDetails": {
     "title": "Account details",
     "subtitle": "Core information used across your FitHub experience.",
-    "fields": {
-      "email": "Email",
-      "phone": "Phone",
-      "accountStatus": "Account status",
-      "memberSince": "Member since",
-      "birthdate": "Birthdate",
-      "gender": "Gender"
-    },
-    "status": {
-      "active": "Active",
-      "inactive": "Inactive"
-    },
-    "placeholders": {
-      "phone": "Add a contact number",
-      "birthdate": "Add your birthdate",
-      "notAvailable": "Not available"
-    }
+    "email": "Email",
+    "phone": "Phone",
+    "accountStatus": "Account status",
+    "memberSince": "Member since",
+    "birthdate": "Birthdate",
+    "gender": "Gender",
+    "active": "Active",
+    "inactive": "Inactive",
+    "phonePlaceholder": "Add a contact number",
+    "birthdatePlaceholder": "Add your birthdate",
+    "notAvailable": "Not available"
   },
   "physicalStats": {
     "title": "Physical stats",
     "subtitle": "Data your trainers use to tailor your sessions.",
-    "weight": {
-      "label": "Current weight",
-      "value": "{{weight}} kg",
-      "placeholder": "Add weight"
-    },
-    "height": {
-      "label": "Height",
-      "value": "{{height}} cm",
-      "placeholder": "Add height"
-    },
-    "hydration": {
-      "label": "Daily hydration target",
-      "value": "{{target}} ml",
-      "placeholder": "Set your target"
-    }
+    "currentWeight": "Current weight",
+    "weightValue": "{{weight}} kg",
+    "weightPlaceholder": "Add weight",
+    "height": "Height",
+    "heightValue": "{{height}} cm",
+    "heightPlaceholder": "Add height",
+    "hydrationTarget": "Daily hydration target",
+    "hydrationValue": "{{target}} ml",
+    "hydrationPlaceholder": "Set your target"
   },
   "editModal": {
     "badge": "Edit profile",
     "subtitle": "Update your basic information and metrics.",
-    "fields": {
-      "firstName": "First name",
-      "lastName": "Last name",
-      "phone": "Phone",
-      "height": "Height (cm)",
-      "weight": "Weight (kg)",
-      "waterTarget": "Water target (ml)"
-    },
+    "firstName": "First name",
+    "lastName": "Last name",
+    "phone": "Phone",
+    "phonePlaceholder": "+12025550123",
+    "birthdate": "Birthdate",
+    "height": "Height (cm)",
+    "weight": "Weight (kg)",
+    "waterTarget": "Water target (ml)",
+    "gender": "Gender",
     "cancelButton": "Cancel",
     "saveButton": "Save changes"
   },
   "loading": "Loading your profile...",
   "errors": {
-    "loadFailed": "Unable to load your profile right now."
+    "loadFailed": "Unable to load your profile right now.",
+    "saveFailed": "Unable to save profile changes.",
+    "fixFields": "Please fix the highlighted profile fields."
   }
 }

@@ -1,66 +1,55 @@
 {
-  "header": {
-    "badge": "Профиль",
-    "title": "{{name}}",
-    "subtitle": "Управляйте личными данными и тренировочными метриками.",
-    "editButton": "Редактировать профиль"
-  },
+  "badge": "Профиль",
+  "title": "{{name}}",
+  "subtitle": "Управляйте личными данными и тренировочными метриками.",
+  "editButton": "Редактировать профиль",
   "accountDetails": {
-    "title": "Детали учетной записи",
+    "title": "Детали аккаунта",
     "subtitle": "Основная информация, используемая в FitHub.",
-    "fields": {
-      "email": "Email",
-      "phone": "Телефон",
-      "accountStatus": "Статус учетной записи",
-      "memberSince": "Член с",
-      "birthdate": "Дата рождения",
-      "gender": "Пол"
-    },
-    "status": {
-      "active": "Активный",
-      "inactive": "Неактивный"
-    },
-    "placeholders": {
-      "phone": "Добавить контактный номер",
-      "birthdate": "Добавить дату рождения",
-      "notAvailable": "Недоступно"
-    }
+    "email": "Электронная почта",
+    "phone": "Телефон",
+    "accountStatus": "Статус аккаунта",
+    "memberSince": "Участник с",
+    "birthdate": "Дата рождения",
+    "gender": "Пол",
+    "active": "Активный",
+    "inactive": "Неактивный",
+    "phonePlaceholder": "Добавьте номер телефона",
+    "birthdatePlaceholder": "Добавьте дату рождения",
+    "notAvailable": "Недоступно"
   },
   "physicalStats": {
     "title": "Физические показатели",
     "subtitle": "Данные, которые тренеры используют для настройки сессий.",
-    "weight": {
-      "label": "Текущий вес",
-      "value": "{{weight}} кг",
-      "placeholder": "Добавить вес"
-    },
-    "height": {
-      "label": "Рост",
-      "value": "{{height}} см",
-      "placeholder": "Добавить рост"
-    },
-    "hydration": {
-      "label": "Ежедневная цель гидратации",
-      "value": "{{target}} мл",
-      "placeholder": "Установить цель"
-    }
+    "currentWeight": "Текущий вес",
+    "weightValue": "{{weight}} кг",
+    "weightPlaceholder": "Добавьте вес",
+    "height": "Рост",
+    "heightValue": "{{height}} см",
+    "heightPlaceholder": "Добавьте рост",
+    "hydrationTarget": "Дневная цель воды",
+    "hydrationValue": "{{target}} мл",
+    "hydrationPlaceholder": "Установите цель"
   },
   "editModal": {
     "badge": "Редактировать профиль",
     "subtitle": "Обновите основную информацию и метрики.",
-    "fields": {
-      "firstName": "Имя",
-      "lastName": "Фамилия",
-      "phone": "Телефон",
-      "height": "Рост (см)",
-      "weight": "Вес (кг)",
-      "waterTarget": "Цель воды (мл)"
-    },
+    "firstName": "Имя",
+    "lastName": "Фамилия",
+    "phone": "Телефон",
+    "phonePlaceholder": "+12025550123",
+    "birthdate": "Дата рождения",
+    "height": "Рост (см)",
+    "weight": "Вес (кг)",
+    "waterTarget": "Цель воды (мл)",
+    "gender": "Пол",
     "cancelButton": "Отменить",
     "saveButton": "Сохранить изменения"
   },
   "loading": "Загрузка профиля...",
   "errors": {
-    "loadFailed": "Не удалось загрузить ваш профиль."
+    "loadFailed": "Не удалось загрузить профиль.",
+    "saveFailed": "Не удалось сохранить изменения профиля.",
+    "fixFields": "Пожалуйста, исправьте отмеченные поля."
   }
 }
