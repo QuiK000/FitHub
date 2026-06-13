@@ -1,0 +1,9 @@
+{
+  "title": "Stay updated",
+  "unreadCount": "You have {{count}} unread notification(s).",
+  "allCaughtUp": "All caught up.",
+  "markAllRead": "Mark all read",
+  "markRead": "Mark read",
+  "noData": "No notifications",
+  "noDataDesc": "You will see updates about sessions, memberships, and workout plans here."
+}

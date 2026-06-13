@@ -1,0 +1,57 @@
+{
+  "title": "Администрирование",
+  "subtitle": "Управляйте абонементами, рассылайте уведомления и просматривайте аналитику.",
+  "tabs": {
+    "overview": "Обзор",
+    "memberships": "Абонементы",
+    "broadcast": "Рассылка"
+  },
+  "overview": {
+    "activeClients": "Активные клиенты",
+    "activeMemberships": "Активные абонементы",
+    "revenue": "Доход",
+    "todayCheckIns": "Сегодняшние регистрации"
+  },
+  "memberships": {
+    "searchPlaceholder": "Введите ID клиента",
+    "searchButton": "Поиск",
+    "createButton": "Создать абонемент",
+    "noResults": "Абонементы для этого клиента не найдены.",
+    "actions": {
+      "activate": "Активировать",
+      "freeze": "Заморозить",
+      "unfreeze": "Разморозить",
+      "cancel": "Отменить"
+    },
+    "createModal": {
+      "title": "Создать абонемент",
+      "clientId": "ID клиента",
+      "planType": "Тип плана",
+      "types": {
+        "monthly": "Ежемесячный",
+        "yearly": "Ежегодный",
+        "visits": "По посещениям"
+      },
+      "durationMonths": "Длительность (месяцы)",
+      "visitsLimit": "Лимит посещений",
+      "visitsLimitPlaceholder": "напр. 10",
+      "createButton": "Создать"
+    }
+  },
+  "broadcast": {
+    "title": "Рассылка уведомлений",
+    "subtitle": "Отправьте уведомление всем пользователям.",
+    "titleLabel": "Заголовок",
+    "titlePlaceholder": "Заголовок уведомления",
+    "priorityLabel": "Приоритет",
+    "priorities": {
+      "LOW": "Низкий",
+      "NORMAL": "Обычный",
+      "HIGH": "Высокий",
+      "URGENT": "Срочный"
+    },
+    "messageLabel": "Сообщение",
+    "messagePlaceholder": "Текст уведомления...",
+    "sendButton": "Отправить"
+  }
+}

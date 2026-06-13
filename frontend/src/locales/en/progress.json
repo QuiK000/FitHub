@@ -1,0 +1,116 @@
+{
+  "title": "Track your transformation",
+  "subtitle": "Body measurements, fitness goals, personal records, and progress photos.",
+  "tabs": {
+    "overview": "Overview",
+    "measurements": "Measurements",
+    "goals": "Goals",
+    "records": "Records",
+    "photos": "Photos"
+  },
+  "overview": {
+    "currentWeight": "Current weight",
+    "bodyFat": "Body fat",
+    "activeGoals": "Active goals",
+    "personalRecords": "Personal records",
+    "completed": "{{count}} completed",
+    "totalRecords": "Total records set",
+    "trends": "Trends",
+    "trendDays": "{{count}} measurements over {{days}} days",
+    "activeGoalsTitle": "Active Goals",
+    "recentRecords": "Recent Records",
+    "noData": "No progress data yet",
+    "noDataDesc": "Start by logging a body measurement, setting a goal, or recording a personal record."
+  },
+  "measurements": {
+    "addButton": "Add measurement",
+    "noData": "No measurements yet",
+    "noDataDesc": "Log your first body measurement to start tracking your transformation.",
+    "modal": {
+      "title": "Log body measurement",
+      "weight": "Weight (kg)",
+      "bodyFat": "Body fat (%)",
+      "muscleMass": "Muscle mass (kg)",
+      "bmi": "BMI",
+      "notes": "Notes",
+      "notesPlaceholder": "Optional notes"
+    }
+  },
+  "goals": {
+    "newButton": "New goal",
+    "completedSection": "Completed",
+    "noData": "No goals yet",
+    "noDataDesc": "Set your first fitness goal to start tracking progress toward it.",
+    "daysLeft": "{{count}} days left",
+    "update": "Update",
+    "complete": "Complete",
+    "modal": {
+      "title": "Set a fitness goal",
+      "goalTitle": "Title",
+      "goalTitlePlaceholder": "e.g. Lose 5 kg",
+      "goalType": "Goal type",
+      "types": {
+        "weightLoss": "Weight loss",
+        "muscleGain": "Muscle gain",
+        "endurance": "Endurance",
+        "strength": "Strength"
+      },
+      "targetValue": "Target value",
+      "unit": "Unit",
+      "units": {
+        "kg": "kg",
+        "cm": "cm",
+        "minutes": "minutes",
+        "reps": "reps"
+      },
+      "description": "Description (optional)",
+      "descriptionPlaceholder": "Why this goal matters",
+      "createButton": "Create goal"
+    }
+  },
+  "records": {
+    "addButton": "Add record",
+    "noData": "No personal records yet",
+    "noDataDesc": "Log your first personal record to track your strength milestones.",
+    "previous": "Previous",
+    "improvedBy": "Improved by {{value}} {{unit}}",
+    "modal": {
+      "title": "Log personal record",
+      "exerciseId": "Exercise ID",
+      "exerciseIdPlaceholder": "Exercise ID",
+      "recordType": "Record type",
+      "types": {
+        "maxWeight": "Max weight",
+        "maxReps": "Max reps",
+        "maxDistance": "Max distance",
+        "bestTime": "Best time"
+      },
+      "value": "Value",
+      "unit": "Unit",
+      "units": {
+        "kg": "kg",
+        "reps": "reps",
+        "seconds": "seconds",
+        "meters": "meters"
+      },
+      "notes": "Notes (optional)",
+      "notesPlaceholder": "Context",
+      "saveButton": "Save record"
+    }
+  },
+  "photos": {
+    "noData": "No progress photos yet",
+    "noDataDesc": "Capture your visual transformation over time."
+  },
+  "trend": {
+    "weight": "Weight",
+    "bodyFat": "Body fat",
+    "muscleMass": "Muscle mass"
+  },
+  "measurement": {
+    "weight": "Weight",
+    "bodyFat": "Body fat",
+    "muscle": "Muscle",
+    "bmi": "BMI"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "title": "Training sessions",
+  "subtitle": "Browse upcoming group and personal training sessions, join, or check in.",
+  "upcoming": "Upcoming",
+  "past": "Past / Completed",
+  "noUpcoming": "No upcoming sessions",
+  "noUpcomingDesc": "Check back later for new training sessions.",
+  "type": {
+    "GROUP": "Group",
+    "PERSONAL": "Personal"
+  },
+  "status": {
+    "SCHEDULED": "Scheduled",
+    "COMPLETED": "Completed",
+    "CANCELLED": "Cancelled"
+  },
+  "join": "Join ({{spots}} spots)",
+  "joining": "Joining...",
+  "sessionFull": "Session is full",
+  "startsAt": "Starts",
+  "capacity": "Capacity",
+  "withTrainer": "With {{name}}"
+}

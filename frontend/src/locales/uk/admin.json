@@ -1,0 +1,57 @@
+{
+  "title": "Адміністрування",
+  "subtitle": "Керуйте абонементами, розсилайте повідомлення та переглядайте аналітику.",
+  "tabs": {
+    "overview": "Огляд",
+    "memberships": "Абонементи",
+    "broadcast": "Розсилка"
+  },
+  "overview": {
+    "activeClients": "Активні клієнти",
+    "activeMemberships": "Активні абонементи",
+    "revenue": "Дохід",
+    "todayCheckIns": "Сьогоднішні реєстрації"
+  },
+  "memberships": {
+    "searchPlaceholder": "Введіть ID клієнта",
+    "searchButton": "Пошук",
+    "createButton": "Створити абонемент",
+    "noResults": "Абонементів для цього клієнта не знайдено.",
+    "actions": {
+      "activate": "Активувати",
+      "freeze": "Заморозити",
+      "unfreeze": "Розморозити",
+      "cancel": "Скасувати"
+    },
+    "createModal": {
+      "title": "Створити абонемент",
+      "clientId": "ID клієнта",
+      "planType": "Тип плану",
+      "types": {
+        "monthly": "Щомісячний",
+        "yearly": "Щорічний",
+        "visits": "За відвідуваннями"
+      },
+      "durationMonths": "Тривалість (місяці)",
+      "visitsLimit": "Ліміт відвідувань",
+      "visitsLimitPlaceholder": "напр. 10",
+      "createButton": "Створити"
+    }
+  },
+  "broadcast": {
+    "title": "Розсилка повідомлень",
+    "subtitle": "Надішліть повідомлення всім користувачам.",
+    "titleLabel": "Заголовок",
+    "titlePlaceholder": "Заголовок повідомлення",
+    "priorityLabel": "Пріоритет",
+    "priorities": {
+      "LOW": "Низький",
+      "NORMAL": "Звичайний",
+      "HIGH": "Високий",
+      "URGENT": "Терміновий"
+    },
+    "messageLabel": "Повідомлення",
+    "messagePlaceholder": "Текст повідомлення...",
+    "sendButton": "Надіслати"
+  }
+}

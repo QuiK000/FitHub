@@ -1,0 +1,21 @@
+{
+  "title": "Find your trainer",
+  "subtitle": "Browse trainers, check specializations, and read reviews.",
+  "searchPlaceholder": "Search trainers...",
+  "searchButton": "Search",
+  "yearsExperience": "{{count}} years experience",
+  "viewDetails": "View details & reviews",
+  "noData": "No trainers found",
+  "noDataDesc": "Try adjusting your search or check back later.",
+  "detail": {
+    "profileLabel": "Trainer profile",
+    "experience": "{{count}} years experience"
+  },
+  "reviews": {
+    "title": "Reviews",
+    "writeReview": "Write review",
+    "noReviews": "No reviews yet. Be the first to leave feedback.",
+    "commentPlaceholder": "Share your experience...",
+    "submitButton": "Submit"
+  }
+}

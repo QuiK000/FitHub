@@ -1,0 +1,24 @@
+{
+  "badge": "Client onboarding",
+  "title": "Complete your profile",
+  "subtitle": "Add your details to personalize your training dashboard and daily targets.",
+  "fields": {
+    "firstName": "First name",
+    "lastName": "Last name",
+    "phone": "Phone (E.164)",
+    "phonePlaceholder": "+12025550123",
+    "birthdate": "Birthdate",
+    "height": "Height (cm)",
+    "weight": "Weight (kg)",
+    "waterTarget": "Water target (ml)",
+    "gender": "Gender"
+  },
+  "submit": "Finish onboarding",
+  "submitting": "Creating profile...",
+  "errors": {
+    "fillFields": "Please complete the highlighted onboarding fields."
+  },
+  "success": {
+    "created": "Profile created. Welcome to FitHub."
+  }
+}

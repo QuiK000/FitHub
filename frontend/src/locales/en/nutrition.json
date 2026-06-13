@@ -1,0 +1,53 @@
+{
+  "title": "Fuel and hydration",
+  "subtitle": "Track today's water, meal plan, calories, and weekly consistency.",
+  "editTargets": "Edit targets",
+  "water": {
+    "today": "Water today",
+    "ofTarget": "of {{target}} ml target",
+    "mlLogged": "{{total}} / {{target}} ml",
+    "logged": "logged today",
+    "noIntakes": "No water logged today. Start with a small entry and build momentum.",
+    "quickAdd": "Quick add",
+    "customAmount": "Custom amount in ml",
+    "logWater": "Log water",
+    "weekly": "Weekly Hydration",
+    "weeklyDesc": "Seven-day water progress at a glance.",
+    "noWeekly": "No weekly water history",
+    "noWeeklyDesc": "Your hydration week will populate once you start logging water."
+  },
+  "calories": {
+    "today": "Calories today",
+    "ofTarget": "of {{target}} target",
+    "noTarget": "No calorie target set"
+  },
+  "weeklyHydration": {
+    "title": "Weekly hydration",
+    "avg": "Average target completion"
+  },
+  "mealPlan": {
+    "todayTitle": "Today's Meal Plan",
+    "todayDesc": "Meal plan totals and completion for today.",
+    "noPlan": "No meal plan for today",
+    "noPlanDesc": "Create a plan to start tracking your nutrition.",
+    "createBelow": "Create below",
+    "targetCalories": "Target calories (optional)",
+    "createPlan": "Create plan",
+    "recentTitle": "Recent Meal Plans",
+    "recentDesc": "Your latest nutrition planning history.",
+    "noRecent": "No meal plans yet",
+    "noRecentDesc": "Meal plans you create will appear here with calorie and macro totals.",
+    "calories": "calories",
+    "meals": "{{count}} meal(s)",
+    "completed": "Completed",
+    "open": "Open"
+  },
+  "meal": {
+    "done": "Done",
+    "planned": "Planned",
+    "foods": "{{count}} food item(s)"
+  },
+  "errors": {
+    "loadFailed": "Some nutrition sections could not be refreshed. The available sections are still shown."
+  }
+}

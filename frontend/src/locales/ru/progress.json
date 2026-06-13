@@ -1,0 +1,116 @@
+{
+  "title": "Отслеживайте свою трансформацию",
+  "subtitle": "Измерения тела, фитнес-цели, личные рекорды и фото прогресса.",
+  "tabs": {
+    "overview": "Обзор",
+    "measurements": "Измерения",
+    "goals": "Цели",
+    "records": "Рекорды",
+    "photos": "Фото"
+  },
+  "overview": {
+    "currentWeight": "Текущий вес",
+    "bodyFat": "Жир тела",
+    "activeGoals": "Активные цели",
+    "personalRecords": "Личные рекорды",
+    "completed": "{{count}} завершено",
+    "totalRecords": "Всего рекордов",
+    "trends": "Тенденции",
+    "trendDays": "{{count}} измерений за {{days}} дней",
+    "activeGoalsTitle": "Активные цели",
+    "recentRecords": "Последние рекорды",
+    "noData": "Пока нет данных о прогрессе",
+    "noDataDesc": "Начните с измерения тела, установки цели или записи личного рекорда."
+  },
+  "measurements": {
+    "addButton": "Добавить измерение",
+    "noData": "Пока нет измерений",
+    "noDataDesc": "Запишите первое измерение тела, чтобы начать отслеживать трансформацию.",
+    "modal": {
+      "title": "Записать измерение тела",
+      "weight": "Вес (кг)",
+      "bodyFat": "Жир тела (%)",
+      "muscleMass": "Мышечная масса (кг)",
+      "bmi": "ИМТ",
+      "notes": "Заметки",
+      "notesPlaceholder": "Необязательные заметки"
+    }
+  },
+  "goals": {
+    "newButton": "Новая цель",
+    "completedSection": "Завершённые",
+    "noData": "Пока нет целей",
+    "noDataDesc": "Установите первую фитнес-цель, чтобы начать отслеживать прогресс.",
+    "daysLeft": "Осталось {{count}} дней",
+    "update": "Обновить",
+    "complete": "Завершить",
+    "modal": {
+      "title": "Установить фитнес-цель",
+      "goalTitle": "Название",
+      "goalTitlePlaceholder": "напр. Похудеть на 5 кг",
+      "goalType": "Тип цели",
+      "types": {
+        "weightLoss": "Похудение",
+        "muscleGain": "Набор мышц",
+        "endurance": "Выносливость",
+        "strength": "Сила"
+      },
+      "targetValue": "Целевое значение",
+      "unit": "Единица",
+      "units": {
+        "kg": "кг",
+        "cm": "см",
+        "minutes": "минуты",
+        "reps": "повторы"
+      },
+      "description": "Описание (необязательно)",
+      "descriptionPlaceholder": "Почему эта цель важна",
+      "createButton": "Создать цель"
+    }
+  },
+  "records": {
+    "addButton": "Добавить рекорд",
+    "noData": "Пока нет личных рекордов",
+    "noDataDesc": "Запишите первый личный рекорд, чтобы отслеживать достижения.",
+    "previous": "Предыдущий",
+    "improvedBy": "Улучшено на {{value}} {{unit}}",
+    "modal": {
+      "title": "Записать личный рекорд",
+      "exerciseId": "ID упражнения",
+      "exerciseIdPlaceholder": "ID упражнения",
+      "recordType": "Тип рекорда",
+      "types": {
+        "maxWeight": "Макс. вес",
+        "maxReps": "Макс. повторы",
+        "maxDistance": "Макс. дистанция",
+        "bestTime": "Лучшее время"
+      },
+      "value": "Значение",
+      "unit": "Единица",
+      "units": {
+        "kg": "кг",
+        "reps": "повторы",
+        "seconds": "секунды",
+        "meters": "метры"
+      },
+      "notes": "Заметки (необязательно)",
+      "notesPlaceholder": "Контекст",
+      "saveButton": "Сохранить рекорд"
+    }
+  },
+  "photos": {
+    "noData": "Пока нет фото прогресса",
+    "noDataDesc": "Закрепите свою визуальную трансформацию со временем."
+  },
+  "trend": {
+    "weight": "Вес",
+    "bodyFat": "Жир тела",
+    "muscleMass": "Мышечная масса"
+  },
+  "measurement": {
+    "weight": "Вес",
+    "bodyFat": "Жир тела",
+    "muscle": "Мышцы",
+    "bmi": "ИМТ"
+  }
+}

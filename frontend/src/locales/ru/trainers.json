@@ -1,0 +1,21 @@
+{
+  "title": "Найдите своего тренера",
+  "subtitle": "Просматривайте тренеров, специализации и отзывы.",
+  "searchPlaceholder": "Поиск тренеров...",
+  "searchButton": "Поиск",
+  "yearsExperience": "{{count}} лет опыта",
+  "viewDetails": "Детали и отзывы",
+  "noData": "Тренеры не найдены",
+  "noDataDesc": "Попробуйте изменить поисковый запрос или загляните позже.",
+  "detail": {
+    "profileLabel": "Профиль тренера",
+    "experience": "{{count}} лет опыта"
+  },
+  "reviews": {
+    "title": "Отзывы",
+    "writeReview": "Написать отзыв",
+    "noReviews": "Пока нет отзывов. Будьте первым.",
+    "commentPlaceholder": "Поделитесь своим опытом...",
+    "submitButton": "Отправить"
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "title": "Administration",
+  "subtitle": "Manage memberships, broadcast notifications, and view system analytics.",
+  "tabs": {
+    "overview": "Overview",
+    "memberships": "Memberships",
+    "broadcast": "Broadcast"
+  },
+  "overview": {
+    "activeClients": "Active clients",
+    "activeMemberships": "Active memberships",
+    "revenue": "Revenue",
+    "todayCheckIns": "Today check-ins"
+  },
+  "memberships": {
+    "searchPlaceholder": "Enter client ID",
+    "searchButton": "Search",
+    "createButton": "Create membership",
+    "noResults": "No memberships found for this client.",
+    "actions": {
+      "activate": "Activate",
+      "freeze": "Freeze",
+      "unfreeze": "Unfreeze",
+      "cancel": "Cancel"
+    },
+    "createModal": {
+      "title": "Create membership",
+      "clientId": "Client ID",
+      "planType": "Plan type",
+      "types": {
+        "monthly": "Monthly",
+        "yearly": "Yearly",
+        "visits": "Visits"
+      },
+      "durationMonths": "Duration (months)",
+      "visitsLimit": "Visits limit",
+      "visitsLimitPlaceholder": "e.g. 10",
+      "createButton": "Create"
+    }
+  },
+  "broadcast": {
+    "title": "Broadcast notification",
+    "subtitle": "Send a notification to all users.",
+    "titleLabel": "Title",
+    "titlePlaceholder": "Notification title",
+    "priorityLabel": "Priority",
+    "priorities": {
+      "LOW": "Low",
+      "NORMAL": "Normal",
+      "HIGH": "High",
+      "URGENT": "Urgent"
+    },
+    "messageLabel": "Message",
+    "messagePlaceholder": "Notification message...",
+    "sendButton": "Send broadcast"
+  }
+}

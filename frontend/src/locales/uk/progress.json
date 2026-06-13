@@ -1,0 +1,116 @@
+{
+  "title": "Відстежуйте свій прогрес",
+  "subtitle": "Вимірювання тіла, фітнес-цілі, особисті рекорди та фото прогресу.",
+  "tabs": {
+    "overview": "Огляд",
+    "measurements": "Вимірювання",
+    "goals": "Цілі",
+    "records": "Рекорди",
+    "photos": "Фото"
+  },
+  "overview": {
+    "currentWeight": "Поточна вага",
+    "bodyFat": "Жир тіла",
+    "activeGoals": "Активні цілі",
+    "personalRecords": "Особисті рекорди",
+    "completed": "{{count}} завершено",
+    "totalRecords": "Всього рекордів",
+    "trends": "Тенденції",
+    "trendDays": "{{count}} вимірювань за {{days}} днів",
+    "activeGoalsTitle": "Активні цілі",
+    "recentRecords": "Останні рекорди",
+    "noData": "Ще немає даних про прогрес",
+    "noDataDesc": "Почніть з вимірювання тіла, встановлення цілі або запису особистого рекорду."
+  },
+  "measurements": {
+    "addButton": "Додати вимірювання",
+    "noData": "Ще немає вимірювань",
+    "noDataDesc": "Запишіть перше вимірювання тіла, щоб почати відстежувати трансформацію.",
+    "modal": {
+      "title": "Записати вимірювання тіла",
+      "weight": "Вага (кг)",
+      "bodyFat": "Жир тіла (%)",
+      "muscleMass": "М'язова маса (кг)",
+      "bmi": "ІМТ",
+      "notes": "Нотатки",
+      "notesPlaceholder": "Необов'язкові нотатки"
+    }
+  },
+  "goals": {
+    "newButton": "Нова ціль",
+    "completedSection": "Завершені",
+    "noData": "Ще немає цілей",
+    "noDataDesc": "Встановіть першу фітнес-ціль, щоб почати відстежувати прогрес.",
+    "daysLeft": "Залишилось {{count}} днів",
+    "update": "Оновити",
+    "complete": "Завершити",
+    "modal": {
+      "title": "Встановити фітнес-ціль",
+      "goalTitle": "Назва",
+      "goalTitlePlaceholder": "напр. Схуднути на 5 кг",
+      "goalType": "Тип цілі",
+      "types": {
+        "weightLoss": "Схуднення",
+        "muscleGain": "Набір м'язів",
+        "endurance": "Витривалість",
+        "strength": "Сила"
+      },
+      "targetValue": "Цільове значення",
+      "unit": "Одиниця",
+      "units": {
+        "kg": "кг",
+        "cm": "см",
+        "minutes": "хвилини",
+        "reps": "повтори"
+      },
+      "description": "Опис (необов'язково)",
+      "descriptionPlaceholder": "Чому ця ціль важлива",
+      "createButton": "Створити ціль"
+    }
+  },
+  "records": {
+    "addButton": "Додати рекорд",
+    "noData": "Ще немає особистих рекордів",
+    "noDataDesc": "Запишіть перший особистий рекорд, щоб відстежувати досягнення.",
+    "previous": "Попередній",
+    "improvedBy": "Покращено на {{value}} {{unit}}",
+    "modal": {
+      "title": "Записати особистий рекорд",
+      "exerciseId": "ID вправи",
+      "exerciseIdPlaceholder": "ID вправи",
+      "recordType": "Тип рекорду",
+      "types": {
+        "maxWeight": "Макс. вага",
+        "maxReps": "Макс. повтори",
+        "maxDistance": "Макс. відстань",
+        "bestTime": "Найкращий час"
+      },
+      "value": "Значення",
+      "unit": "Одиниця",
+      "units": {
+        "kg": "кг",
+        "reps": "повтори",
+        "seconds": "секунди",
+        "meters": "метри"
+      },
+      "notes": "Нотатки (необов'язково)",
+      "notesPlaceholder": "Контекст",
+      "saveButton": "Зберегти рекорд"
+    }
+  },
+  "photos": {
+    "noData": "Ще немає фото прогресу",
+    "noDataDesc": "Закарбуйте свою візуальну трансформацію з часом."
+  },
+  "trend": {
+    "weight": "Вага",
+    "bodyFat": "Жир тіла",
+    "muscleMass": "М'язова маса"
+  },
+  "measurement": {
+    "weight": "Вага",
+    "bodyFat": "Жир тіла",
+    "muscle": "М'язи",
+    "bmi": "ІМТ"
+  }
+}
