@@ -7,7 +7,13 @@
       "workouts": "Workouts",
       "memberships": "Memberships",
       "profile": "Profile",
-      "analytics": "Analytics"
+      "analytics": "Analytics",
+      "nutrition": "Nutrition",
+      "progress": "Progress",
+      "trainers": "Trainers",
+      "sessions": "Sessions",
+      "notifications": "Notifications",
+      "admin": "Admin"
     },
     "trainingLoad": {
       "label": "Training Load",
