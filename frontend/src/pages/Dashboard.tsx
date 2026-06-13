@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState, type ComponentType, type SVGProps } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   Activity,
   ArrowRight,
+  BarChart3,
   CalendarDays,
   CheckCircle2,
   Clock3,
@@ -34,16 +36,16 @@ import {
   getTrainingSessions,
 } from '../services/workout.service'
 import { useAuthStore } from '../store/useAuthStore'
-import type { MembershipResponse } from '../types/membership.types'
-import type { DailyWaterIntakeResponse } from '../types/nutrition.types'
+import type { MembershipResponse } from '../types'
+import type { DailyWaterIntakeResponse } from '../types'
 import type {
   BodyMeasurementResponse,
   GoalResponse,
-} from '../types/progress.types'
+} from '../types'
 import type {
   ClientWorkoutPlanResponse,
   TrainingSessionResponse,
-} from '../types/workout.types'
+} from '../types'
 
 type DashboardData = {
   membership: MembershipResponse | null
@@ -59,6 +61,7 @@ type DashboardErrors = Partial<Record<keyof DashboardData, string>>
 const todayIso = () => new Date().toISOString().slice(0, 10)
 
 const Dashboard = () => {
+  const { t } = useTranslation('dashboard')
   const user = useAuthStore((state) => state.user)
   const roles = useAuthStore((state) => state.roles)
   const isClient = roles.includes('CLIENT')
@@ -167,36 +170,36 @@ const Dashboard = () => {
   const focusCards = useMemo(
     () => [
       {
-        title: 'Membership',
-        value: membershipDays === null ? 'Not active' : `${membershipDays} days`,
+        title: t('membership.title'),
+        value: membershipDays === null ? t('membership.notActive') : t('membership.days', { count: membershipDays }),
         label:
           membershipDays === null
-            ? 'Explore a plan to unlock sessions'
-            : `Valid until ${formatDate(data.membership?.endDate)}`,
+            ? t('membership.explorePlan')
+            : t('membership.validUntil', { date: formatDate(data.membership?.endDate) }),
         icon: CreditCard,
         tone: 'bg-emerald-500',
       },
       {
-        title: 'Water today',
+        title: t('water.title'),
         value: `${Math.round(waterProgress)}%`,
-        label: `${data.water?.totalMl ?? 0} / ${data.water?.targetMl ?? user?.clientProfile?.dailyWaterTarget ?? 0} ml`,
+        label: t('water.mlLogged', { total: data.water?.totalMl ?? 0, target: data.water?.targetMl ?? user?.clientProfile?.dailyWaterTarget ?? 0 }),
         icon: Droplets,
         tone: 'bg-sky-500',
       },
       {
-        title: 'Workout plan',
+        title: t('workoutPlan.title'),
         value: activeAssignment
           ? `${Math.round(activeAssignment.completionPercentage ?? 0)}%`
-          : 'None',
-        label: activeAssignment?.workoutPlan.name ?? 'No active assignment yet',
+          : t('workoutPlan.none'),
+        label: activeAssignment?.workoutPlan.name ?? t('workoutPlan.noActive'),
         icon: Dumbbell,
         tone: 'bg-violet-500',
       },
       {
-        title: 'Active goals',
+        title: t('goals.title'),
         value: data.goals.length.toString(),
         label:
-          data.goals[0]?.title ?? 'Create a goal to track your next milestone',
+          data.goals[0]?.title ?? t('goals.noGoals'),
         icon: Target,
         tone: 'bg-amber-500',
       },
@@ -215,10 +218,63 @@ const Dashboard = () => {
 
   if (!isClient) {
     return (
-      <ShellNotice
-        title="Dashboard is client-focused in this step"
-        description="Trainer and admin dashboards will get their own tailored views in later implementation steps."
-      />
+      <div className="space-y-6">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Dashboard
+          </p>
+          <h1 className="mt-2 text-2xl font-bold text-foreground md:text-3xl">
+            Welcome back, {user?.trainerProfile?.firstname ?? user?.email?.split('@')[0] ?? 'Admin'}
+          </h1>
+          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+            Overview of your gym operations and key metrics.
+          </p>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <MetricCard
+            icon={Users2}
+            label="Quick Access"
+            value="—"
+            tone="bg-blue-500"
+          />
+          <MetricCard
+            icon={Dumbbell}
+            label="Workouts"
+            value="—"
+            tone="bg-violet-500"
+          />
+          <MetricCard
+            icon={CalendarDays}
+            label="Sessions"
+            value="—"
+            tone="bg-emerald-500"
+          />
+          <MetricCard
+            icon={BarChart3}
+            label="Analytics"
+            value="—"
+            tone="bg-amber-500"
+          />
+        </div>
+
+        <Card>
+          <CardContent className="flex min-h-48 flex-col items-center justify-center p-8 text-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
+              <Activity className="h-6 w-6 text-primary" />
+            </div>
+            <h2 className="mt-4 text-lg font-bold text-foreground">Trainer Dashboard</h2>
+            <p className="mt-2 max-w-md text-sm text-muted-foreground">
+              Use the navigation sidebar to access workout plans, sessions, analytics, and client management.
+            </p>
+            <div className="mt-5 flex flex-wrap justify-center gap-2">
+              <ActionLink to="/workouts" label="Manage Plans" icon={Dumbbell} />
+              <ActionLink to="/sessions" label="View Sessions" icon={CalendarDays} />
+              <ActionLink to="/analytics" label="Analytics" icon={BarChart3} />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     )
   }
 
@@ -227,20 +283,19 @@ const Dashboard = () => {
       <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Client dashboard
+            {t('badge')}
           </p>
           <h1 className="mt-2 text-2xl font-bold text-foreground md:text-3xl">
-            Welcome back, {greetingName}
+            {t('title', { name: greetingName })}
           </h1>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            Your membership, hydration, training, and progress signals in one
-            focused view for {formatDate(todayIso())}.
+            {t('subtitle', { date: formatDate(todayIso()) })}
           </p>
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <ActionLink to="/workouts" label="Open workouts" icon={Dumbbell} />
-          <ActionLink to="/progress" label="Track progress" icon={LineChart} />
+          <ActionLink to="/workouts" label={t('openWorkouts')} icon={Dumbbell} />
+          <ActionLink to="/progress" label={t('trackProgress')} icon={LineChart} />
         </div>
       </div>
 
@@ -257,9 +312,9 @@ const Dashboard = () => {
           <CardHeader>
             <div className="flex items-center justify-between gap-4">
               <div>
-                <CardTitle>Today&apos;s Plan</CardTitle>
+                <CardTitle>{t('todayPlan.title')}</CardTitle>
                 <CardDescription>
-                  The highest-value actions for your next workout day.
+                  {t('todayPlan.desc')}
                 </CardDescription>
               </div>
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
@@ -284,9 +339,9 @@ const Dashboard = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Hydration</CardTitle>
+            <CardTitle>{t('water.hydrationTitle')}</CardTitle>
             <CardDescription>
-              Keep today&apos;s water target visible and easy to scan.
+              {t('water.hydrationDesc')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -305,9 +360,9 @@ const Dashboard = () => {
       <section className="grid gap-4 xl:grid-cols-[minmax(0,0.9fr),minmax(0,1.1fr)]">
         <Card>
           <CardHeader>
-            <CardTitle>Membership Status</CardTitle>
+            <CardTitle>{t('membership.statusTitle')}</CardTitle>
             <CardDescription>
-              Your access window and remaining visit context.
+              {t('membership.statusDesc')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -325,9 +380,9 @@ const Dashboard = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Goals & Measurements</CardTitle>
+            <CardTitle>{t('goals.activeGoalsTitle')}</CardTitle>
             <CardDescription>
-              The latest progress signals from your tracking history.
+              {t('goals.activeGoalsDesc')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -349,8 +404,7 @@ const Dashboard = () => {
 
       {Object.keys(errors).length > 0 && !isLoading && (
         <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-700 dark:text-amber-200">
-          Some dashboard sections could not be refreshed. The rest of your
-          overview is still available.
+          {t('errors.loadFailed')}
         </div>
       )}
     </div>
@@ -414,7 +468,7 @@ const formatEnum = (value: string) =>
 type IconType = ComponentType<SVGProps<SVGSVGElement>>
 
 type MetricCardProps = {
-  title: string
+  title?: string
   value: string
   label: string
   icon: IconType
@@ -428,17 +482,17 @@ const MetricCard = ({ title, value, label, icon: Icon, tone }: MetricCardProps) 
     transition={{ duration: 0.25 }}
   >
     <Card className="h-full">
-      <CardContent className="flex h-full flex-col justify-between p-5">
-        <div className="flex items-start justify-between gap-3">
+      <CardContent className="flex min-h-[140px] items-start justify-between gap-4 p-5">
+        <div className="flex flex-col justify-between">
           <div>
             <p className="text-xs font-medium text-muted-foreground">{title}</p>
             <p className="mt-2 text-2xl font-bold text-foreground">{value}</p>
           </div>
-          <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${tone}`}>
-            <Icon className="h-5 w-5 text-white" />
-          </div>
+          <p className="mt-3 line-clamp-2 text-xs text-muted-foreground">{label}</p>
         </div>
-        <p className="mt-4 line-clamp-2 text-xs text-muted-foreground">{label}</p>
+        <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${tone}`}>
+          <Icon className="h-5 w-5 text-white" />
+        </div>
       </CardContent>
     </Card>
   </motion.div>
@@ -835,26 +889,6 @@ const SkeletonBlock = () => (
 
 const SkeletonLine = () => (
   <div className="h-14 animate-pulse rounded-xl bg-muted" />
-)
-
-const ShellNotice = ({
-  title,
-  description,
-}: {
-  title: string
-  description: string
-}) => (
-  <Card>
-    <CardContent className="flex min-h-64 flex-col items-center justify-center p-8 text-center">
-      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
-        <LineChart className="h-6 w-6 text-primary" />
-      </div>
-      <h1 className="mt-5 text-2xl font-bold text-foreground">{title}</h1>
-      <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-        {description}
-      </p>
-    </CardContent>
-  </Card>
 )
 
 export default Dashboard
