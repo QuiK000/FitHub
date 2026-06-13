@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/reviews")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('TRAINER')")
 public class TrainerReviewController {
     private final ITrainerReviewService trainerReviewService;
 
     @GetMapping("/trainers/{trainer-id}")
+    @PreAuthorize("hasAnyRole('TRAINER', 'CLIENT', 'ADMIN')")
     public ResponseEntity<PageResponse<TrainerReviewResponse>> getReviewsByTrainerId(
             @PathVariable("trainer-id") String trainerId,
             @RequestParam(defaultValue = "0") int page,
@@ -30,6 +30,7 @@ public class TrainerReviewController {
     }
 
     @GetMapping("/me")
+    @PreAuthorize("hasRole('TRAINER')")
     public ResponseEntity<PageResponse<TrainerReviewResponse>> getMyReviews(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
@@ -38,6 +39,7 @@ public class TrainerReviewController {
     }
 
     @GetMapping("/me/summary")
+    @PreAuthorize("hasRole('TRAINER')")
     public ResponseEntity<TrainerReviewSummaryResponse> getMyReviewSummary() {
         return ResponseEntity.ok(trainerReviewService.getMyReviewSummary());
     }
