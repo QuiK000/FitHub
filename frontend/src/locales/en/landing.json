@@ -11,7 +11,7 @@
     "subtitle": "Track workouts, monitor progress, and achieve your fitness goals with our comprehensive platform designed for athletes and fitness enthusiasts.",
     "ctaPrimary": "Start tracking free",
     "ctaSecondary": "Sign in",
-    "benefits": "No credit card required • Free forever • Cancel anytime"
+    "benefits": "No credit card required \u2022 Free forever \u2022 Cancel anytime"
   },
   "stats": {
     "users": {
@@ -62,6 +62,6 @@
   },
   "footer": {
     "brand": "FitHub",
-    "copyright": "© 2026 FitHub. All rights reserved."
+    "copyright": "\u00a9 2026 FitHub. All rights reserved."
   }
 }
