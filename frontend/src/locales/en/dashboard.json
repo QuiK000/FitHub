@@ -1,52 +1,78 @@
 {
-  "header": {
-    "badge": "Dashboard",
-    "title": "Welcome back, {{name}}",
-    "subtitle": "Track your progress and stay on top of your fitness goals.",
-    "todayCheckIns": "Today's check-ins:",
-    "startSession": "Start new session"
+  "badge": "Client dashboard",
+  "title": "Welcome back, {{name}}",
+  "subtitle": "Your membership, hydration, training, and progress signals in one focused view for {{date}}.",
+  "openWorkouts": "Open workouts",
+  "trackProgress": "Track progress",
+  "membership": {
+    "title": "Membership",
+    "notActive": "Not active",
+    "days": "{{count}} days",
+    "explorePlan": "Explore a plan to unlock sessions",
+    "validUntil": "Valid until {{date}}",
+    "statusTitle": "Membership Status",
+    "statusDesc": "Your access window and remaining visit context.",
+    "activePlan": "Active plan",
+    "daysRemaining": "{{count}} day(s) remaining",
+    "validFrom": "Valid from",
+    "validUntilDate": "Valid until",
+    "visitsLeft": "Visits left",
+    "unlimited": "Unlimited",
+    "noActive": "No active membership",
+    "noActiveDesc": "You do not have an active membership yet. Explore plans to unlock training access.",
+    "explorePlans": "Explore plans"
   },
-  "stats": {
-    "activeClients": {
-      "label": "Active clients",
-      "description": "Currently engaged memberships"
-    },
-    "activeMemberships": {
-      "label": "Active memberships",
-      "description": "Running contracts in this period"
-    },
-    "todayCheckIns": {
-      "label": "Today's check-ins",
-      "description": "Member arrivals logged"
-    },
-    "monthlyRevenue": {
-      "label": "Monthly revenue",
-      "description": "From all active memberships"
-    }
+  "water": {
+    "title": "Water today",
+    "ofTarget": "of {{target}} ml target",
+    "mlLogged": "{{total}} / {{target}} ml",
+    "intakesLogged": "{{count}} intake(s) logged today.",
+    "noIntakes": "No water logged today. Start with one glass and build momentum.",
+    "hydrationTitle": "Hydration",
+    "hydrationDesc": "Keep today's water target visible and easy to scan.",
+    "noTarget": "No hydration target yet",
+    "noTargetDesc": "Set your daily water target from your profile to start tracking intake.",
+    "updateProfile": "Update profile"
   },
-  "chart": {
-    "title": "Weekly Activity",
-    "subtitle": "Session density and flow across the week.",
-    "legend": "Sessions / day"
+  "workoutPlan": {
+    "title": "Workout plan",
+    "none": "None",
+    "noActive": "No active workout plan",
+    "noActiveDesc": "Once a trainer assigns your plan, today's training focus will appear here.",
+    "browseWorkouts": "Browse workouts",
+    "activeWorkoutPlan": "Active workout plan",
+    "sessionsPerWeek": "{{count}} sessions/week",
+    "complete": "% complete",
+    "logged": "{{completed}} / {{total}} workouts"
   },
-  "capacity": {
-    "title": "Capacity",
-    "percentage": "86%",
-    "peakExpected": "Peak expected in",
-    "minutes": "{{count}} min",
-    "status": "Stable",
-    "topSession": "Top session",
-    "attendance": "Attendance",
-    "checkIns": "{{count}} check-ins",
-    "noData": "Data not available"
+  "nextSession": {
+    "title": "Next session",
+    "noUpcoming": "No upcoming sessions",
+    "noUpcomingDesc": "Join a class or book a personal session when the next schedule opens.",
+    "viewSessions": "View sessions",
+    "training": "training",
+    "withTrainer": "With {{name}}",
+    "starts": "Starts",
+    "capacity": "Capacity"
   },
-  "highlights": {
-    "title": "Highlights",
-    "activeClients": "Active clients",
-    "todayCheckIns": "Today's check-ins",
-    "popularSessions": "Popular sessions tracked"
+  "goals": {
+    "title": "Active goals",
+    "noGoals": "Create a goal to track your next milestone",
+    "activeGoalsTitle": "Goals & Measurements",
+    "activeGoalsDesc": "The latest progress signals from your tracking history.",
+    "noActiveGoals": "No active goals",
+    "noActiveGoalsDesc": "Create your first goal to turn progress into something visible.",
+    "openProgress": "Open progress",
+    "noMeasurements": "No measurements yet",
+    "noMeasurementsDesc": "Log your first body measurement to unlock trend tracking.",
+    "addMeasurement": "Add measurement"
+  },
+  "todayPlan": {
+    "title": "Today's Plan",
+    "desc": "The highest-value actions for your next workout day."
   },
   "errors": {
-    "loadFailed": "Unable to load dashboard analytics."
+    "loadFailed": "Some dashboard sections could not be refreshed. The rest of your overview is still available.",
+    "unableToLoad": "Unable to load dashboard data."
   }
 }
