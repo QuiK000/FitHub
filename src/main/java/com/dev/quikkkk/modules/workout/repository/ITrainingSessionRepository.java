@@ -23,7 +23,7 @@ public interface ITrainingSessionRepository extends JpaRepository<TrainingSessio
             LEFT JOIN t.specialization spec
             WHERE
                         :search IS NULL
-                        OR TRIM(:search) = ''
+                        OR :search = ''
                         OR LOWER(s.type) LIKE LOWER(CONCAT('%', :search, '%'))
                         OR LOWER(t.firstname) LIKE LOWER(CONCAT('%', :search, '%'))
                         OR LOWER(t.lastname) LIKE LOWER(CONCAT('%', :search, '%'))

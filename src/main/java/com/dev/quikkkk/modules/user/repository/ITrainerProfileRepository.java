@@ -29,7 +29,7 @@ public interface ITrainerProfileRepository extends JpaRepository<TrainerProfile,
             WHERE t.active = true
             AND (
                 :search IS NULL
-                OR TRIM(:search) = ''
+                OR :search = ''
                 OR LOWER (t.firstname) LIKE LOWER(CONCAT('%', :search, '%'))
                 OR LOWER (t.lastname) LIKE LOWER(CONCAT('%', :search, '%'))
                 OR LOWER(s.name) LIKE LOWER(CONCAT('%', :search, '%'))

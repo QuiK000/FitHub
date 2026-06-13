@@ -19,7 +19,7 @@ public interface IExerciseRepository extends JpaRepository<Exercise, String> {
             WHERE e.active = true
             AND (
                  :search IS NULL
-                  OR TRIM(:search) = ''
+                  OR :search = ''
                   OR LOWER(e.name) LIKE LOWER(CONCAT('%', :search, '%'))
                   OR LOWER(e.description) LIKE LOWER(CONCAT('%', :search, '%'))
                   OR LOWER(e.instructions) LIKE LOWER(CONCAT('%', :search, '%'))

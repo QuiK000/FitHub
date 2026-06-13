@@ -22,7 +22,7 @@ public interface IClientProfileRepository extends JpaRepository<ClientProfile, S
             SELECT DISTINCT c FROM ClientProfile c
             LEFT JOIN FETCH c.user
             WHERE c.active = true
-            AND (:search IS NULL OR TRIM(:search) = ''
+            AND (:search IS NULL OR :search = ''
                     OR LOWER(c.lastname) LIKE LOWER(CONCAT('%', :search, '%'))
                     OR LOWER(c.firstname) LIKE LOWER(CONCAT('%', :search, '%'))
                 ) ORDER BY c.createdDate DESC
