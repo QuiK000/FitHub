@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type ComponentType, type SVGProps } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
@@ -34,6 +35,7 @@ import { LogWorkoutModal } from '../components/workouts/LogWorkoutModal'
 import toast from '../utils/toast'
 
 const WorkoutDetail = () => {
+  const { t } = useTranslation(['progress', 'common'])
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const [assignment, setAssignment] = useState<ClientWorkoutPlanResponse | null>(
@@ -84,7 +86,7 @@ const WorkoutDetail = () => {
       'Trainer')
 
   const handleLogged = async () => {
-    toast.success('Workout logged successfully.')
+    toast.success(t('common:toast.workoutLogged'))
     setIsLogOpen(false)
     if (id) {
       await load(id)

@@ -8,6 +8,7 @@ import {
   Dumbbell,
   History,
   ListChecks,
+  Play,
   Trophy,
   User2,
 } from 'lucide-react'
@@ -22,10 +23,13 @@ import { useAuthStore } from '../store/useAuthStore'
 import {
   type ClientWorkoutPlanResponse,
   type WorkoutLogResponse,
+  type WorkoutPlanExerciseResponse,
   getMyActiveAssignments,
   getMyAssignments,
   getMyWorkoutLogs,
+  getWorkoutPlanById,
 } from '../services/workout.service'
+import { LogWorkoutModal } from '../components/workouts/LogWorkoutModal'
 
 type WorkoutsState = {
   activeAssignments: ClientWorkoutPlanResponse[]
@@ -44,39 +48,57 @@ const Workouts = () => {
   })
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [selectedAssignment, setSelectedAssignment] = useState<ClientWorkoutPlanResponse | null>(null)
+  const [selectedExercises, setSelectedExercises] = useState<WorkoutPlanExerciseResponse[]>([])
+  const [isLogOpen, setIsLogOpen] = useState(false)
 
-  useEffect(() => {
+  const handleStartWorkout = async (assignment: ClientWorkoutPlanResponse) => {
+    setSelectedAssignment(assignment)
+    try {
+      const plan = await getWorkoutPlanById(assignment.workoutPlan.id)
+      setSelectedExercises(plan.exercises)
+    } catch {
+      setSelectedExercises([])
+    }
+    setIsLogOpen(true)
+  }
+
+  const loadData = async () => {
     if (!isClient) {
       setIsLoading(false)
       return
     }
 
-    const load = async () => {
-      setIsLoading(true)
-      setError(null)
+    setIsLoading(true)
+    setError(null)
 
-      try {
-        const [activeAssignments, allAssignments, recentLogsPage] =
-          await Promise.all([
-            getMyActiveAssignments(),
-            getMyAssignments(),
-            getMyWorkoutLogs(0, 5),
-          ])
+    try {
+      const [activeAssignments, allAssignments, recentLogsPage] =
+        await Promise.all([
+          getMyActiveAssignments(),
+          getMyAssignments(),
+          getMyWorkoutLogs(0, 5),
+        ])
 
-        setState({
-          activeAssignments,
-          allAssignments,
-          recentLogs: recentLogsPage.content,
-        })
-      } catch (err) {
-        console.error(err)
-        setError('Unable to load your workout module right now.')
-      } finally {
-        setIsLoading(false)
-      }
+      setState({
+        activeAssignments,
+        allAssignments,
+        recentLogs: recentLogsPage.content,
+      })
+    } catch (err) {
+      console.error(err)
+      setError('Unable to load your workout module right now.')
+    } finally {
+      setIsLoading(false)
     }
+  }
 
-    void load()
+  useEffect(() => {
+    void loadData()
+  }, [isClient])
+
+  useEffect(() => {
+    void loadData()
   }, [isClient])
 
   const titleName =
@@ -100,22 +122,11 @@ const Workouts = () => {
     return Math.round(total / state.allAssignments.length)
   }, [state.allAssignments])
 
-  if (!isClient) {
-    return (
-      <Card>
-        <CardContent className="flex min-h-64 flex-col items-center justify-center p-8 text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
-            <Dumbbell className="h-6 w-6 text-primary" />
-          </div>
-          <h1 className="mt-5 text-2xl font-bold text-foreground">
-            Client workouts are not available for this role yet
-          </h1>
-          <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-            Trainer and admin workout management will be completed in later steps.
-          </p>
-        </CardContent>
-      </Card>
-    )
+  const handleLogged = async () => {
+    setIsLogOpen(false)
+    setSelectedAssignment(null)
+    setSelectedExercises([])
+    await loadData()
   }
 
   return (
@@ -195,7 +206,11 @@ const Workouts = () => {
             ) : state.activeAssignments.length ? (
               <div className="grid gap-4 md:grid-cols-2">
                 {state.activeAssignments.map((assignment) => (
-                  <WorkoutCard key={assignment.id} assignment={assignment} />
+                  <WorkoutCard
+                    key={assignment.id}
+                    assignment={assignment}
+                    onStart={() => handleStartWorkout(assignment)}
+                  />
                 ))}
               </div>
             ) : (
@@ -273,6 +288,20 @@ const Workouts = () => {
           )}
         </CardContent>
       </Card>
+
+      {selectedAssignment && (
+        <LogWorkoutModal
+          isOpen={isLogOpen}
+          onClose={() => {
+            setIsLogOpen(false)
+            setSelectedAssignment(null)
+            setSelectedExercises([])
+          }}
+          assignment={selectedAssignment}
+          exercises={selectedExercises}
+          onLogged={handleLogged}
+        />
+      )}
     </div>
   )
 }
@@ -323,7 +352,13 @@ const SummaryCard = ({
   </Card>
 )
 
-const WorkoutCard = ({ assignment }: { assignment: ClientWorkoutPlanResponse }) => {
+const WorkoutCard = ({
+  assignment,
+  onStart,
+}: {
+  assignment: ClientWorkoutPlanResponse
+  onStart: () => void
+}) => {
   const plan = assignment.workoutPlan
   const progress = clampPercentage(assignment.completionPercentage ?? 0)
   const trainerName =
@@ -367,13 +402,23 @@ const WorkoutCard = ({ assignment }: { assignment: ClientWorkoutPlanResponse }) 
           <User2 className="h-3.5 w-3.5 shrink-0" />
           <span className="truncate">{trainerName}</span>
         </div>
-        <Link
-          to={`/workouts/${assignment.id}`}
-          className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-primary hover:underline"
-        >
-          Details
-          <ArrowRight className="h-4 w-4" />
-        </Link>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onStart}
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-soft transition-all hover:bg-primary/90"
+          >
+            <Play className="h-3.5 w-3.5" />
+            Start
+          </button>
+          <Link
+            to={`/workouts/${assignment.id}`}
+            className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-primary hover:underline"
+          >
+            Details
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
       </div>
     </motion.div>
   )
