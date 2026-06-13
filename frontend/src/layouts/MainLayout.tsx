@@ -52,13 +52,13 @@ const MainLayout = () => {
       },
       {
         to: '/nutrition',
-        label: 'Nutrition',
+        label: t('navigation:sidebar.items.nutrition'),
         icon: Utensils,
         roles: ['CLIENT'],
       },
       {
         to: '/progress',
-        label: 'Progress',
+        label: t('navigation:sidebar.items.progress'),
         icon: Target,
         roles: ['CLIENT'],
       },
@@ -70,13 +70,13 @@ const MainLayout = () => {
       },
       {
         to: '/trainers',
-        label: 'Trainers',
+        label: t('navigation:sidebar.items.trainers'),
         icon: Users2,
         roles: ['CLIENT', 'TRAINER', 'ADMIN'],
       },
       {
         to: '/sessions',
-        label: 'Sessions',
+        label: t('navigation:sidebar.items.sessions'),
         icon: CalendarDays,
         roles: ['CLIENT', 'TRAINER'],
       },
@@ -88,12 +88,12 @@ const MainLayout = () => {
       },
       {
         to: '/notifications',
-        label: 'Notifications',
+        label: t('navigation:sidebar.items.notifications'),
         icon: Bell,
       },
       {
         to: '/admin',
-        label: 'Admin',
+        label: t('navigation:sidebar.items.admin'),
         icon: ShieldCheck,
         roles: ['ADMIN'],
       },

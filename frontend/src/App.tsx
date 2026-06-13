@@ -1,14 +1,5 @@
 import { useEffect } from 'react'
 import {
-    BarChart3,
-    Bell,
-    CalendarDays,
-    CreditCard,
-    ShieldCheck,
-    Target,
-    Users,
-} from 'lucide-react'
-import {
     BrowserRouter,
     Navigate,
     Route,
@@ -25,11 +16,17 @@ import Profile from './pages/Profile'
 import Workouts from './pages/Workouts'
 import WorkoutDetail from './pages/WorkoutDetail'
 import Nutrition from './pages/Nutrition'
+import Progress from './pages/Progress'
+import Sessions from './pages/Sessions'
+import Trainers from './pages/Trainers'
+import Notifications from './pages/Notifications'
+import Memberships from './pages/Memberships'
+import Analytics from './pages/Analytics'
+import Admin from './pages/Admin'
 import VerifyEmail from './pages/VerifyEmail'
 import Onboarding from './pages/Onboarding'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
-import ShellPage from './pages/ShellPage'
 
 import ProtectedRoute from './components/ProtectedRoute'
 import ClientOnboardingGate from './components/ClientOnboardingGate'
@@ -67,76 +64,22 @@ const AppRoutes = () => {
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/onboarding" element={<Onboarding />} />
                     </Route>
-                    <Route
-                        path="/trainers"
-                        element={
-                            <ShellPage
-                                title="Trainers"
-                                description="Trainer discovery, profiles, reviews, and booking context will be added here."
-                                icon={Users}
-                            />
-                        }
-                    />
-                    <Route
-                        path="/notifications"
-                        element={
-                            <ShellPage
-                                title="Notifications"
-                                description="Unread notifications, live updates, and message actions will appear here."
-                                icon={Bell}
-                            />
-                        }
-                    />
+                    <Route path="/trainers" element={<Trainers />} />
+                    <Route path="/notifications" element={<Notifications />} />
                     <Route element={<ProtectedRoute allowedRoles={['CLIENT', 'TRAINER']} />}>
                         <Route path="/workouts" element={<Workouts />} />
                         <Route path="/workouts/:id" element={<WorkoutDetail />} />
-                        <Route
-                            path="/sessions"
-                            element={
-                                <ShellPage
-                                    title="Sessions"
-                                    description="Training sessions, joins, waitlists, and check-ins will be managed from this route."
-                                    icon={CalendarDays}
-                                />
-                            }
-                        />
+                        <Route path="/sessions" element={<Sessions />} />
                     </Route>
                     <Route element={<ProtectedRoute allowedRoles={['CLIENT']} />}>
                         <Route path="/nutrition" element={<Nutrition />} />
-                        <Route
-                            path="/progress"
-                            element={
-                                <ShellPage
-                                    title="Progress"
-                                    description="Measurements, goals, personal records, and progress photos will be built in this workspace."
-                                    icon={Target}
-                                />
-                            }
-                        />
+                        <Route path="/progress" element={<Progress />} />
                     </Route>
                     <Route element={<ProtectedRoute allowedRoles={['CLIENT', 'ADMIN']} />}>
-                        <Route
-                            path="/memberships"
-                            element={
-                                <ShellPage
-                                    title="Memberships"
-                                    description="Active membership details, payment history, and plan status will be available here."
-                                    icon={CreditCard}
-                                />
-                            }
-                        />
+                        <Route path="/memberships" element={<Memberships />} />
                     </Route>
                     <Route element={<ProtectedRoute allowedRoles={['TRAINER', 'ADMIN']} />}>
-                        <Route
-                            path="/analytics"
-                            element={
-                                <ShellPage
-                                    title="Analytics"
-                                    description="Role-aware performance, attendance, revenue, and client analytics will land here."
-                                    icon={BarChart3}
-                                />
-                            }
-                        />
+                        <Route path="/analytics" element={<Analytics />} />
                     </Route>
                 </Route>
                 </Route>
@@ -144,16 +87,7 @@ const AppRoutes = () => {
 
             <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
                 <Route element={<MainLayout />}>
-                    <Route
-                        path="/admin"
-                        element={
-                            <ShellPage
-                                title="Admin"
-                                description="Administrative controls and operations tooling will be exposed from this protected area."
-                                icon={ShieldCheck}
-                            />
-                        }
-                    />
+                    <Route path="/admin" element={<Admin />} />
                 </Route>
             </Route>
 
