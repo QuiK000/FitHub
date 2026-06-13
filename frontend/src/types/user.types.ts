@@ -52,6 +52,7 @@ export interface UpdateTrainerProfileRequest {
 }
 
 export interface ClientProfileResponse {
+  id?: string
   firstname: string
   lastname: string
   phone: string
@@ -76,6 +77,14 @@ export interface ClientAnalyticsResponse {
   totalVisits: number
   missedSessions: number
   lastVisit: ISODateTimeString | null
+}
+
+export interface TrainerAnalyticsResponse {
+  trainerId: string
+  trainerName: string
+  totalSessions: number
+  totalClients: number
+  attendanceRate: number
 }
 
 export interface SpecializationResponse {
