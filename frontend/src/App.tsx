@@ -27,9 +27,11 @@ import VerifyEmail from './pages/VerifyEmail'
 import Onboarding from './pages/Onboarding'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
+import TrainerWorkouts from './pages/TrainerWorkouts'
+import TrainerProfile from './pages/TrainerProfile'
 
 import ProtectedRoute from './components/ProtectedRoute'
-import ClientOnboardingGate from './components/ClientOnboardingGate'
+import ProfileOnboardingGate from './components/ClientOnboardingGate'
 
 import { useAuthStore } from './store/useAuthStore'
 import { ThemeProvider } from './contexts/ThemeContext'
@@ -57,7 +59,7 @@ const AppRoutes = () => {
             <Route path="/reset-password" element={<ResetPassword />} />
 
             <Route element={<ProtectedRoute />}>
-                <Route element={<ClientOnboardingGate />}>
+                <Route element={<ProfileOnboardingGate />}>
                 <Route element={<MainLayout />}>
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route element={<ProtectedRoute allowedRoles={['CLIENT']} />}>
@@ -70,6 +72,10 @@ const AppRoutes = () => {
                         <Route path="/workouts" element={<Workouts />} />
                         <Route path="/workouts/:id" element={<WorkoutDetail />} />
                         <Route path="/sessions" element={<Sessions />} />
+                    </Route>
+                    <Route element={<ProtectedRoute allowedRoles={['TRAINER']} />}>
+                        <Route path="/trainer-workouts" element={<TrainerWorkouts />} />
+                        <Route path="/trainer-profile" element={<TrainerProfile />} />
                     </Route>
                     <Route element={<ProtectedRoute allowedRoles={['CLIENT']} />}>
                         <Route path="/nutrition" element={<Nutrition />} />
