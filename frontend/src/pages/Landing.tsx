@@ -101,20 +101,20 @@ const Landing = () => {
           <div className="grid gap-4 md:grid-cols-3">
             <StatCard
               icon={Users}
-              value="10K+"
-              label="Active users"
+              value={t('stats.users.value')}
+              label={t('stats.users.label')}
               delay={0.3}
             />
             <StatCard
               icon={Activity}
-              value="500K+"
-              label="Workouts logged"
+              value={t('stats.workouts.value')}
+              label={t('stats.workouts.label')}
               delay={0.4}
             />
             <StatCard
               icon={TrendingUp}
-              value="95%"
-              label="Goal achievement"
+              value={t('stats.achievement.value')}
+              label={t('stats.achievement.label')}
               delay={0.5}
             />
           </div>
@@ -142,38 +142,38 @@ const Landing = () => {
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             <FeatureCard
               icon={Dumbbell}
-              title="Workout Logging"
-              description="Track every rep, set, and exercise with our intuitive logging system. Build custom routines and monitor your progress over time."
+              title={t('features.workoutLogging.title')}
+              description={t('features.workoutLogging.description')}
               delay={0.1}
             />
             <FeatureCard
               icon={BarChart3}
-              title="Progress Analytics"
-              description="Visualize your fitness journey with detailed charts and insights. See your strength gains, volume trends, and performance metrics."
+              title={t('features.progressAnalytics.title')}
+              description={t('features.progressAnalytics.description')}
               delay={0.2}
             />
             <FeatureCard
               icon={Heart}
-              title="Nutrition Tracking"
-              description="Monitor your macros and calories to fuel your workouts. Set nutrition goals and track your daily intake effortlessly."
+              title={t('features.nutritionTracking.title')}
+              description={t('features.nutritionTracking.description')}
               delay={0.3}
             />
             <FeatureCard
               icon={Activity}
-              title="Performance Metrics"
-              description="Track key performance indicators like one-rep max, volume load, and training frequency to optimize your results."
+              title={t('features.performanceMetrics.title')}
+              description={t('features.performanceMetrics.description')}
               delay={0.4}
             />
             <FeatureCard
               icon={TrendingUp}
-              title="Goal Setting"
-              description="Set SMART fitness goals and track your progress. Get motivated with milestone celebrations and achievement badges."
+              title={t('features.goalSetting.title')}
+              description={t('features.goalSetting.description')}
               delay={0.5}
             />
             <FeatureCard
               icon={Users}
-              title="Community Support"
-              description="Connect with like-minded fitness enthusiasts. Share your progress, get inspired, and stay accountable together."
+              title={t('features.communitySupport.title')}
+              description={t('features.communitySupport.description')}
               delay={0.6}
             />
           </div>

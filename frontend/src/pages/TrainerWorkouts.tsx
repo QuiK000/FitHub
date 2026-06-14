@@ -21,6 +21,8 @@ import {
   type ClientWorkoutPlanResponse,
   type WorkoutPlanResponse,
 } from '../services/workout.service'
+import { formatEnum, formatDate, type IconType } from '../lib/utils'
+import { EmptyState } from '../components/ui/empty-state'
 import { CreatePlanModal } from '../components/workouts/CreatePlanModal'
 
 const TrainerWorkouts = () => {
@@ -221,19 +223,6 @@ const TrainerWorkouts = () => {
   )
 }
 
-const formatEnum = (value: string) =>
-  value
-    .toLowerCase()
-    .split('_')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ')
-
-const formatDate = (value: string) =>
-  new Intl.DateTimeFormat(undefined, {
-    month: 'short',
-    day: 'numeric',
-  }).format(new Date(value))
-
 const StatusBadge = ({ status }: { status: string }) => {
   const colors: Record<string, string> = {
     ASSIGNED: 'bg-amber-500/10 text-amber-600',
@@ -247,8 +236,6 @@ const StatusBadge = ({ status }: { status: string }) => {
     </span>
   )
 }
-
-type IconType = React.ComponentType<React.SVGProps<SVGSVGElement>>
 
 const SummaryCard = ({
   icon: Icon,
@@ -283,24 +270,6 @@ const SummaryCard = ({
       </CardContent>
     </Card>
   </motion.div>
-)
-
-const EmptyState = ({
-  icon: Icon,
-  title,
-  description,
-}: {
-  icon: IconType
-  title: string
-  description: string
-}) => (
-  <div className="flex min-h-40 flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-muted/30 p-6 text-center">
-    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-background">
-      <Icon className="h-5 w-5 text-muted-foreground" />
-    </div>
-    <p className="mt-3 text-sm font-semibold text-foreground">{title}</p>
-    <p className="mt-1 max-w-xs text-xs text-muted-foreground">{description}</p>
-  </div>
 )
 
 export default TrainerWorkouts

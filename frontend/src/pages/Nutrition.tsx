@@ -1,8 +1,7 @@
-import { useEffect, useMemo, useState, type ComponentType, type FormEvent, type SVGProps } from 'react'
+import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import {
-  ArrowRight,
   CalendarDays,
   Droplets,
   Flame,
@@ -30,6 +29,10 @@ import {
   type MealPlanResponse,
 } from '../services/nutrition.service'
 import { useAuthStore } from '../store/useAuthStore'
+import { clampPercentage, type IconType } from '../lib/utils'
+import { ProgressBar } from '../components/ui/progress-bar'
+import { EmptyState } from '../components/ui/empty-state'
+import { SkeletonCard, SkeletonBlock, SkeletonLine } from '../components/ui/skeleton'
 import { getApiErrorMessage } from '../utils/errorHandler'
 import toast from '../utils/toast'
 
@@ -452,11 +455,6 @@ const unwrapResult = <T,>(
   return fallback
 }
 
-type IconType = ComponentType<SVGProps<SVGSVGElement>>
-
-const clampPercentage = (value: number) =>
-  Math.max(0, Math.min(100, Number.isFinite(value) ? value : 0))
-
 const formatDate = (value: string) =>
   new Intl.DateTimeFormat(undefined, {
     month: 'short',
@@ -602,67 +600,6 @@ const WaterDayRow = ({ day }: { day: DailyWaterIntakeResponse }) => (
     </div>
     <ProgressBar value={day.progress} className="mt-3" />
   </div>
-)
-
-const ProgressBar = ({
-  value,
-  className,
-}: {
-  value: number
-  className?: string
-}) => (
-  <div className={`h-2 overflow-hidden rounded-full bg-muted ${className ?? ''}`}>
-    <div
-      className="h-full rounded-full bg-primary transition-all duration-500"
-      style={{ width: `${clampPercentage(value)}%` }}
-    />
-  </div>
-)
-
-const EmptyState = ({
-  icon: Icon,
-  title,
-  description,
-  actionLabel,
-  onClick,
-}: {
-  icon: IconType
-  title: string
-  description: string
-  actionLabel?: string
-  onClick?: () => void
-}) => (
-  <div className="rounded-2xl border border-dashed border-border bg-muted/30 p-5">
-    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-background">
-      <Icon className="h-5 w-5 text-muted-foreground" />
-    </div>
-    <p className="mt-4 text-sm font-semibold text-foreground">{title}</p>
-    <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-    {actionLabel && (
-      <button
-        type="button"
-        onClick={onClick}
-        className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
-      >
-        {actionLabel}
-        <ArrowRight className="h-4 w-4" />
-      </button>
-    )}
-  </div>
-)
-
-const SkeletonCard = ({ className = '' }: { className?: string }) => (
-  <div className={`animate-pulse rounded-2xl border border-border bg-card ${className}`}>
-    <div className="h-full rounded-2xl bg-muted/80" />
-  </div>
-)
-
-const SkeletonBlock = () => (
-  <div className="h-56 animate-pulse rounded-2xl bg-muted" />
-)
-
-const SkeletonLine = () => (
-  <div className="h-16 animate-pulse rounded-xl bg-muted" />
 )
 
 export default Nutrition

@@ -1,4 +1,4 @@
-import { useEffect, useState, type ComponentType, type FormEvent, type SVGProps } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import {
@@ -18,6 +18,7 @@ import {
   type TrainerReviewResponse,
   type TrainerProfileResponse,
 } from '../services/trainer.service'
+import { EmptyState } from '../components/ui/empty-state'
 import { getApiErrorMessage } from '../utils/errorHandler'
 import toast from '../utils/toast'
 
@@ -147,8 +148,6 @@ const Trainers = () => {
     </div>
   )
 }
-
-type IconType = ComponentType<SVGProps<SVGSVGElement>>
 
 const TrainerCard = ({
   trainer,
@@ -428,24 +427,6 @@ const ReviewRow = ({ review }: { review: TrainerReviewResponse }) => (
     {review.comment && (
       <p className="mt-2 text-sm text-muted-foreground">{review.comment}</p>
     )}
-  </div>
-)
-
-const EmptyState = ({
-  icon: Icon,
-  title,
-  description,
-}: {
-  icon: IconType
-  title: string
-  description: string
-}) => (
-  <div className="flex min-h-48 flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-muted/30 p-8 text-center">
-    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-background">
-      <Icon className="h-6 w-6 text-muted-foreground" />
-    </div>
-    <p className="mt-4 text-sm font-semibold text-foreground">{title}</p>
-    <p className="mt-1 max-w-sm text-sm text-muted-foreground">{description}</p>
   </div>
 )
 

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ComponentType, type SVGProps } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
@@ -30,6 +30,10 @@ import {
   getWorkoutPlanById,
 } from '../services/workout.service'
 import { LogWorkoutModal } from '../components/workouts/LogWorkoutModal'
+import { formatEnum, formatDate, clampPercentage, type IconType } from '../lib/utils'
+import { ProgressBar } from '../components/ui/progress-bar'
+import { EmptyState } from '../components/ui/empty-state'
+import { SkeletonCard, SkeletonBlock, SkeletonLine } from '../components/ui/skeleton'
 
 type WorkoutsState = {
   activeAssignments: ClientWorkoutPlanResponse[]
@@ -92,10 +96,6 @@ const Workouts = () => {
       setIsLoading(false)
     }
   }
-
-  useEffect(() => {
-    void loadData()
-  }, [isClient])
 
   useEffect(() => {
     void loadData()
@@ -306,27 +306,6 @@ const Workouts = () => {
   )
 }
 
-type IconType = ComponentType<SVGProps<SVGSVGElement>>
-
-const formatEnum = (value: string) =>
-  value
-    .toLowerCase()
-    .split('_')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ')
-
-const formatDate = (value?: string | null) => {
-  if (!value) return 'Not set'
-  return new Intl.DateTimeFormat(undefined, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  }).format(new Date(value))
-}
-
-const clampPercentage = (value: number) =>
-  Math.max(0, Math.min(100, Number.isFinite(value) ? value : 0))
-
 const SummaryCard = ({
   icon: Icon,
   label,
@@ -475,66 +454,6 @@ const HistoryRow = ({
       {Math.round(assignment.completionPercentage ?? 0)}%
     </div>
   </Link>
-)
-
-const ProgressBar = ({
-  value,
-  className,
-}: {
-  value: number
-  className?: string
-}) => (
-  <div className={`h-2 overflow-hidden rounded-full bg-muted ${className ?? ''}`}>
-    <div
-      className="h-full rounded-full bg-primary transition-all duration-500"
-      style={{ width: `${clampPercentage(value)}%` }}
-    />
-  </div>
-)
-
-const EmptyState = ({
-  icon: Icon,
-  title,
-  description,
-  actionLabel,
-  to,
-}: {
-  icon: IconType
-  title: string
-  description: string
-  actionLabel: string
-  to: string
-}) => (
-  <div className="flex min-h-52 flex-col justify-between rounded-2xl border border-dashed border-border bg-muted/30 p-5">
-    <div>
-      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-background">
-        <Icon className="h-5 w-5 text-muted-foreground" />
-      </div>
-      <p className="mt-4 text-sm font-semibold text-foreground">{title}</p>
-      <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-    </div>
-    <Link
-      to={to}
-      className="mt-4 inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
-    >
-      {actionLabel}
-      <ArrowRight className="h-4 w-4" />
-    </Link>
-  </div>
-)
-
-const SkeletonCard = ({ className = '' }: { className?: string }) => (
-  <div className={`animate-pulse rounded-2xl border border-border bg-card ${className}`}>
-    <div className="h-full rounded-2xl bg-muted/80" />
-  </div>
-)
-
-const SkeletonBlock = () => (
-  <div className="h-52 animate-pulse rounded-2xl bg-muted" />
-)
-
-const SkeletonLine = () => (
-  <div className="h-16 animate-pulse rounded-xl bg-muted" />
 )
 
 export default Workouts

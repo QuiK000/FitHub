@@ -4,6 +4,7 @@ import {
   CalendarDays,
   CheckCircle2,
   CreditCard,
+  DollarSign,
   PauseCircle,
   XCircle,
 } from 'lucide-react'
@@ -19,23 +20,29 @@ import {
   getMyMembershipHistory,
   type MembershipResponse,
 } from '../services/membership.service'
+import { getMyPayments, type PaymentResponse } from '../services/payment.service'
+import { formatEnum, formatDate } from '../lib/utils'
+import { InfoTile } from '../components/ui/info-tile'
 
 const Memberships = () => {
   const { t } = useTranslation('memberships')
   const [active, setActive] = useState<MembershipResponse | null>(null)
   const [history, setHistory] = useState<MembershipResponse[]>([])
+  const [payments, setPayments] = useState<PaymentResponse[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const load = async () => {
       setIsLoading(true)
       try {
-        const [activeResult, historyResult] = await Promise.allSettled([
+        const [activeResult, historyResult, paymentsResult] = await Promise.allSettled([
           getMyActiveMembership(),
           getMyMembershipHistory(),
+          getMyPayments(0, 20),
         ])
         if (activeResult.status === 'fulfilled') setActive(activeResult.value)
         if (historyResult.status === 'fulfilled') setHistory(historyResult.value.memberships)
+        if (paymentsResult.status === 'fulfilled') setPayments(paymentsResult.value.content)
       } catch {
         // handled by Promise.allSettled
       } finally {
@@ -166,6 +173,17 @@ const Memberships = () => {
               </div>
             </section>
           )}
+
+          {payments.length > 0 && (
+            <section>
+              <h2 className="mb-4 text-lg font-semibold text-foreground">Payment History</h2>
+              <div className="divide-y divide-border overflow-hidden rounded-2xl border border-border">
+                {payments.map((payment) => (
+                  <PaymentRow key={payment.id} payment={payment} />
+                ))}
+              </div>
+            </section>
+          )}
         </>
       )}
     </div>
@@ -177,24 +195,6 @@ const StatusIcon = ({ status }: { status: string }) => {
   if (status === 'FROZEN') return <PauseCircle className="h-8 w-8 opacity-90" />
   return <XCircle className="h-8 w-8 opacity-90" />
 }
-
-const InfoTile = ({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
-  label: string
-  value: string
-}) => (
-  <div className="rounded-xl bg-background px-3 py-3">
-    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-      <Icon className="h-4 w-4" />
-      {label}
-    </div>
-    <p className="mt-2 text-sm font-semibold text-foreground">{value}</p>
-  </div>
-)
 
 const SummaryRow = ({ label, value }: { label: string; value: string }) => (
   <div className="flex items-center justify-between rounded-xl bg-muted px-4 py-3">
@@ -230,18 +230,34 @@ const HistoryRow = ({ membership }: { membership: MembershipResponse }) => {
   )
 }
 
-const formatEnum = (value: string) =>
-  value
-    .toLowerCase()
-    .split('_')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ')
 
-const formatDate = (value: string) =>
-  new Intl.DateTimeFormat(undefined, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  }).format(new Date(value))
+
+const PaymentRow = ({ payment }: { payment: PaymentResponse }) => {
+  const statusColors: Record<string, string> = {
+    PAID: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+    PENDING: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+    FAILED: 'bg-red-500/10 text-red-600 dark:text-red-400',
+  }
+
+  return (
+    <div className="grid gap-3 bg-card p-4 md:grid-cols-[minmax(0,1fr),auto]">
+      <div className="flex items-center gap-3">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+          <DollarSign className="h-4 w-4 text-primary" />
+        </div>
+        <div>
+          <p className="font-semibold text-foreground">${payment.amount.toFixed(2)} {payment.currency}</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            {formatDate(payment.paymentDate)}
+          </p>
+        </div>
+      </div>
+      <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${statusColors[payment.status] ?? 'bg-muted text-muted-foreground'}`}>
+        {formatEnum(payment.status)}
+      </span>
+    </div>
+  )
+}
+
 
 export default Memberships

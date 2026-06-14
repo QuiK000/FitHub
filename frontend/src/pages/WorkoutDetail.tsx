@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ComponentType, type SVGProps } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
@@ -32,6 +32,11 @@ import {
   getWorkoutPlanById,
 } from '../services/workout.service'
 import { LogWorkoutModal } from '../components/workouts/LogWorkoutModal'
+import { formatEnum, formatDate, clampPercentage, type IconType } from '../lib/utils'
+import { ProgressBar } from '../components/ui/progress-bar'
+import { EmptyState } from '../components/ui/empty-state'
+import { SkeletonBlock } from '../components/ui/skeleton'
+import { StatusPill } from '../components/ui/status-pill'
 import toast from '../utils/toast'
 
 const WorkoutDetail = () => {
@@ -286,8 +291,6 @@ const WorkoutDetail = () => {
   )
 }
 
-type IconType = ComponentType<SVGProps<SVGSVGElement>>
-
 const groupExercisesByDay = (exercises: WorkoutPlanExerciseResponse[]) => {
   const grouped = exercises.reduce<Record<number, WorkoutPlanExerciseResponse[]>>(
     (acc, exercise) => {
@@ -304,25 +307,6 @@ const groupExercisesByDay = (exercises: WorkoutPlanExerciseResponse[]) => {
     ] as const)
     .sort(([dayA], [dayB]) => dayA - dayB)
 }
-
-const formatEnum = (value: string) =>
-  value
-    .toLowerCase()
-    .split('_')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ')
-
-const formatDate = (value?: string | null) => {
-  if (!value) return 'Not set'
-  return new Intl.DateTimeFormat(undefined, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  }).format(new Date(value))
-}
-
-const clampPercentage = (value: number) =>
-  Math.max(0, Math.min(100, Number.isFinite(value) ? value : 0))
 
 const MetricCard = ({
   icon: Icon,
@@ -439,55 +423,10 @@ const RecentLog = ({ log }: { log: WorkoutLogResponse }) => (
   </div>
 )
 
-const ProgressBar = ({
-  value,
-  className,
-}: {
-  value: number
-  className?: string
-}) => (
-  <div className={`h-2 overflow-hidden rounded-full bg-muted ${className ?? ''}`}>
-    <div
-      className="h-full rounded-full bg-primary transition-all duration-500"
-      style={{ width: `${clampPercentage(value)}%` }}
-    />
-  </div>
-)
-
-const StatusPill = ({ label }: { label: string }) => (
-  <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
-    {label}
-  </span>
-)
-
 const InfoRow = ({ label, value }: { label: string; value: string }) => (
   <div className="flex items-center justify-between gap-4 rounded-xl bg-muted px-3 py-2">
     <span className="text-muted-foreground">{label}</span>
     <span className="font-semibold text-foreground">{value}</span>
-  </div>
-)
-
-const EmptyState = ({
-  icon: Icon,
-  title,
-  description,
-}: {
-  icon: IconType
-  title: string
-  description: string
-}) => (
-  <div className="rounded-2xl border border-dashed border-border bg-muted/30 p-5">
-    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-background">
-      <Icon className="h-5 w-5 text-muted-foreground" />
-    </div>
-    <p className="mt-4 text-sm font-semibold text-foreground">{title}</p>
-    <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-  </div>
-)
-
-const SkeletonBlock = ({ className = '' }: { className?: string }) => (
-  <div className={`animate-pulse rounded-2xl border border-border bg-card ${className}`}>
-    <div className="h-full rounded-2xl bg-muted/80" />
   </div>
 )
 

@@ -5,12 +5,15 @@ import {
   BarChart3,
   CreditCard,
   Bell,
+  Eye,
+  EyeOff,
   PauseCircle,
   PlayCircle,
   Plus,
   Search,
   ShieldCheck,
   Send,
+  Star,
   User2,
   X,
   XCircle,
@@ -37,15 +40,22 @@ import {
   getDashboardAnalytics,
   type DashboardAnalyticsResponse,
 } from '../services/dashboard.service'
+import {
+  getAllReviews,
+  updateReviewVisibility,
+  type TrainerReviewResponse,
+} from '../services/review.service'
+import { formatEnum, formatDate } from '../lib/utils'
 import api from '../services/api'
 import { getApiErrorMessage } from '../utils/errorHandler'
 import toast from '../utils/toast'
 
-type AdminTab = 'overview' | 'memberships' | 'broadcast'
+type AdminTab = 'overview' | 'memberships' | 'broadcast' | 'reviews'
 
 const getAdminTabs = (t: (key: string) => string): { key: AdminTab; label: string; icon: React.ComponentType<React.SVGProps<SVGSVGElement>> }[] => [
   { key: 'overview', label: t('tabs.overview'), icon: BarChart3 },
   { key: 'memberships', label: t('tabs.memberships'), icon: CreditCard },
+  { key: 'reviews', label: t('tabs.reviews'), icon: Star },
   { key: 'broadcast', label: t('tabs.broadcast'), icon: Send },
 ]
 
@@ -89,6 +99,7 @@ const Admin = () => {
 
       {activeTab === 'overview' && <OverviewTab />}
       {activeTab === 'memberships' && <MembershipTab />}
+      {activeTab === 'reviews' && <ReviewsTab />}
       {activeTab === 'broadcast' && <BroadcastTab />}
     </div>
   )
@@ -411,6 +422,157 @@ const MembershipTab = () => {
   )
 }
 
+const ReviewsTab = () => {
+  const { t } = useTranslation(['admin', 'common'])
+  const [reviews, setReviews] = useState<TrainerReviewResponse[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [filterVisible, setFilterVisible] = useState<boolean | undefined>(undefined)
+
+  const loadReviews = async (isVisible?: boolean) => {
+    setIsLoading(true)
+    try {
+      const page = await getAllReviews(0, 50, { isVisible })
+      setReviews(page.content)
+    } catch (err) {
+      console.error(err)
+      toast.error('Failed to load reviews.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    void loadReviews(filterVisible)
+  }, [filterVisible])
+
+  const handleToggleVisibility = async (reviewId: string, currentVisibility: boolean) => {
+    try {
+      await updateReviewVisibility(reviewId, { visible: !currentVisibility })
+      toast.success(t('common:toast.reviewVisibilityUpdated'))
+      setReviews((prev) =>
+        prev.map((r) =>
+          r.id === reviewId ? { ...r, visible: !currentVisibility } : r,
+        ),
+      )
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, 'Failed to update review visibility.'))
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-semibold text-foreground">Review Moderation</h3>
+        <div className="flex gap-1 rounded-xl border border-border bg-muted p-1">
+          {[
+            { label: 'All', value: undefined },
+            { label: 'Visible', value: true },
+            { label: 'Hidden', value: false },
+          ].map((option) => (
+            <button
+              key={option.label}
+              type="button"
+              onClick={() => setFilterVisible(option.value)}
+              className={`rounded-lg px-3 py-1 text-xs font-medium transition ${
+                filterVisible === option.value
+                  ? 'bg-background text-foreground shadow-soft'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {isLoading ? (
+        <div className="space-y-3">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-24 animate-pulse rounded-2xl bg-muted" />
+          ))}
+        </div>
+      ) : reviews.length > 0 ? (
+        <div className="space-y-3">
+          {reviews.map((review) => (
+            <motion.div
+              key={review.id}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-2xl border border-border bg-card p-4"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-semibold text-foreground">
+                      {review.reviewer.clientFirstname} {review.reviewer.clientLastname}
+                    </p>
+                    <span className="text-xs text-muted-foreground">→</span>
+                    <p className="text-sm text-muted-foreground">
+                      Trainer review
+                    </p>
+                  </div>
+                  <div className="mt-1 flex items-center gap-1">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`h-3.5 w-3.5 ${
+                          i < review.rating
+                            ? 'fill-amber-400 text-amber-400'
+                            : 'text-muted-foreground'
+                        }`}
+                      />
+                    ))}
+                    <span className="ml-2 text-xs text-muted-foreground">
+                      {review.rating}/5
+                    </span>
+                  </div>
+                  {review.comment && (
+                    <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
+                      {review.comment}
+                    </p>
+                  )}
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {formatDate(review.createdAt)}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => void handleToggleVisibility(review.id, review.visible)}
+                  className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+                    review.visible
+                      ? 'border border-emerald-500/40 text-emerald-600 hover:bg-emerald-500/5'
+                      : 'border border-border text-muted-foreground hover:bg-accent'
+                  }`}
+                >
+                  {review.visible ? (
+                    <>
+                      <Eye className="h-3.5 w-3.5" />
+                      Visible
+                    </>
+                  ) : (
+                    <>
+                      <EyeOff className="h-3.5 w-3.5" />
+                      Hidden
+                    </>
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      ) : (
+        <div className="flex min-h-40 flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-muted/30 p-8 text-center">
+          <Star className="h-8 w-8 text-muted-foreground/40" />
+          <p className="mt-3 text-sm font-semibold text-foreground">No reviews found</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Reviews from clients will appear here.
+          </p>
+        </div>
+      )}
+    </div>
+  )
+}
+
 const BroadcastTab = () => {
   const { t } = useTranslation(['admin', 'common'])
   const [form, setForm] = useState({
@@ -660,18 +822,6 @@ const statusColors: Record<string, string> = {
   CREATED: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
 }
 
-const formatEnum = (value: string) =>
-  value
-    .toLowerCase()
-    .split('_')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ')
 
-const formatDate = (value: string) =>
-  new Intl.DateTimeFormat(undefined, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  }).format(new Date(value))
 
 export default Admin

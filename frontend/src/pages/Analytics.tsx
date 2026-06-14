@@ -27,6 +27,7 @@ import {
 import {
   getDashboardAnalytics,
   getAttendanceStats,
+  getRevenueStats,
   type AttendanceStatsResponse,
   type DashboardAnalyticsResponse,
 } from '../services/dashboard.service'
@@ -35,6 +36,7 @@ const Analytics = () => {
   const { t } = useTranslation('analytics')
   const [analytics, setAnalytics] = useState<DashboardAnalyticsResponse | null>(null)
   const [attendance, setAttendance] = useState<AttendanceStatsResponse[]>([])
+  const [revenueData, setRevenueData] = useState<{ date: string; revenue: number }[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [period, setPeriod] = useState<7 | 14 | 30>(30)
 
@@ -48,13 +50,15 @@ const Analytics = () => {
         const from = startDate.toISOString().slice(0, 10)
         const to = now.toISOString().slice(0, 10)
 
-        const [analyticsResult, attendanceResult] = await Promise.allSettled([
+        const [analyticsResult, attendanceResult, revenueResult] = await Promise.allSettled([
           getDashboardAnalytics(),
           getAttendanceStats(from, to),
+          getRevenueStats(from, to),
         ])
 
         if (analyticsResult.status === 'fulfilled') setAnalytics(analyticsResult.value)
         if (attendanceResult.status === 'fulfilled') setAttendance(attendanceResult.value)
+        if (revenueResult.status === 'fulfilled') setRevenueData(revenueResult.value)
       } catch {
         // handled by Promise.allSettled
       } finally {
@@ -87,6 +91,20 @@ const Analytics = () => {
     if (!attendance.length) return null
     return attendance.reduce((max, a) => (a.checkIns > max.checkIns ? a : max), attendance[0])
   }, [attendance])
+
+  const revenueChartData = useMemo(
+    () =>
+      revenueData.map((r) => ({
+        date: new Date(r.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+        revenue: r.revenue,
+      })),
+    [revenueData],
+  )
+
+  const totalRevenue = useMemo(
+    () => revenueData.reduce((sum, r) => sum + r.revenue, 0),
+    [revenueData],
+  )
 
   return (
     <div className="space-y-6">
@@ -237,6 +255,61 @@ const Analytics = () => {
                 )}
               </CardContent>
             </Card>
+
+            {revenueChartData.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>{t('revenue.title', { defaultValue: 'Revenue Overview' })}</CardTitle>
+                  <CardDescription>{t('revenue.subtitle', { defaultValue: `Total: $${totalRevenue.toLocaleString()} over ${period}d` })}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={revenueChartData}>
+                        <defs>
+                          <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="hsl(142, 76%, 36%)" stopOpacity={0.3} />
+                            <stop offset="95%" stopColor="hsl(142, 76%, 36%)" stopOpacity={0} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                        <XAxis
+                          dataKey="date"
+                          className="text-xs"
+                          tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                          tickLine={false}
+                          axisLine={false}
+                        />
+                        <YAxis
+                          className="text-xs"
+                          tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                          tickLine={false}
+                          axisLine={false}
+                          tickFormatter={(value) => `$${value}`}
+                        />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: 'hsl(var(--card))',
+                            border: '1px solid hsl(var(--border))',
+                            borderRadius: '12px',
+                            fontSize: '12px',
+                          }}
+                          formatter={(value) => [`$${Number(value).toLocaleString()}`, 'Revenue']}
+                        />
+                        <Area
+                          type="monotone"
+                          dataKey="revenue"
+                          stroke="hsl(142, 76%, 36%)"
+                          strokeWidth={2}
+                          fillOpacity={1}
+                          fill="url(#colorRevenue)"
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             <div className="space-y-4">
               <Card>

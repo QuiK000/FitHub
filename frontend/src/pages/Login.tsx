@@ -35,11 +35,20 @@ const Login = () => {
 
     try {
       const auth = await login({ email, password })
-      setAuth(auth.accessToken, auth.refreshToken, null)
-      const user = await getCurrentUser()
-      const roles = normalizeRoles(user.roles)
 
+      try {
+        localStorage.setItem('access_token', auth.accessToken)
+        if (auth.refreshToken) {
+          localStorage.setItem('refresh_token', auth.refreshToken)
+        }
+      } catch {
+        // ignore persistence errors
+      }
+
+      const user = await getCurrentUser()
       setAuth(auth.accessToken, auth.refreshToken, user)
+
+      const roles = normalizeRoles(user.roles)
 
       if (!roles.includes('CLIENT')) {
         navigate('/dashboard', { replace: true })

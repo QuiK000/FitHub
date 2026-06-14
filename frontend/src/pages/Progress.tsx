@@ -24,11 +24,14 @@ import {
   CardTitle,
 } from '../components/ui/card'
 import { Input } from '../components/ui/input'
+import { EmptyState } from '../components/ui/empty-state'
+import { formatEnum, formatDate, type IconType } from '../lib/utils'
 import {
   type BodyMeasurementResponse,
   type CreateBodyMeasurementRequest,
   type CreateGoalRequest,
   type CreatePersonalRecordRequest,
+  type CreateProgressPhotoRequest,
   type GoalResponse,
   type GoalType,
   type MeasurementUnit,
@@ -39,6 +42,7 @@ import {
   createBodyMeasurement,
   createGoal,
   createPersonalRecord,
+  createProgressPhoto,
   getActiveGoals,
   getCompletedGoals,
   getMeasurementHistory,
@@ -158,7 +162,7 @@ const Progress = () => {
             <RecordsTab records={records} onRefresh={loadAll} />
           )}
           {activeTab === 'photos' && (
-            <PhotosTab photos={photos} />
+            <PhotosTab photos={photos} onRefresh={loadAll} />
           )}
         </>
       )}
@@ -480,12 +484,27 @@ const RecordsTab = ({
 
 const PhotosTab = ({
   photos,
+  onRefresh,
 }: {
   photos: ProgressPhotoResponse[]
+  onRefresh: () => Promise<void>
 }) => {
   const { t } = useTranslation('progress')
+  const [isUploadOpen, setIsUploadOpen] = useState(false)
+
   return (
     <div className="space-y-6">
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={() => setIsUploadOpen(true)}
+          className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-soft transition-all hover:bg-primary/90"
+        >
+          <Camera className="h-4 w-4" />
+          {t('photos.addButton')}
+        </button>
+      </div>
+
       {photos.length > 0 ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {photos.map((photo) => (
@@ -499,11 +518,36 @@ const PhotosTab = ({
           description={t('photos.noDataDesc')}
         />
       )}
+
+      {isUploadOpen && (
+        <CreatePhotoModal
+          onClose={() => setIsUploadOpen(false)}
+          onCreated={async () => {
+            setIsUploadOpen(false)
+            await onRefresh()
+          }}
+        />
+      )}
     </div>
   )
 }
 
-type IconType = ComponentType<SVGProps<SVGSVGElement>>
+const TrendTile = ({
+  label,
+  change,
+  unit,
+}: {
+  label: string
+  change: number | null
+  unit: string
+}) => (
+  <div className="rounded-xl bg-muted px-4 py-3">
+    <p className="text-xs text-muted-foreground">{label}</p>
+    <p className={`mt-1 text-lg font-bold ${change != null && change <= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'}`}>
+      {change != null ? `${change > 0 ? '+' : ''}${change.toFixed(1)} ${unit}` : '—'}
+    </p>
+  </div>
+)
 
 const MetricCard = ({
   icon: Icon,
@@ -540,19 +584,87 @@ const MetricCard = ({
   </Card>
 )
 
-const TrendTile = ({
+const MeasurementCard = ({ measurement }: { measurement: BodyMeasurementResponse }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 8 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="rounded-2xl border border-border bg-card p-5"
+  >
+    <div className="flex items-center justify-between gap-4">
+      <div>
+        <p className="text-sm font-semibold text-foreground">
+          {formatDate(measurement.measurementDate)}
+        </p>
+        {measurement.notes && (
+          <p className="mt-1 text-xs text-muted-foreground">{measurement.notes}</p>
+        )}
+      </div>
+      <div className="flex items-center gap-2">
+        {measurement.weightChange != null && (
+          <span className={`rounded-full px-2 py-1 text-xs font-semibold ${measurement.weightChange <= 0 ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-red-500/10 text-red-600 dark:text-red-400'}`}>
+            {measurement.weightChange > 0 ? '+' : ''}{measurement.weightChange.toFixed(1)} kg
+          </span>
+        )}
+      </div>
+    </div>
+    <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <MeasurementTile label="Weight" value={measurement.weight} unit="kg" />
+      <MeasurementTile label="Body fat" value={measurement.bodyFatPercentage} unit="%" />
+      <MeasurementTile label="Muscle" value={measurement.muscleMass} unit="kg" />
+      <MeasurementTile label="BMI" value={measurement.bmi} unit="" />
+    </div>
+  </motion.div>
+)
+
+const PhotoCard = ({ photo }: { photo: ProgressPhotoResponse }) => {
+  const [imgError, setImgError] = useState(false)
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="overflow-hidden rounded-2xl border border-border bg-card"
+    >
+      <div className="aspect-square bg-muted flex items-center justify-center overflow-hidden">
+        {photo.photoUrl && !imgError ? (
+          <img
+            src={photo.photoUrl}
+            alt={`Progress photo ${formatDate(photo.photoDate)}`}
+            className="h-full w-full object-cover"
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          <Image className="h-12 w-12 text-muted-foreground/40" />
+        )}
+      </div>
+      <div className="p-4">
+        <div className="flex items-center justify-between">
+          <p className="text-sm font-semibold text-foreground">{formatDate(photo.photoDate)}</p>
+          <span className="rounded-full bg-muted px-2 py-1 text-xs text-muted-foreground">
+            {formatEnum(photo.angle)}
+          </span>
+        </div>
+        {photo.notes && (
+          <p className="mt-2 text-xs text-muted-foreground">{photo.notes}</p>
+        )}
+      </div>
+    </motion.div>
+  )
+}
+
+const MeasurementTile = ({
   label,
-  change,
+  value,
   unit,
 }: {
   label: string
-  change: number | null
+  value: number | null
   unit: string
 }) => (
-  <div className="rounded-xl bg-muted px-4 py-3">
+  <div className="rounded-xl bg-muted px-3 py-2">
     <p className="text-xs text-muted-foreground">{label}</p>
-    <p className={`mt-1 text-lg font-bold ${change != null && change <= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'}`}>
-      {change != null ? `${change > 0 ? '+' : ''}${change.toFixed(1)} ${unit}` : '—'}
+    <p className="mt-1 text-sm font-semibold text-foreground">
+      {value === null ? '—' : `${value}${unit ? ` ${unit}` : ''}`}
     </p>
   </div>
 )
@@ -570,7 +682,6 @@ const GoalRow = ({ goal }: { goal: GoalResponse }) => (
         {Math.round(goal.progressPercentage)}%
       </span>
     </div>
-    <ProgressBar value={goal.progressPercentage} className="mt-3" />
   </div>
 )
 
@@ -607,8 +718,6 @@ const GoalCard = ({
           {Math.round(goal.progressPercentage)}%
         </span>
       </div>
-
-      <ProgressBar value={goal.progressPercentage} className="mt-4" />
 
       <div className="mt-4 flex items-center gap-3 text-sm">
         <span className="text-muted-foreground">
@@ -709,125 +818,6 @@ const RecordCard = ({ record }: { record: PersonalRecordResponse }) => (
     )}
   </motion.div>
 )
-
-const MeasurementCard = ({ measurement }: { measurement: BodyMeasurementResponse }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 8 }}
-    animate={{ opacity: 1, y: 0 }}
-    className="rounded-2xl border border-border bg-card p-5"
-  >
-    <div className="flex items-center justify-between gap-4">
-      <div>
-        <p className="text-sm font-semibold text-foreground">
-          {formatDate(measurement.measurementDate)}
-        </p>
-        {measurement.notes && (
-          <p className="mt-1 text-xs text-muted-foreground">{measurement.notes}</p>
-        )}
-      </div>
-      <div className="flex items-center gap-2">
-        {measurement.weightChange != null && (
-          <span className={`rounded-full px-2 py-1 text-xs font-semibold ${measurement.weightChange <= 0 ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-red-500/10 text-red-600 dark:text-red-400'}`}>
-            {measurement.weightChange > 0 ? '+' : ''}{measurement.weightChange.toFixed(1)} kg
-          </span>
-        )}
-      </div>
-    </div>
-    <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-      <MeasurementTile label="Weight" value={measurement.weight} unit="kg" />
-      <MeasurementTile label="Body fat" value={measurement.bodyFatPercentage} unit="%" />
-      <MeasurementTile label="Muscle" value={measurement.muscleMass} unit="kg" />
-      <MeasurementTile label="BMI" value={measurement.bmi} unit="" />
-    </div>
-  </motion.div>
-)
-
-const PhotoCard = ({ photo }: { photo: ProgressPhotoResponse }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 8 }}
-    animate={{ opacity: 1, y: 0 }}
-    className="overflow-hidden rounded-2xl border border-border bg-card"
-  >
-    <div className="aspect-square bg-muted flex items-center justify-center">
-      <Image className="h-12 w-12 text-muted-foreground/40" />
-    </div>
-    <div className="p-4">
-      <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold text-foreground">{formatDate(photo.photoDate)}</p>
-        <span className="rounded-full bg-muted px-2 py-1 text-xs text-muted-foreground">
-          {formatEnum(photo.angle)}
-        </span>
-      </div>
-      {photo.notes && (
-        <p className="mt-2 text-xs text-muted-foreground">{photo.notes}</p>
-      )}
-    </div>
-  </motion.div>
-)
-
-const MeasurementTile = ({
-  label,
-  value,
-  unit,
-}: {
-  label: string
-  value: number | null
-  unit: string
-}) => (
-  <div className="rounded-xl bg-muted px-3 py-2">
-    <p className="text-xs text-muted-foreground">{label}</p>
-    <p className="mt-1 text-sm font-semibold text-foreground">
-      {value === null ? '—' : `${value}${unit ? ` ${unit}` : ''}`}
-    </p>
-  </div>
-)
-
-const ProgressBar = ({
-  value,
-  className,
-}: {
-  value: number
-  className?: string
-}) => (
-  <div className={`h-2 overflow-hidden rounded-full bg-muted ${className ?? ''}`}>
-    <div
-      className="h-full rounded-full bg-primary transition-all duration-500"
-      style={{ width: `${Math.max(0, Math.min(100, value))}%` }}
-    />
-  </div>
-)
-
-const EmptyState = ({
-  icon: Icon,
-  title,
-  description,
-}: {
-  icon: IconType
-  title: string
-  description: string
-}) => (
-  <div className="flex min-h-48 flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-muted/30 p-8 text-center">
-    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-background">
-      <Icon className="h-6 w-6 text-muted-foreground" />
-    </div>
-    <p className="mt-4 text-sm font-semibold text-foreground">{title}</p>
-    <p className="mt-1 max-w-sm text-sm text-muted-foreground">{description}</p>
-  </div>
-)
-
-const formatEnum = (value: string) =>
-  value
-    .toLowerCase()
-    .split('_')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ')
-
-const formatDate = (value: string) =>
-  new Intl.DateTimeFormat(undefined, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  }).format(new Date(value))
 
 const CreateMeasurementModal = ({
   onClose,
@@ -1154,5 +1144,97 @@ const ModalInput = ({
     />
   </label>
 )
+
+const CreatePhotoModal = ({
+  onClose,
+  onCreated,
+}: {
+  onClose: () => void
+  onCreated: () => Promise<void>
+}) => {
+  const { t } = useTranslation(['progress', 'common'])
+  const [form, setForm] = useState<{
+    photoUrl: string
+    angle: CreateProgressPhotoRequest['angle']
+    notes: string
+  }>({
+    photoUrl: '',
+    angle: 'FRONT',
+    notes: '',
+  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault()
+    if (!form.photoUrl.trim()) return
+    setIsSubmitting(true)
+    try {
+      await createProgressPhoto({
+        photoUrl: form.photoUrl.trim(),
+        angle: form.angle,
+        notes: form.notes.trim() || undefined,
+      })
+      await onCreated()
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, 'Failed to upload photo.'))
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-30 flex items-center justify-center bg-background/70 px-4 py-6 backdrop-blur-sm">
+      <motion.div
+        initial={{ opacity: 0, y: 20, scale: 0.96 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        className="max-h-[calc(100vh-3rem)] w-full max-w-lg overflow-y-auto rounded-2xl border border-border bg-card p-6 shadow-soft-lg"
+      >
+        <div className="mb-5 flex items-center justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t('photos.modal.title')}</p>
+            <h2 className="mt-1 text-xl font-bold text-foreground">{t('photos.modal.title')}</h2>
+          </div>
+          <button type="button" onClick={onClose} disabled={isSubmitting} className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-background text-muted-foreground transition hover:bg-accent">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <ModalInput label={t('photos.modal.photoUrl')} value={form.photoUrl} onChange={(v) => setForm((p) => ({ ...p, photoUrl: v }))} placeholder={t('photos.modal.photoUrlPlaceholder')} />
+          <label className="space-y-1.5">
+            <span className="text-xs text-foreground">{t('photos.modal.angle')}</span>
+            <select
+              value={form.angle}
+              onChange={(e) => setForm((p) => ({ ...p, angle: e.target.value as CreateProgressPhotoRequest['angle'] }))}
+              className="flex h-10 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
+            >
+              <option value="FRONT">{t('photos.modal.angles.front')}</option>
+              <option value="BACK">{t('photos.modal.angles.back')}</option>
+              <option value="SIDE_LEFT">{t('photos.modal.angles.sideLeft')}</option>
+              <option value="SIDE_RIGHT">{t('photos.modal.angles.sideRight')}</option>
+            </select>
+          </label>
+          <label className="space-y-1.5">
+            <span className="text-xs text-foreground">{t('photos.modal.notes')}</span>
+            <textarea
+              className="min-h-[72px] w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
+              placeholder={t('photos.modal.notesPlaceholder')}
+              value={form.notes}
+              onChange={(e) => setForm((p) => ({ ...p, notes: e.target.value }))}
+            />
+          </label>
+          <div className="flex justify-end gap-2">
+            <button type="button" onClick={onClose} disabled={isSubmitting} className="inline-flex h-9 items-center justify-center rounded-xl px-4 text-sm font-medium text-foreground transition hover:bg-accent disabled:opacity-60">
+              {t('common:buttons.cancel')}
+            </button>
+            <button type="submit" disabled={isSubmitting || !form.photoUrl.trim()} className="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:opacity-60">
+              {isSubmitting && <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />}
+              {t('photos.modal.uploadButton')}
+            </button>
+          </div>
+        </form>
+      </motion.div>
+    </div>
+  )
+}
 
 export default Progress

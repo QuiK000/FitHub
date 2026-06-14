@@ -1,10 +1,9 @@
-import { useEffect, useMemo, useState, type ComponentType, type SVGProps } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   Activity,
-  ArrowRight,
   BarChart3,
   CalendarDays,
   CheckCircle2,
@@ -46,6 +45,12 @@ import type {
   ClientWorkoutPlanResponse,
   TrainingSessionResponse,
 } from '../types'
+import { formatEnum, formatDate, clampPercentage, type IconType } from '../lib/utils'
+import { ProgressBar } from '../components/ui/progress-bar'
+import { EmptyState } from '../components/ui/empty-state'
+import { SkeletonCard, SkeletonBlock, SkeletonLine } from '../components/ui/skeleton'
+import { StatusPill } from '../components/ui/status-pill'
+import { InfoTile } from '../components/ui/info-tile'
 
 type DashboardData = {
   membership: MembershipResponse | null
@@ -440,32 +445,11 @@ const getDaysRemaining = (endDate: string) => {
   return Math.max(0, Math.ceil(diff / 86_400_000))
 }
 
-const clampPercentage = (value: number) =>
-  Math.max(0, Math.min(100, Number.isFinite(value) ? value : 0))
-
-const formatDate = (value?: string | null) => {
-  if (!value) return 'Not set'
-  return new Intl.DateTimeFormat(undefined, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  }).format(new Date(value))
-}
-
 const formatTime = (value: string) =>
   new Intl.DateTimeFormat(undefined, {
     hour: 'numeric',
     minute: '2-digit',
   }).format(new Date(value))
-
-const formatEnum = (value: string) =>
-  value
-    .toLowerCase()
-    .split('_')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ')
-
-type IconType = ComponentType<SVGProps<SVGSVGElement>>
 
 type MetricCardProps = {
   title?: string
@@ -789,27 +773,6 @@ const MeasurementTile = ({
   </div>
 )
 
-const ProgressBar = ({
-  value,
-  className,
-}: {
-  value: number
-  className?: string
-}) => (
-  <div className={`h-2 overflow-hidden rounded-full bg-muted ${className ?? ''}`}>
-    <div
-      className="h-full rounded-full bg-primary transition-all duration-500"
-      style={{ width: `${clampPercentage(value)}%` }}
-    />
-  </div>
-)
-
-const StatusPill = ({ label }: { label: string }) => (
-  <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
-    {label}
-  </span>
-)
-
 const ActionLink = ({
   to,
   label,
@@ -826,69 +789,6 @@ const ActionLink = ({
     <Icon className="h-4 w-4" />
     {label}
   </Link>
-)
-
-const EmptyState = ({
-  icon: Icon,
-  title,
-  description,
-  actionLabel,
-  to,
-}: {
-  icon: IconType
-  title: string
-  description: string
-  actionLabel: string
-  to: string
-}) => (
-  <div className="flex h-full min-h-44 flex-col justify-between rounded-2xl border border-dashed border-border bg-muted/30 p-4">
-    <div>
-      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-background">
-        <Icon className="h-5 w-5 text-muted-foreground" />
-      </div>
-      <p className="mt-4 text-sm font-semibold text-foreground">{title}</p>
-      <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-    </div>
-    <Link
-      to={to}
-      className="mt-4 inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
-    >
-      {actionLabel}
-      <ArrowRight className="h-4 w-4" />
-    </Link>
-  </div>
-)
-
-const InfoTile = ({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: IconType
-  label: string
-  value: string
-}) => (
-  <div className="rounded-xl bg-background px-3 py-3">
-    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-      <Icon className="h-4 w-4" />
-      {label}
-    </div>
-    <p className="mt-2 text-sm font-semibold text-foreground">{value}</p>
-  </div>
-)
-
-const SkeletonCard = ({ className = '' }: { className?: string }) => (
-  <div className={`animate-pulse rounded-2xl border border-border bg-card ${className}`}>
-    <div className="h-full rounded-2xl bg-muted/80" />
-  </div>
-)
-
-const SkeletonBlock = () => (
-  <div className="h-44 animate-pulse rounded-2xl bg-muted" />
-)
-
-const SkeletonLine = () => (
-  <div className="h-14 animate-pulse rounded-xl bg-muted" />
 )
 
 export default Dashboard

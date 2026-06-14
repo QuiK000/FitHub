@@ -1,8 +1,9 @@
-import { useEffect, useState, type ComponentType, type SVGProps } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import {
   CalendarDays,
+  CheckCircle,
   Clock,
   Dumbbell,
   Users2,
@@ -11,27 +12,39 @@ import {
 import { useAuthStore } from '../store/useAuthStore'
 import {
   getTrainingSessions,
+  getMyAttendance,
   joinSession,
   type TrainingSessionResponse,
 } from '../services/workout.service'
 import { getApiErrorMessage } from '../utils/errorHandler'
 import toast from '../utils/toast'
+import { formatEnum } from '../lib/utils'
+import { EmptyState } from '../components/ui/empty-state'
+import { InfoTile } from '../components/ui/info-tile'
+
+type SessionFilter = 'all' | 'upcoming' | 'past'
 
 const Sessions = () => {
   const { t } = useTranslation(['sessions', 'common'])
   const roles = useAuthStore((state) => state.roles)
   const isClient = roles.includes('CLIENT')
   const [sessions, setSessions] = useState<TrainingSessionResponse[]>([])
+  const [joinedSessionIds, setJoinedSessionIds] = useState<Set<string>>(new Set())
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [joiningId, setJoiningId] = useState<string | null>(null)
+  const [activeFilter, setActiveFilter] = useState<SessionFilter>('all')
 
   const loadSessions = async () => {
     setIsLoading(true)
     setError(null)
     try {
-      const page = await getTrainingSessions(0, 20)
-      setSessions(page.content)
+      const [sessionsPage, attendance] = await Promise.all([
+        getTrainingSessions(0, 50),
+        isClient ? getMyAttendance() : Promise.resolve([]),
+      ])
+      setSessions(sessionsPage.content)
+      setJoinedSessionIds(new Set(attendance.map((a) => a.session.sessionId)))
     } catch (err) {
       console.error(err)
       setError('Unable to load training sessions.')
@@ -42,7 +55,7 @@ const Sessions = () => {
 
   useEffect(() => {
     void loadSessions()
-  }, [])
+  }, [isClient])
 
   const handleJoin = async (sessionId: string) => {
     setJoiningId(sessionId)
@@ -64,6 +77,12 @@ const Sessions = () => {
   const past = sessions.filter(
     (s) => new Date(s.startTime).getTime() < now || s.status !== 'SCHEDULED',
   )
+
+  const filteredSessions = activeFilter === 'upcoming'
+    ? upcoming
+    : activeFilter === 'past'
+      ? past
+      : sessions
 
   return (
     <div className="space-y-6">
@@ -87,68 +106,71 @@ const Sessions = () => {
         </div>
       )}
 
-      <section>
-        <h2 className="mb-4 text-lg font-semibold text-foreground">{t('upcoming')}</h2>
-        {isLoading ? (
-          <div className="grid gap-4 md:grid-cols-2">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-48 animate-pulse rounded-2xl bg-muted" />
-            ))}
-          </div>
-        ) : upcoming.length ? (
-          <div className="grid gap-4 md:grid-cols-2">
-            {upcoming.map((session) => (
+      <div className="flex gap-1 overflow-x-auto rounded-xl border border-border bg-muted p-1">
+        {(['all', 'upcoming', 'past'] as const).map((filter) => (
+          <button
+            key={filter}
+            type="button"
+            onClick={() => setActiveFilter(filter)}
+            className={`inline-flex items-center gap-2 whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition ${
+              activeFilter === filter
+                ? 'bg-background text-foreground shadow-soft'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            {filter === 'all' && t('filter.all')}
+            {filter === 'upcoming' && t('upcoming')}
+            {filter === 'past' && t('past')}
+          </button>
+        ))}
+      </div>
+
+      {isLoading ? (
+        <div className="grid gap-4 md:grid-cols-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-48 animate-pulse rounded-2xl bg-muted" />
+          ))}
+        </div>
+      ) : filteredSessions.length ? (
+        <div className="grid gap-4 md:grid-cols-2">
+          {filteredSessions.map((session) => {
+            const isPast = new Date(session.startTime).getTime() < now || session.status !== 'SCHEDULED'
+            return (
               <SessionCard
                 key={session.id}
                 session={session}
                 isClient={isClient}
                 isJoining={joiningId === session.id}
+                isJoined={joinedSessionIds.has(session.id)}
                 onJoin={() => void handleJoin(session.id)}
+                isPast={isPast}
               />
-            ))}
-          </div>
-        ) : (
-          <EmptyState
-            icon={CalendarDays}
-            title="No upcoming sessions"
-            description="Check back later for new training sessions."
-          />
-        )}
-      </section>
-
-      {past.length > 0 && (
-        <section>
-          <h2 className="mb-4 text-lg font-semibold text-foreground">{t('past')}</h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            {past.map((session) => (
-              <SessionCard
-                key={session.id}
-                session={session}
-                isClient={isClient}
-                isJoining={false}
-                onJoin={() => {}}
-                isPast
-              />
-            ))}
-          </div>
-        </section>
+            )
+          })}
+        </div>
+      ) : (
+        <EmptyState
+          icon={CalendarDays}
+          title={t('emptyState.title')}
+          description={t('emptyState.description')}
+        />
       )}
     </div>
   )
 }
 
-type IconType = ComponentType<SVGProps<SVGSVGElement>>
-
 const SessionCard = ({
   session,
   isClient,
   isJoining,
+  isJoined,
   onJoin,
   isPast = false,
 }: {
   session: TrainingSessionResponse
   isClient: boolean
   isJoining: boolean
+  isJoined: boolean
   onJoin: () => void
   isPast?: boolean
 }) => {
@@ -178,6 +200,12 @@ const SessionCard = ({
               {session.type}
             </span>
             <StatusBadge status={session.status} />
+            {isJoined && !isPast && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                <CheckCircle className="h-3 w-3" />
+                {t('joined')}
+              </span>
+            )}
           </div>
           <h3 className="mt-3 text-base font-semibold text-foreground">
             {formatEnum(session.type)} training
@@ -206,8 +234,13 @@ const SessionCard = ({
 
       {isClient && !isPast && session.status === 'SCHEDULED' && (
         <div className="mt-4">
-          {isFull ? (
-            <p className="text-xs text-muted-foreground">Session is full</p>
+          {isJoined ? (
+            <p className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+              <CheckCircle className="h-3.5 w-3.5" />
+              {t('alreadyJoined')}
+            </p>
+          ) : isFull ? (
+            <p className="text-xs text-muted-foreground">{t('sessionFull')}</p>
           ) : (
             <button
               type="button"
@@ -241,49 +274,6 @@ const StatusBadge = ({ status }: { status: string }) => {
     </span>
   )
 }
-
-const InfoTile = ({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: IconType
-  label: string
-  value: string
-}) => (
-  <div className="rounded-xl bg-muted px-3 py-3">
-    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-      <Icon className="h-4 w-4" />
-      {label}
-    </div>
-    <p className="mt-2 text-sm font-semibold text-foreground">{value}</p>
-  </div>
-)
-
-const EmptyState = ({
-  icon: Icon,
-  title,
-  description,
-}: {
-  icon: IconType
-  title: string
-  description: string
-}) => (
-  <div className="flex min-h-48 flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-muted/30 p-8 text-center">
-    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-background">
-      <Icon className="h-6 w-6 text-muted-foreground" />
-    </div>
-    <p className="mt-4 text-sm font-semibold text-foreground">{title}</p>
-    <p className="mt-1 max-w-sm text-sm text-muted-foreground">{description}</p>
-  </div>
-)
-
-const formatEnum = (value: string) =>
-  value
-    .toLowerCase()
-    .split('_')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ')
 
 const formatDateTime = (value: string) => {
   const date = new Date(value)
