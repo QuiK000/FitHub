@@ -1,0 +1,15 @@
+import { clampPercentage } from '../../lib/utils'
+
+type ProgressBarProps = {
+  value: number
+  className?: string
+}
+
+export const ProgressBar = ({ value, className }: ProgressBarProps) => (
+  <div className={`h-2 overflow-hidden rounded-full bg-muted ${className ?? ''}`}>
+    <div
+      className="h-full rounded-full bg-primary transition-all duration-500"
+      style={{ width: `${clampPercentage(value)}%` }}
+    />
+  </div>
+)
