@@ -6,6 +6,7 @@ import type {
   CreateBodyMeasurementRequest,
   CreateGoalRequest,
   CreatePersonalRecordRequest,
+  CreateProgressPhotoRequest,
   GoalResponse,
   MeasurementHistoryResponse,
   PersonalRecordResponse,
@@ -20,6 +21,7 @@ export type {
   CreateBodyMeasurementRequest,
   CreateGoalRequest,
   CreatePersonalRecordRequest,
+  CreateProgressPhotoRequest,
   GoalResponse,
   GoalStatus,
   GoalType,
@@ -245,6 +247,16 @@ export const getProgressPhotoById = async (
 ): Promise<ProgressPhotoResponse> => {
   const { data } = await api.get<ProgressPhotoResponse>(
     `/progress/photos/${photoId}`,
+  )
+  return data
+}
+
+export const createProgressPhoto = async (
+  payload: CreateProgressPhotoRequest,
+): Promise<ProgressPhotoResponse> => {
+  const { data } = await api.post<ProgressPhotoResponse>(
+    '/progress/photos',
+    payload,
   )
   return data
 }

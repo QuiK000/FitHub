@@ -143,10 +143,12 @@ export const completeMeal = async (
 
 export const searchFoods = async (
   query: string,
-): Promise<FoodResponse[]> => {
-  const { data } = await api.get<FoodResponse[]>(
+  page = 0,
+  size = 20,
+): Promise<PageResponse<FoodResponse>> => {
+  const { data } = await api.get<PageResponse<FoodResponse>>(
     '/nutrition/foods/search',
-    { params: { q: query } },
+    { params: { q: query, page, size } },
   )
   return data
 }
@@ -178,9 +180,12 @@ export const getFoodByBarcode = async (
   }
 }
 
-export const getWeeklyMealPlans = async (): Promise<MealPlanResponse[]> => {
-  const { data } = await api.get<MealPlanResponse[]>(
+export const getWeeklyMealPlans = async (
+  startDate: string,
+): Promise<PageResponse<MealPlanResponse>> => {
+  const { data } = await api.get<PageResponse<MealPlanResponse>>(
     '/nutrition/meal-plans/weekly',
+    { params: { startDate } },
   )
   return data
 }
