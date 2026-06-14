@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { getMyClientProfile } from '../services/profile.service'
+import { getMyClientProfile, getMyTrainerProfile } from '../services/profile.service'
 import { useAuthStore } from '../store/useAuthStore'
 import { getApiErrorMessage } from '../utils/errorHandler'
 import toast from '../utils/toast'
 
-const ClientOnboardingGate = () => {
+const ProfileOnboardingGate = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const roles = useAuthStore((state) => state.roles)
@@ -14,24 +14,35 @@ const ClientOnboardingGate = () => {
   const [isCheckingProfile, setIsCheckingProfile] = useState(false)
 
   const isClient = roles.includes('CLIENT')
+  const isTrainer = roles.includes('TRAINER')
   const isOnboardingRoute = location.pathname === '/onboarding'
+  const isTrainerProfileRoute = location.pathname === '/trainer-profile'
 
   useEffect(() => {
-    if (!isClient) {
+    if (!isClient && !isTrainer) {
       return
     }
 
-    if (user?.clientProfile === null && !isOnboardingRoute) {
+    if (isClient && user?.clientProfile === null && !isOnboardingRoute) {
       navigate('/onboarding', { replace: true })
+      return
+    }
+
+    if (isTrainer && user?.trainerProfile === null && !isTrainerProfileRoute) {
+      navigate('/trainer-profile', { replace: true })
       return
     }
 
     let isMounted = true
     setIsCheckingProfile(true)
 
-    void getMyClientProfile()
+    const checkProfile = isClient
+      ? getMyClientProfile()
+      : getMyTrainerProfile()
+
+    void checkProfile
       .then(() => {
-        if (isMounted && isOnboardingRoute) {
+        if (isMounted && (isOnboardingRoute || isTrainerProfileRoute)) {
           navigate('/dashboard', { replace: true })
         }
       })
@@ -42,8 +53,10 @@ const ClientOnboardingGate = () => {
           axios.isAxiosError(err) &&
           (err.response?.status === 404 || err.response?.status === 500)
         ) {
-          if (!isOnboardingRoute) {
+          if (isClient && !isOnboardingRoute) {
             navigate('/onboarding', { replace: true })
+          } else if (isTrainer && !isTrainerProfileRoute) {
+            navigate('/trainer-profile', { replace: true })
           }
           return
         }
@@ -64,13 +77,13 @@ const ClientOnboardingGate = () => {
     return () => {
       isMounted = false
     }
-  }, [isClient, isOnboardingRoute, location.pathname, navigate, user?.clientProfile])
+  }, [isClient, isTrainer, isOnboardingRoute, isTrainerProfileRoute, location.pathname, navigate, user?.clientProfile, user?.trainerProfile])
 
-  if (!isClient && isOnboardingRoute && roles.length > 0) {
+  if (!isClient && !isTrainer && (isOnboardingRoute || isTrainerProfileRoute) && roles.length > 0) {
     return <Navigate to="/dashboard" replace />
   }
 
-  if (isClient && isCheckingProfile && !isOnboardingRoute) {
+  if ((isClient || isTrainer) && isCheckingProfile && !isOnboardingRoute && !isTrainerProfileRoute) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
         <div className="flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 text-sm text-foreground shadow-soft-lg">
@@ -84,4 +97,4 @@ const ClientOnboardingGate = () => {
   return <Outlet />
 }
 
-export default ClientOnboardingGate
+export default ProfileOnboardingGate
