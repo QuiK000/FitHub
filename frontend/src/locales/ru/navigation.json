@@ -13,7 +13,8 @@
       "trainers": "Тренеры",
       "sessions": "Сессии",
       "notifications": "Уведомления",
-      "admin": "Админ"
+      "admin": "Админ",
+      "myPlans": "Мои планы"
     },
     "trainingLoad": {
       "label": "Тренировочная нагрузка",

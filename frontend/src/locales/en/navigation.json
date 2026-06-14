@@ -13,7 +13,8 @@
       "trainers": "Trainers",
       "sessions": "Sessions",
       "notifications": "Notifications",
-      "admin": "Admin"
+      "admin": "Admin",
+      "myPlans": "My Plans"
     },
     "trainingLoad": {
       "label": "Training Load",

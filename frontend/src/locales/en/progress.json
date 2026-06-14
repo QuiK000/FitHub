@@ -99,8 +99,24 @@
     }
   },
   "photos": {
+    "addButton": "Add photo",
     "noData": "No progress photos yet",
-    "noDataDesc": "Capture your visual transformation over time."
+    "noDataDesc": "Capture your visual transformation over time.",
+    "modal": {
+      "title": "Add progress photo",
+      "photoUrl": "Photo URL",
+      "photoUrlPlaceholder": "https://example.com/photo.jpg",
+      "angle": "Angle",
+      "angles": {
+        "front": "Front",
+        "back": "Back",
+        "sideLeft": "Side left",
+        "sideRight": "Side right"
+      },
+      "notes": "Notes (optional)",
+      "notesPlaceholder": "How you feel about your progress...",
+      "uploadButton": "Add photo"
+    }
   },
   "trend": {
     "weight": "Weight",

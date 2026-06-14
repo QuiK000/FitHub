@@ -3,6 +3,16 @@
   "subtitle": "Browse upcoming group and personal training sessions, join, or check in.",
   "upcoming": "Upcoming",
   "past": "Past / Completed",
+  "filter": {
+    "all": "All"
+  },
+  "joined": "Joined",
+  "alreadyJoined": "Already joined",
+  "sessionFull": "Session is full",
+  "emptyState": {
+    "title": "No sessions found",
+    "description": "Check back later for new training sessions."
+  },
   "noUpcoming": "No upcoming sessions",
   "noUpcomingDesc": "Check back later for new training sessions.",
   "type": {
@@ -16,7 +26,6 @@
   },
   "join": "Join ({{spots}} spots)",
   "joining": "Joining...",
-  "sessionFull": "Session is full",
   "startsAt": "Starts",
   "capacity": "Capacity",
   "withTrainer": "With {{name}}"

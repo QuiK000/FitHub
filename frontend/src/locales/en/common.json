@@ -63,7 +63,8 @@
     "profileCreated": "Profile created. Welcome to FitHub.",
     "noSessions": "Unable to load sessions.",
     "sessionJoined": "Joined session successfully.",
-    "joinFailed": "Unable to join session."
+    "joinFailed": "Unable to join session.",
+    "reviewVisibilityUpdated": "Review visibility updated."
   },
   "errors": {
     "required": "This field is required",

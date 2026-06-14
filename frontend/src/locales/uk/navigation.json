@@ -13,7 +13,8 @@
       "trainers": "Тренери",
       "sessions": "Сесії",
       "notifications": "Сповіщення",
-      "admin": "Адмін"
+      "admin": "Адмін",
+      "myPlans": "Мої плани"
     },
     "trainingLoad": {
       "label": "Тренувальне навантаження",

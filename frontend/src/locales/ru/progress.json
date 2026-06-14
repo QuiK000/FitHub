@@ -99,8 +99,24 @@
     }
   },
   "photos": {
+    "addButton": "Добавить фото",
     "noData": "Пока нет фото прогресса",
-    "noDataDesc": "Закрепите свою визуальную трансформацию со временем."
+    "noDataDesc": "Закрепите свою визуальную трансформацию со временем.",
+    "modal": {
+      "title": "Добавить фото прогресса",
+      "photoUrl": "URL фото",
+      "photoUrlPlaceholder": "https://example.com/photo.jpg",
+      "angle": "Угол",
+      "angles": {
+        "front": "Спереди",
+        "back": "Сзади",
+        "sideLeft": "Слева",
+        "sideRight": "Справа"
+      },
+      "notes": "Заметки (необязательно)",
+      "notesPlaceholder": "Как вы чувствуете свой прогресс...",
+      "uploadButton": "Добавить фото"
+    }
   },
   "trend": {
     "weight": "Вес",
