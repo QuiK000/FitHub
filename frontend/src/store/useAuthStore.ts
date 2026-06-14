@@ -142,8 +142,8 @@ export const useAuthStore = create<AuthState>((set, get) => {
           refreshToken: getInitialRefreshToken(),
         })
       } catch (error) {
-        // eslint-disable-next-line no-console
         console.error('Failed to fetch current user', error)
+        clearAuthState()
       }
     },
   }
