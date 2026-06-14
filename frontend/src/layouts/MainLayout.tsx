@@ -81,6 +81,18 @@ const MainLayout = () => {
         roles: ['CLIENT', 'TRAINER'],
       },
       {
+        to: '/trainer-workouts',
+        label: t('navigation:sidebar.items.myPlans'),
+        icon: Dumbbell,
+        roles: ['TRAINER'],
+      },
+      {
+        to: '/trainer-profile',
+        label: t('navigation:sidebar.items.profile'),
+        icon: User2,
+        roles: ['TRAINER'],
+      },
+      {
         to: '/analytics',
         label: t('navigation:sidebar.items.analytics'),
         icon: Activity,
