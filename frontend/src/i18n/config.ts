@@ -52,11 +52,14 @@ import onboardingRU from '../locales/ru/onboarding.json'
 import nutritionEN from '../locales/en/nutrition.json'
 import nutritionUK from '../locales/uk/nutrition.json'
 import nutritionRU from '../locales/ru/nutrition.json'
+import workoutsEN from '../locales/en/workouts.json'
+import workoutsUK from '../locales/uk/workouts.json'
+import workoutsRU from '../locales/ru/workouts.json'
 
 const allNamespaces = [
   'common', 'auth', 'landing', 'dashboard', 'profile',
   'navigation', 'validation', 'progress', 'sessions',
-  'trainers', 'notifications', 'memberships', 'analytics', 'admin', 'onboarding', 'nutrition',
+  'trainers', 'notifications', 'memberships', 'analytics', 'admin', 'onboarding', 'nutrition', 'workouts',
 ]
 
 const resources = {
@@ -68,6 +71,7 @@ const resources = {
     memberships: membershipsEN, analytics: analyticsEN, admin: adminEN,
     onboarding: onboardingEN,
     nutrition: nutritionEN,
+    workouts: workoutsEN,
   },
   uk: {
     common: commonUK, auth: authUK, landing: landingUK,
@@ -77,6 +81,7 @@ const resources = {
     memberships: membershipsUK, analytics: analyticsUK, admin: adminUK,
     onboarding: onboardingUK,
     nutrition: nutritionUK,
+    workouts: workoutsUK,
   },
   ru: {
     common: commonRU, auth: authRU, landing: landingRU,
@@ -86,6 +91,7 @@ const resources = {
     memberships: membershipsRU, analytics: analyticsRU, admin: adminRU,
     onboarding: onboardingRU,
     nutrition: nutritionRU,
+    workouts: workoutsRU,
   },
 }
 

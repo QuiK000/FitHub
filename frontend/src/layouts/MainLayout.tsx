@@ -1,4 +1,4 @@
-import { useMemo, useState, type ComponentType, type SVGProps } from 'react'
+import { useEffect, useMemo, useState, type ComponentType, type SVGProps } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import {
   Activity,
@@ -37,6 +37,16 @@ const MainLayout = () => {
   const { t } = useTranslation(['navigation'])
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsMobileMenuOpen(false)
+    }
+    if (isMobileMenuOpen) {
+      document.addEventListener('keydown', handleEscape)
+      return () => document.removeEventListener('keydown', handleEscape)
+    }
+  }, [isMobileMenuOpen])
+
   const navItems = useMemo<NavItem[]>(
     () => [
       {
@@ -48,7 +58,7 @@ const MainLayout = () => {
         to: '/workouts',
         label: t('navigation:sidebar.items.workouts'),
         icon: Dumbbell,
-        roles: ['CLIENT', 'TRAINER'],
+        roles: ['CLIENT'],
       },
       {
         to: '/nutrition',
@@ -66,7 +76,7 @@ const MainLayout = () => {
         to: '/memberships',
         label: t('navigation:sidebar.items.memberships'),
         icon: CreditCard,
-        roles: ['CLIENT', 'ADMIN'],
+        roles: ['CLIENT'],
       },
       {
         to: '/trainers',
@@ -93,6 +103,12 @@ const MainLayout = () => {
         roles: ['TRAINER'],
       },
       {
+        to: '/trainer-sessions',
+        label: t('navigation:sidebar.items.trainerSessions'),
+        icon: CalendarDays,
+        roles: ['TRAINER'],
+      },
+      {
         to: '/analytics',
         label: t('navigation:sidebar.items.analytics'),
         icon: Activity,
@@ -107,6 +123,12 @@ const MainLayout = () => {
         to: '/admin',
         label: t('navigation:sidebar.items.admin'),
         icon: ShieldCheck,
+        roles: ['ADMIN'],
+      },
+      {
+        to: '/admin/exercises',
+        label: t('navigation:sidebar.items.exerciseManagement'),
+        icon: Dumbbell,
         roles: ['ADMIN'],
       },
       {
@@ -138,8 +160,10 @@ const MainLayout = () => {
     .filter(Boolean)
     .join(' ')
 
-  const userName = fullName || user?.email?.split('@')[0] || 'FitHub member'
-  const roleLabel = roles.length ? roles.join(' / ') : 'Member'
+  const userName = fullName || user?.email?.split('@')[0] || t('header.fithubMember')
+  const roleLabel = roles.length
+    ? roles.map(r => t(`common:fallbacks.${r.toLowerCase()}`)).join(' / ')
+    : t('header.member')
   const initials = (fullName || user?.email || 'FH')
     .split(/[\s@.]+/)
     .filter(Boolean)
@@ -232,7 +256,7 @@ const MainLayout = () => {
       {isMobileMenuOpen && (
         <button
           type="button"
-          aria-label="Close navigation overlay"
+          aria-label={t('common:buttons.close')}
           className="fixed inset-0 z-30 bg-background/70 backdrop-blur-sm md:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
@@ -261,7 +285,7 @@ const MainLayout = () => {
           </div>
           <button
             type="button"
-            aria-label="Close navigation"
+            aria-label={t('common:buttons.close')}
             onClick={() => setIsMobileMenuOpen(false)}
             className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-background text-muted-foreground transition hover:bg-accent hover:text-foreground"
           >

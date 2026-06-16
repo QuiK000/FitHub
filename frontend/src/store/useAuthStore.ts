@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import axios from 'axios'
 import { logout as logoutRequest } from '../services/auth.service'
 import { getCurrentUser } from '../services/user.service'
 import type { RoleName, UserResponse } from '../types/user.types'
@@ -142,8 +143,12 @@ export const useAuthStore = create<AuthState>((set, get) => {
           refreshToken: getInitialRefreshToken(),
         })
       } catch (error) {
-        console.error('Failed to fetch current user', error)
-        clearAuthState()
+        if (axios.isAxiosError(error) && error.response?.status === 401) {
+          clearAuthState()
+        } else {
+          console.error('Failed to fetch current user', error)
+          clearAuthState()
+        }
       }
     },
   }
