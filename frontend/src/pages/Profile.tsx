@@ -13,6 +13,7 @@ import type {
   UpdateClientProfileRequest,
 } from '../types/user.types'
 import { getApiErrorMessage } from '../utils/errorHandler'
+import { useMountedRef } from '../utils/useMountedRef'
 import toast from '../utils/toast'
 
 type ProfileForm = {
@@ -30,12 +31,6 @@ type ProfileErrors = Partial<Record<keyof ProfileForm, string>>
 
 const phonePattern = /^\+[1-9]\d{1,14}$/
 
-const genderOptions: { label: string; value: ClientGender }[] = [
-  { label: 'Male', value: 'MALE' },
-  { label: 'Female', value: 'FEMALE' },
-  { label: 'Other', value: 'OTHER' },
-]
-
 const createFormFromProfile = (
   profile: ClientProfileResponse | null,
 ): ProfileForm => ({
@@ -50,7 +45,7 @@ const createFormFromProfile = (
 })
 
 const Profile = () => {
-  const { t } = useTranslation('profile')
+  const { t } = useTranslation(['profile', 'common'])
   const { user, fetchCurrentUser } = useAuthStore()
   const [profile, setProfile] = useState<ClientProfileResponse | null>(null)
   const [form, setForm] = useState<ProfileForm>(() => createFormFromProfile(null))
@@ -59,6 +54,7 @@ const Profile = () => {
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isEditOpen, setIsEditOpen] = useState(false)
+  const mounted = useMountedRef()
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -67,18 +63,22 @@ const Profile = () => {
 
       try {
         const data = await getMyClientProfile()
-        setProfile(data)
-        setForm(createFormFromProfile(data))
+        if (mounted.current) {
+          setProfile(data)
+          setForm(createFormFromProfile(data))
+        }
       } catch (err) {
         console.error(err)
-        const message = getApiErrorMessage(
-          err,
-          'Unable to load your profile right now.',
-        )
-        setError(message)
-        toast.error(message)
+        if (mounted.current) {
+          const message = getApiErrorMessage(
+            err,
+            t('common:errors.serverError'),
+          )
+          setError(message)
+          toast.error(message)
+        }
       } finally {
-        setIsLoading(false)
+        if (mounted.current) setIsLoading(false)
       }
     }
 
@@ -88,7 +88,7 @@ const Profile = () => {
   const fullName =
     profile && profile.firstname && profile.lastname
       ? `${profile.firstname} ${profile.lastname}`
-      : user?.email ?? 'Client'
+      : user?.email ?? t('common:fallbacks.client')
 
   const formattedBirthdate =
     profile?.birthdate &&
@@ -107,8 +107,8 @@ const Profile = () => {
     })
 
   const canSave = useMemo(
-    () => Object.keys(validateProfileForm(form)).length === 0,
-    [form],
+    () => Object.keys(validateProfileForm(form, t)).length === 0,
+    [form, t],
   )
 
   const updateField = (field: keyof ProfileForm, value: string) => {
@@ -128,11 +128,11 @@ const Profile = () => {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    const errors = validateProfileForm(form)
+    const errors = validateProfileForm(form, t)
     setFormErrors(errors)
 
     if (Object.keys(errors).length > 0) {
-      toast.error(t('errors.fixFields', { ns: 'common' }))
+      toast.error(t('errors.fixFields'))
       return
     }
 
@@ -156,10 +156,10 @@ const Profile = () => {
       setForm(createFormFromProfile(updatedProfile))
       await fetchCurrentUser()
       setIsEditOpen(false)
-      toast.success(response.message || 'Profile updated successfully.')
+      toast.success(response.message || t('common:toast.updated'))
     } catch (err) {
       console.error(err)
-      toast.error(getApiErrorMessage(err, 'Unable to save profile changes.'))
+      toast.error(getApiErrorMessage(err, t('common:errors.serverError')))
     } finally {
       setIsSaving(false)
     }
@@ -186,7 +186,7 @@ const Profile = () => {
           disabled={isLoading || Boolean(error)}
           className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 text-sm font-semibold text-foreground transition-all hover:bg-accent disabled:cursor-not-allowed disabled:opacity-60"
         >
-          Edit profile
+          {t('editButton')}
         </button>
       </div>
 
@@ -240,7 +240,7 @@ const Profile = () => {
                 value={formattedBirthdate ?? t('accountDetails.birthdatePlaceholder')}
                 icon={<Calendar className="h-4 w-4 text-muted-foreground" />}
               />
-              <ProfileField label={t('accountDetails.gender')} value={profile?.gender ?? '-'} />
+              <ProfileField label={t('accountDetails.gender')} value={profile?.gender ? t('common:gender.' + profile.gender.toLowerCase()) : '-'} />
             </div>
           </div>
         </motion.div>
@@ -287,7 +287,7 @@ const Profile = () => {
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/60 backdrop-blur-sm">
           <div className="flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 text-sm text-foreground shadow-soft-lg">
             <span className="inline-flex h-4 w-4 animate-spin rounded-full border-2 border-border border-t-primary" />
-            Loading your profile...
+            {t('loading')}
           </div>
         </div>
       )}
@@ -299,7 +299,7 @@ const Profile = () => {
       )}
 
       {isEditOpen && (
-        <div className="fixed inset-0 z-30 flex items-center justify-center bg-background/70 px-4 py-6 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 px-4 py-6 backdrop-blur-sm">
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -312,12 +312,12 @@ const Profile = () => {
           {t('editButton')}
                 </p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Update your basic information and metrics.
+                  {t('editModal.subtitle')}
                 </p>
               </div>
               <button
                 type="button"
-                aria-label="Close profile editor"
+                aria-label={t('common:buttons.close')}
                 onClick={() => setIsEditOpen(false)}
                 disabled={isSaving}
                 className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border bg-background text-muted-foreground transition hover:bg-accent hover:text-accent-foreground disabled:cursor-not-allowed disabled:opacity-60"
@@ -329,40 +329,40 @@ const Profile = () => {
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="grid gap-3 md:grid-cols-2">
                 <EditField
-                  label="First name"
+                  label={t('common:labels.firstName')}
                   value={form.firstname}
                   error={formErrors.firstname}
                   onChange={(value) => updateField('firstname', value)}
                 />
                 <EditField
-                  label="Last name"
+                  label={t('common:labels.lastName')}
                   value={form.lastname}
                   error={formErrors.lastname}
                   onChange={(value) => updateField('lastname', value)}
                 />
                 <EditField
-                  label="Phone"
+                  label={t('editModal.phone')}
                   value={form.phone}
                   error={formErrors.phone}
                   onChange={(value) => updateField('phone', value)}
                   placeholder="+12025550123"
                 />
                 <EditField
-                  label="Birthdate"
+                  label={t('editModal.birthdate')}
                   type="date"
                   value={form.birthdate}
                   error={formErrors.birthdate}
                   onChange={(value) => updateField('birthdate', value)}
                 />
                 <EditField
-                  label="Height (cm)"
+                  label={t('editModal.height')}
                   type="number"
                   value={form.height}
                   error={formErrors.height}
                   onChange={(value) => updateField('height', value)}
                 />
                 <EditField
-                  label="Weight (kg)"
+                  label={t('editModal.weight')}
                   type="number"
                   step="0.1"
                   value={form.weight}
@@ -370,14 +370,14 @@ const Profile = () => {
                   onChange={(value) => updateField('weight', value)}
                 />
                 <EditField
-                  label="Water target (ml)"
+                  label={t('editModal.waterTarget')}
                   type="number"
                   value={form.dailyWaterTarget}
                   error={formErrors.dailyWaterTarget}
                   onChange={(value) => updateField('dailyWaterTarget', value)}
                 />
                 <label className="space-y-1.5">
-                  <span className="text-xs text-foreground">Gender</span>
+                  <span className="text-xs text-foreground">{t('editModal.gender')}</span>
                   <select
                     value={form.gender}
                     onChange={(event) =>
@@ -385,11 +385,9 @@ const Profile = () => {
                     }
                     className="flex h-10 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground shadow-soft transition-all focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
                   >
-                    {genderOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
+                    <option value="MALE">{t('editModal.genderLabels.male', { ns: 'profile' })}</option>
+                    <option value="FEMALE">{t('editModal.genderLabels.female', { ns: 'profile' })}</option>
+                    <option value="OTHER">{t('editModal.genderLabels.other', { ns: 'profile' })}</option>
                   </select>
                   {formErrors.gender && (
                     <span className="text-xs text-destructive">
@@ -406,7 +404,7 @@ const Profile = () => {
                   disabled={isSaving}
                   className="inline-flex h-9 items-center justify-center rounded-xl px-4 text-sm font-medium text-foreground transition-all hover:bg-accent disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Cancel
+                  {t('editModal.cancelButton')}
                 </button>
                 <button
                   type="submit"
@@ -416,7 +414,7 @@ const Profile = () => {
                   {isSaving && (
                     <span className="inline-flex h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
                   )}
-                  {isSaving ? 'Saving...' : 'Save changes'}
+                  {isSaving ? t('common:buttons.loading') : t('editModal.saveButton')}
                 </button>
               </div>
             </form>
@@ -427,22 +425,22 @@ const Profile = () => {
   )
 }
 
-const validateProfileForm = (form: ProfileForm): ProfileErrors => {
+const validateProfileForm = (form: ProfileForm, t: (key: string) => string): ProfileErrors => {
   const errors: ProfileErrors = {}
 
-  if (!form.firstname.trim()) errors.firstname = 'First name is required.'
-  if (!form.lastname.trim()) errors.lastname = 'Last name is required.'
+  if (!form.firstname.trim()) errors.firstname = t('common:validation.firstNameRequired')
+  if (!form.lastname.trim()) errors.lastname = t('common:validation.lastNameRequired')
   if (!phonePattern.test(form.phone.trim())) {
-    errors.phone = 'Use E.164 format, for example +12025550123.'
+    errors.phone = t('common:validation.phoneFormat')
   }
-  if (!form.gender) errors.gender = 'Gender is required.'
-  if (!isPositiveNumber(form.height)) errors.height = 'Height must be positive.'
-  if (!isPositiveNumber(form.weight)) errors.weight = 'Weight must be positive.'
+  if (!form.gender) errors.gender = t('common:validation.genderRequired')
+  if (!isPositiveNumber(form.height)) errors.height = t('common:validation.heightPositive')
+  if (!isPositiveNumber(form.weight)) errors.weight = t('common:validation.weightPositive')
   if (!isPositiveInteger(form.dailyWaterTarget)) {
-    errors.dailyWaterTarget = 'Water target must be a positive whole number.'
+    errors.dailyWaterTarget = t('common:validation.waterTargetPositive')
   }
   if (form.birthdate && Number.isNaN(Date.parse(form.birthdate))) {
-    errors.birthdate = 'Enter a valid birthdate.'
+    errors.birthdate = t('common:validation.birthdateValid')
   }
 
   return errors

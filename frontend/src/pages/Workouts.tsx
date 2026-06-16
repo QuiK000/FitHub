@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import {
   ArrowRight,
@@ -19,6 +20,7 @@ import {
   CardHeader,
   CardTitle,
 } from '../components/ui/card'
+import { StatusBadge, assignmentStatusColors } from '../components/ui/status-badge'
 import { useAuthStore } from '../store/useAuthStore'
 import {
   type ClientWorkoutPlanResponse,
@@ -30,7 +32,8 @@ import {
   getWorkoutPlanById,
 } from '../services/workout.service'
 import { LogWorkoutModal } from '../components/workouts/LogWorkoutModal'
-import { formatEnum, formatDate, clampPercentage, type IconType } from '../lib/utils'
+import { formatDate, clampPercentage, type IconType } from '../lib/utils'
+import { useMountedRef } from '../utils/useMountedRef'
 import { ProgressBar } from '../components/ui/progress-bar'
 import { EmptyState } from '../components/ui/empty-state'
 import { SkeletonCard, SkeletonBlock, SkeletonLine } from '../components/ui/skeleton'
@@ -42,6 +45,7 @@ type WorkoutsState = {
 }
 
 const Workouts = () => {
+  const { t } = useTranslation(['workouts', 'common'])
   const user = useAuthStore((state) => state.user)
   const roles = useAuthStore((state) => state.roles)
   const isClient = roles.includes('CLIENT')
@@ -51,6 +55,7 @@ const Workouts = () => {
     recentLogs: [],
   })
   const [isLoading, setIsLoading] = useState(true)
+  const mounted = useMountedRef()
   const [error, setError] = useState<string | null>(null)
   const [selectedAssignment, setSelectedAssignment] = useState<ClientWorkoutPlanResponse | null>(null)
   const [selectedExercises, setSelectedExercises] = useState<WorkoutPlanExerciseResponse[]>([])
@@ -84,16 +89,18 @@ const Workouts = () => {
           getMyWorkoutLogs(0, 5),
         ])
 
-      setState({
-        activeAssignments,
-        allAssignments,
-        recentLogs: recentLogsPage.content,
-      })
+      if (mounted.current) {
+        setState({
+          activeAssignments,
+          allAssignments,
+          recentLogs: recentLogsPage.content,
+        })
+      }
     } catch (err) {
       console.error(err)
-      setError('Unable to load your workout module right now.')
+      if (mounted.current) setError(t('errorLoading'))
     } finally {
-      setIsLoading(false)
+      if (mounted.current) setIsLoading(false)
     }
   }
 
@@ -102,7 +109,7 @@ const Workouts = () => {
   }, [isClient])
 
   const titleName =
-    user?.clientProfile?.firstname ?? user?.clientProfile?.lastname ?? 'Athlete'
+    user?.clientProfile?.firstname ?? user?.clientProfile?.lastname ?? t('common:fallbacks.client')
 
   const totalCompleted = useMemo(
     () =>
@@ -134,14 +141,13 @@ const Workouts = () => {
       <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Workouts
+            {t('badge')}
           </p>
           <h1 className="mt-2 text-2xl font-bold text-foreground md:text-3xl">
-            Your training workspace, {titleName}
+            {t('subtitle')}, {titleName}
           </h1>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            Follow assigned plans, review recent logs, and keep your next session
-            easy to find.
+            {t('headerDesc')}
           </p>
         </div>
 
@@ -150,7 +156,7 @@ const Workouts = () => {
           className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 text-sm font-semibold text-foreground shadow-soft transition-all hover:bg-accent"
         >
           <CalendarDays className="h-4 w-4" />
-          View sessions
+          {t('viewSessions')}
         </Link>
       </div>
 
@@ -169,21 +175,21 @@ const Workouts = () => {
           <>
             <SummaryCard
               icon={Dumbbell}
-              label="Active plans"
+              label={t('summary.activePlans')}
               value={state.activeAssignments.length.toString()}
-              detail="Currently assigned by your trainer"
+              detail={t('summary.activePlansDetail')}
             />
             <SummaryCard
               icon={ListChecks}
-              label="Logged workouts"
+              label={t('summary.loggedWorkouts')}
               value={totalCompleted.toString()}
-              detail="Completed across all assignments"
+              detail={t('summary.loggedWorkoutsDetail')}
             />
             <SummaryCard
               icon={Trophy}
-              label="Average completion"
+              label={t('summary.avgCompletion')}
               value={`${averageCompletion}%`}
-              detail="Across your plan history"
+              detail={t('summary.avgCompletionDetail')}
             />
           </>
         )}
@@ -192,9 +198,9 @@ const Workouts = () => {
       <section className="grid gap-4 xl:grid-cols-[minmax(0,1.3fr),minmax(360px,0.7fr)]">
         <Card>
           <CardHeader>
-            <CardTitle>Active Workout Plans</CardTitle>
+            <CardTitle>{t('activePlans.title')}</CardTitle>
             <CardDescription>
-              Start here when you are ready to train.
+              {t('activePlans.desc')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -216,9 +222,9 @@ const Workouts = () => {
             ) : (
               <EmptyState
                 icon={Dumbbell}
-                title="No active workout plans"
-                description="Your trainer can assign a workout plan when your next training block is ready."
-                actionLabel="Explore trainers"
+                title={t('activePlans.empty')}
+                description={t('activePlans.emptyDesc')}
+                actionLabel={t('activePlans.exploreTrainers')}
                 to="/trainers"
               />
             )}
@@ -227,9 +233,9 @@ const Workouts = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Recent Logs</CardTitle>
+            <CardTitle>{t('recentLogs.title')}</CardTitle>
             <CardDescription>
-              Your latest completed exercises.
+              {t('recentLogs.desc')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -248,9 +254,9 @@ const Workouts = () => {
             ) : (
               <EmptyState
                 icon={History}
-                title="No workouts logged yet"
-                description="Open an assigned plan and log your first workout when you finish a set."
-                actionLabel="View active plans"
+                title={t('recentLogs.empty')}
+                description={t('recentLogs.emptyDesc')}
+                actionLabel={t('recentLogs.viewPlans')}
                 to="/workouts"
               />
             )}
@@ -260,9 +266,9 @@ const Workouts = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Plan History</CardTitle>
+          <CardTitle>{t('planHistory.title')}</CardTitle>
           <CardDescription>
-            Completed, cancelled, and in-progress assignments stay visible here.
+            {t('planHistory.desc')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -280,9 +286,9 @@ const Workouts = () => {
           ) : (
             <EmptyState
               icon={CheckCircle2}
-              title="No assignment history yet"
-              description="Assigned plans will appear here once your trainer starts building your program."
-              actionLabel="Back to dashboard"
+              title={t('planHistory.empty')}
+              description={t('planHistory.emptyDesc')}
+              actionLabel={t('planHistory.backToDashboard')}
               to="/dashboard"
             />
           )}
@@ -318,7 +324,7 @@ const SummaryCard = ({
   detail: string
 }) => (
   <Card>
-    <CardContent className="flex items-start justify-between gap-4 p-5">
+      <CardContent className="flex items-center justify-between gap-4 p-5">
       <div>
         <p className="text-xs font-medium text-muted-foreground">{label}</p>
         <p className="mt-2 text-2xl font-bold text-foreground">{value}</p>
@@ -338,41 +344,44 @@ const WorkoutCard = ({
   assignment: ClientWorkoutPlanResponse
   onStart: () => void
 }) => {
+  const { t } = useTranslation(['workouts', 'common'])
   const plan = assignment.workoutPlan
   const progress = clampPercentage(assignment.completionPercentage ?? 0)
   const trainerName =
     [plan.trainer.firstname, plan.trainer.lastname].filter(Boolean).join(' ') ||
-    'Trainer'
+    t('detail.trainer')
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25 }}
-      className="rounded-2xl border border-border bg-background p-4 shadow-soft"
+      className="h-full rounded-2xl border border-border bg-background p-4 shadow-soft"
     >
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {formatEnum(assignment.status)}
-          </p>
+          <StatusBadge
+            status={assignment.status}
+            colors={assignmentStatusColors}
+            label={t('common:enums.assignmentStatus.' + assignment.status)}
+          />
           <h2 className="mt-2 text-base font-semibold text-foreground">
             {plan.name}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            {formatEnum(plan.difficultyLevel)} · {plan.sessionsPerWeek} sessions/week
+            {t('common:enums.difficultyLevel.' + plan.difficultyLevel)} · {t('planCard.sessionsPerWeek', { count: plan.sessionsPerWeek })}
           </p>
         </div>
         <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
-          {plan.durationWeeks} weeks
+          {t('planCard.weeks', { count: plan.durationWeeks })}
         </span>
       </div>
 
       <ProgressBar value={progress} className="mt-5" />
       <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
-        <span>{Math.round(progress)}% complete</span>
+        <span>{t('planCard.complete', { count: Math.round(progress) })}</span>
         <span>
-          {assignment.completedWorkouts ?? 0}/{assignment.totalWorkouts ?? 0} logged
+          {t('planCard.loggedCount', { completed: assignment.completedWorkouts ?? 0, total: assignment.totalWorkouts ?? 0 })}
         </span>
       </div>
 
@@ -388,13 +397,13 @@ const WorkoutCard = ({
             className="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-soft transition-all hover:bg-primary/90"
           >
             <Play className="h-3.5 w-3.5" />
-            Start
+            {t('planCard.start')}
           </button>
           <Link
             to={`/workouts/${assignment.id}`}
             className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-primary hover:underline"
           >
-            Details
+            {t('planCard.details')}
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
@@ -403,57 +412,65 @@ const WorkoutCard = ({
   )
 }
 
-const LogRow = ({ log }: { log: WorkoutLogResponse }) => (
-  <div className="rounded-2xl border border-border bg-background p-3">
-    <div className="flex items-start justify-between gap-3">
-      <div>
-        <p className="text-sm font-semibold text-foreground">
-          {log.exercise.name}
-        </p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          {formatDate(log.workoutDate)} · {formatEnum(log.exercise.category)}
-        </p>
+const LogRow = ({ log }: { log: WorkoutLogResponse }) => {
+  const { t } = useTranslation(['workouts', 'common'])
+
+  return (
+    <div className="rounded-2xl border border-border bg-background p-3">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold text-foreground">
+            {log.exercise.name}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {formatDate(log.workoutDate)} · {t('common:enums.exerciseCategory.' + log.exercise.category)}
+          </p>
+        </div>
+        {log.difficultyRating && (
+          <span className="rounded-full bg-muted px-2 py-1 text-xs text-muted-foreground">
+            {t('planCard.rpe')} {log.difficultyRating}/5
+          </span>
+        )}
       </div>
-      {log.difficultyRating && (
-        <span className="rounded-full bg-muted px-2 py-1 text-xs text-muted-foreground">
-          RPE {log.difficultyRating}/5
-        </span>
-      )}
+      <p className="mt-3 text-xs text-muted-foreground">
+        {[
+          log.setsCompleted ? `${log.setsCompleted} ${t('planCard.sets')}` : null,
+          log.repsCompleted ? `${log.repsCompleted} ${t('planCard.reps')}` : null,
+          log.weightUsed ? `${log.weightUsed} ${t('planCard.kg')}` : null,
+        ]
+          .filter(Boolean)
+          .join(' · ') || t('planCard.workoutLogged')}
+      </p>
     </div>
-    <p className="mt-3 text-xs text-muted-foreground">
-      {[
-        log.setsCompleted ? `${log.setsCompleted} sets` : null,
-        log.repsCompleted ? `${log.repsCompleted} reps` : null,
-        log.weightUsed ? `${log.weightUsed} kg` : null,
-      ]
-        .filter(Boolean)
-        .join(' · ') || 'Workout logged'}
-    </p>
-  </div>
-)
+  )
+}
 
 const HistoryRow = ({
   assignment,
 }: {
   assignment: ClientWorkoutPlanResponse
-}) => (
-  <Link
-    to={`/workouts/${assignment.id}`}
-    className="grid gap-3 bg-card p-4 transition hover:bg-accent md:grid-cols-[minmax(0,1fr),auto,auto]"
-  >
-    <div>
-      <p className="font-semibold text-foreground">{assignment.workoutPlan.name}</p>
-      <p className="mt-1 text-xs text-muted-foreground">
-        Assigned {formatDate(assignment.assignedDate)}
-      </p>
-    </div>
-    <div className="text-sm text-muted-foreground">
-      {formatEnum(assignment.status)}
-    </div>
-    <div className="text-sm font-semibold text-primary">
-      {Math.round(assignment.completionPercentage ?? 0)}%
-    </div>
-  </Link>
-)
+}) => {
+  const { t } = useTranslation(['workouts', 'common'])
+
+  return (
+    <Link
+      to={`/workouts/${assignment.id}`}
+      className="grid gap-3 bg-card p-4 transition hover:bg-accent md:grid-cols-[minmax(0,1fr),auto,auto]"
+    >
+      <div>
+        <p className="font-semibold text-foreground">{assignment.workoutPlan.name}</p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          {t('planCard.assignedDate', { date: formatDate(assignment.assignedDate) })}
+        </p>
+      </div>
+      <div className="text-sm text-muted-foreground">
+        {t('common:enums.assignmentStatus.' + assignment.status)}
+      </div>
+      <div className="text-sm font-semibold text-primary">
+        {Math.round(assignment.completionPercentage ?? 0)}%
+      </div>
+    </Link>
+  )
+}
 
 export default Workouts

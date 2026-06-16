@@ -21,15 +21,24 @@ import {
   type MembershipResponse,
 } from '../services/membership.service'
 import { getMyPayments, type PaymentResponse } from '../services/payment.service'
-import { formatEnum, formatDate } from '../lib/utils'
+import { formatDate } from '../lib/utils'
 import { InfoTile } from '../components/ui/info-tile'
+import { SummaryCard } from '../components/ui/summary-card'
+import {
+  StatusBadge,
+  membershipStatusColors,
+  paymentStatusColors,
+} from '../components/ui/status-badge'
+import { EmptyState } from '../components/ui/empty-state'
+import { useMountedRef } from '../utils/useMountedRef'
 
 const Memberships = () => {
-  const { t } = useTranslation('memberships')
+  const { t } = useTranslation(['memberships', 'common'])
   const [active, setActive] = useState<MembershipResponse | null>(null)
   const [history, setHistory] = useState<MembershipResponse[]>([])
   const [payments, setPayments] = useState<PaymentResponse[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const mounted = useMountedRef()
 
   useEffect(() => {
     const load = async () => {
@@ -40,13 +49,15 @@ const Memberships = () => {
           getMyMembershipHistory(),
           getMyPayments(0, 20),
         ])
-        if (activeResult.status === 'fulfilled') setActive(activeResult.value)
-        if (historyResult.status === 'fulfilled') setHistory(historyResult.value.memberships)
-        if (paymentsResult.status === 'fulfilled') setPayments(paymentsResult.value.content)
+        if (mounted.current) {
+          if (activeResult.status === 'fulfilled') setActive(activeResult.value)
+          if (historyResult.status === 'fulfilled') setHistory(historyResult.value.memberships)
+          if (paymentsResult.status === 'fulfilled') setPayments(paymentsResult.value.content)
+        }
       } catch {
         // handled by Promise.allSettled
       } finally {
-        setIsLoading(false)
+        if (mounted.current) setIsLoading(false)
       }
     }
     void load()
@@ -61,7 +72,7 @@ const Memberships = () => {
       <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {t('title')}
+            {t('badge')}
           </p>
           <h1 className="mt-2 text-2xl font-bold text-foreground md:text-3xl">
             {t('title')}
@@ -77,24 +88,32 @@ const Memberships = () => {
           <div className="h-56 animate-pulse rounded-2xl bg-muted" />
           <div className="h-56 animate-pulse rounded-2xl bg-muted" />
         </div>
+      ) : !active && history.length === 0 && payments.length === 0 ? (
+        <EmptyState
+          icon={CreditCard}
+          title={t('noActive')}
+          description={t('noActiveDesc')}
+        />
       ) : (
         <>
           <section className="grid gap-4 md:grid-cols-2">
-            <Card className="overflow-hidden">
+            <Card>
               <CardHeader>
-                <CardTitle>Active Plan</CardTitle>
-                <CardDescription>Your current membership status.</CardDescription>
+                <CardTitle>{t('activePlan')}</CardTitle>
+                <CardDescription>{t('activePlanDesc')}</CardDescription>
               </CardHeader>
               <CardContent>
                 {active ? (
                   <div className="space-y-4">
                     <div className="rounded-2xl bg-primary p-5 text-primary-foreground">
-                      <p className="text-sm opacity-80">Plan type</p>
+                      <p className="text-sm opacity-80">{t('planType')}</p>
                       <div className="mt-3 flex items-end justify-between gap-4">
                         <div>
-                          <p className="text-2xl font-bold">{formatEnum(active.type)}</p>
+                          <p className="text-2xl font-bold">
+                            {t('common:enums.membershipType.' + active.type)}
+                          </p>
                           <p className="mt-1 text-sm opacity-80">
-                            {daysRemaining} day{daysRemaining === 1 ? '' : 's'} remaining
+                            {t('daysRemaining', { count: daysRemaining ?? undefined })}
                           </p>
                         </div>
                         <StatusIcon status={active.status} />
@@ -103,32 +122,32 @@ const Memberships = () => {
                     <div className="grid gap-3 text-sm sm:grid-cols-2">
                       <InfoTile
                         icon={CalendarDays}
-                        label="Valid from"
+                        label={t('validFrom')}
                         value={formatDate(active.startDate)}
                       />
                       <InfoTile
                         icon={CalendarDays}
-                        label="Valid until"
+                        label={t('validUntil')}
                         value={formatDate(active.endDate)}
                       />
                       <InfoTile
                         icon={CreditCard}
-                        label="Status"
-                        value={formatEnum(active.status)}
+                        label={t('status')}
+                        value={t('common:enums.membershipStatus.' + active.status)}
                       />
                       <InfoTile
                         icon={CheckCircle2}
-                        label="Visits left"
-                        value={active.visitsLeft === null ? 'Unlimited' : String(active.visitsLeft)}
+                        label={t('visitsLeft')}
+                        value={active.visitsLeft === null ? t('unlimited') : String(active.visitsLeft)}
                       />
                     </div>
                   </div>
                 ) : (
                   <div className="flex min-h-40 flex-col items-center justify-center text-center">
                     <CreditCard className="h-8 w-8 text-muted-foreground/40" />
-                    <p className="mt-3 text-sm font-semibold text-foreground">No active membership</p>
+                    <p className="mt-3 text-sm font-semibold text-foreground">{t('noActive')}</p>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      Contact the gym to get started with a plan.
+                      {t('noActiveDesc')}
                     </p>
                   </div>
                 )}
@@ -137,25 +156,25 @@ const Memberships = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle>Membership Summary</CardTitle>
-                <CardDescription>Quick overview of your access.</CardDescription>
+                <CardTitle>{t('summary.title')}</CardTitle>
+                <CardDescription>{t('summary.subtitle')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <SummaryRow
-                    label="Total memberships"
+                  <SummaryCard
+                    label={t('summary.total')}
                     value={history.length.toString()}
                   />
-                  <SummaryRow
-                    label="Active"
+                  <SummaryCard
+                    label={t('summary.active')}
                     value={history.filter((m) => m.status === 'ACTIVE').length.toString()}
                   />
-                  <SummaryRow
-                    label="Expired"
+                  <SummaryCard
+                    label={t('summary.expired')}
                     value={history.filter((m) => m.status === 'EXPIRED').length.toString()}
                   />
-                  <SummaryRow
-                    label="Cancelled"
+                  <SummaryCard
+                    label={t('summary.cancelled')}
                     value={history.filter((m) => m.status === 'CANCELLED').length.toString()}
                   />
                 </div>
@@ -163,26 +182,38 @@ const Memberships = () => {
             </Card>
           </section>
 
-          {history.length > 0 && (
+          {history.length > 0 ? (
             <section>
-              <h2 className="mb-4 text-lg font-semibold text-foreground">History</h2>
+              <h2 className="mb-4 text-lg font-semibold text-foreground">{t('history')}</h2>
               <div className="divide-y divide-border overflow-hidden rounded-2xl border border-border">
                 {history.map((membership) => (
                   <HistoryRow key={membership.id} membership={membership} />
                 ))}
               </div>
             </section>
+          ) : (
+            <EmptyState
+              icon={CalendarDays}
+              title={t('history')}
+              description={t('common:messages.noData')}
+            />
           )}
 
-          {payments.length > 0 && (
+          {payments.length > 0 ? (
             <section>
-              <h2 className="mb-4 text-lg font-semibold text-foreground">Payment History</h2>
+              <h2 className="mb-4 text-lg font-semibold text-foreground">{t('paymentHistory')}</h2>
               <div className="divide-y divide-border overflow-hidden rounded-2xl border border-border">
                 {payments.map((payment) => (
                   <PaymentRow key={payment.id} payment={payment} />
                 ))}
               </div>
             </section>
+          ) : (
+            <EmptyState
+              icon={DollarSign}
+              title={t('paymentHistory')}
+              description={t('common:messages.noData')}
+            />
           )}
         </>
       )}
@@ -196,48 +227,33 @@ const StatusIcon = ({ status }: { status: string }) => {
   return <XCircle className="h-8 w-8 opacity-90" />
 }
 
-const SummaryRow = ({ label, value }: { label: string; value: string }) => (
-  <div className="flex items-center justify-between rounded-xl bg-muted px-4 py-3">
-    <span className="text-sm text-muted-foreground">{label}</span>
-    <span className="text-sm font-semibold text-foreground">{value}</span>
-  </div>
-)
-
 const HistoryRow = ({ membership }: { membership: MembershipResponse }) => {
-  const statusColors: Record<string, string> = {
-    ACTIVE: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-    EXPIRED: 'bg-muted text-muted-foreground',
-    FROZEN: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-    CANCELLED: 'bg-red-500/10 text-red-600 dark:text-red-400',
-    CREATED: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-  }
+  const { t } = useTranslation(['memberships', 'common'])
 
   return (
     <div className="grid gap-3 bg-card p-4 md:grid-cols-[minmax(0,1fr),auto,auto,auto]">
       <div>
-        <p className="font-semibold text-foreground">{formatEnum(membership.type)} plan</p>
+        <p className="font-semibold text-foreground">
+          {t('planType')} — {t('common:enums.membershipType.' + membership.type)}
+        </p>
         <p className="mt-1 text-xs text-muted-foreground">
           {formatDate(membership.startDate)} — {formatDate(membership.endDate)}
         </p>
       </div>
-      <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${statusColors[membership.status] ?? 'bg-muted text-muted-foreground'}`}>
-        {formatEnum(membership.status)}
-      </span>
+      <StatusBadge
+        status={membership.status}
+        colors={membershipStatusColors}
+        label={t('common:enums.membershipStatus.' + membership.status)}
+      />
       <div className="text-sm text-muted-foreground">
-        {membership.visitsLeft === null ? 'Unlimited visits' : `${membership.visitsLeft} visits left`}
+        {membership.visitsLeft === null ? t('unlimited') : t('visitsLeft', { count: membership.visitsLeft })}
       </div>
     </div>
   )
 }
 
-
-
 const PaymentRow = ({ payment }: { payment: PaymentResponse }) => {
-  const statusColors: Record<string, string> = {
-    PAID: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-    PENDING: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-    FAILED: 'bg-red-500/10 text-red-600 dark:text-red-400',
-  }
+  const { t } = useTranslation(['memberships', 'common'])
 
   return (
     <div className="grid gap-3 bg-card p-4 md:grid-cols-[minmax(0,1fr),auto]">
@@ -246,18 +262,21 @@ const PaymentRow = ({ payment }: { payment: PaymentResponse }) => {
           <DollarSign className="h-4 w-4 text-primary" />
         </div>
         <div>
-          <p className="font-semibold text-foreground">${payment.amount.toFixed(2)} {payment.currency}</p>
+          <p className="font-semibold text-foreground">
+            ${payment.amount.toFixed(2)} {payment.currency}
+          </p>
           <p className="mt-0.5 text-xs text-muted-foreground">
             {formatDate(payment.paymentDate)}
           </p>
         </div>
       </div>
-      <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${statusColors[payment.status] ?? 'bg-muted text-muted-foreground'}`}>
-        {formatEnum(payment.status)}
-      </span>
+      <StatusBadge
+        status={payment.status}
+        colors={paymentStatusColors}
+        label={t('common:enums.paymentStatus.' + payment.status)}
+      />
     </div>
   )
 }
-
 
 export default Memberships

@@ -10,17 +10,21 @@ import {
   UserCheck,
 } from 'lucide-react'
 import { useAuthStore } from '../store/useAuthStore'
+import { useMountedRef } from '../utils/useMountedRef'
 import {
   getTrainingSessions,
   getMyAttendance,
   joinSession,
+  joinWaitlist,
   type TrainingSessionResponse,
 } from '../services/workout.service'
 import { getApiErrorMessage } from '../utils/errorHandler'
 import toast from '../utils/toast'
-import { formatEnum } from '../lib/utils'
+import { formatDateTime } from '../lib/utils'
 import { EmptyState } from '../components/ui/empty-state'
+import { Pagination } from '../components/ui/pagination'
 import { InfoTile } from '../components/ui/info-tile'
+import { StatusBadge, sessionStatusColors } from '../components/ui/status-badge'
 
 type SessionFilter = 'all' | 'upcoming' | 'past'
 
@@ -34,22 +38,29 @@ const Sessions = () => {
   const [error, setError] = useState<string | null>(null)
   const [joiningId, setJoiningId] = useState<string | null>(null)
   const [activeFilter, setActiveFilter] = useState<SessionFilter>('all')
+  const [currentPage, setCurrentPage] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
+  const mounted = useMountedRef()
 
-  const loadSessions = async () => {
+  const loadSessions = async (page = 0) => {
     setIsLoading(true)
     setError(null)
     try {
       const [sessionsPage, attendance] = await Promise.all([
-        getTrainingSessions(0, 50),
+        getTrainingSessions(page, 12),
         isClient ? getMyAttendance() : Promise.resolve([]),
       ])
-      setSessions(sessionsPage.content)
-      setJoinedSessionIds(new Set(attendance.map((a) => a.session.sessionId)))
+      if (mounted.current) {
+        setSessions(sessionsPage.content)
+        setTotalPages(sessionsPage.totalPages)
+        setCurrentPage(page)
+        setJoinedSessionIds(new Set(attendance.map((a) => a.session.sessionId)))
+      }
     } catch (err) {
       console.error(err)
-      setError('Unable to load training sessions.')
+      setError(t('errors.loadFailed'))
     } finally {
-      setIsLoading(false)
+      if (mounted.current) setIsLoading(false)
     }
   }
 
@@ -64,7 +75,20 @@ const Sessions = () => {
       toast.success(t('common:toast.joinedSession'))
       await loadSessions()
     } catch (err) {
-      toast.error(getApiErrorMessage(err, 'Unable to join session.'))
+      toast.error(getApiErrorMessage(err, t('errors.joinFailed')))
+    } finally {
+      setJoiningId(null)
+    }
+  }
+
+  const handleWaitlist = async (sessionId: string) => {
+    setJoiningId(sessionId)
+    try {
+      await joinWaitlist(sessionId)
+      toast.success(t('waitlisted'))
+      await loadSessions()
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, t('errors.joinFailed')))
     } finally {
       setJoiningId(null)
     }
@@ -89,7 +113,7 @@ const Sessions = () => {
       <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {t('title')}
+            {t('badge')}
           </p>
           <h1 className="mt-2 text-2xl font-bold text-foreground md:text-3xl">
             {t('title')}
@@ -106,11 +130,13 @@ const Sessions = () => {
         </div>
       )}
 
-      <div className="flex gap-1 overflow-x-auto rounded-xl border border-border bg-muted p-1">
+      <div className="flex gap-1 overflow-x-auto rounded-xl border border-border bg-muted p-1" role="tablist">
         {(['all', 'upcoming', 'past'] as const).map((filter) => (
           <button
             key={filter}
             type="button"
+            role="tab"
+            aria-selected={activeFilter === filter}
             onClick={() => setActiveFilter(filter)}
             className={`inline-flex items-center gap-2 whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition ${
               activeFilter === filter
@@ -132,22 +158,32 @@ const Sessions = () => {
           ))}
         </div>
       ) : filteredSessions.length ? (
-        <div className="grid gap-4 md:grid-cols-2">
-          {filteredSessions.map((session) => {
-            const isPast = new Date(session.startTime).getTime() < now || session.status !== 'SCHEDULED'
-            return (
-              <SessionCard
-                key={session.id}
-                session={session}
-                isClient={isClient}
-                isJoining={joiningId === session.id}
-                isJoined={joinedSessionIds.has(session.id)}
-                onJoin={() => void handleJoin(session.id)}
-                isPast={isPast}
-              />
-            )
-          })}
-        </div>
+        <>
+          <div className="grid gap-4 md:grid-cols-2">
+            {filteredSessions.map((session) => {
+              const isPast = new Date(session.startTime).getTime() < now || session.status !== 'SCHEDULED'
+              return (
+                <SessionCard
+                  key={session.id}
+                  session={session}
+                  isClient={isClient}
+                  isJoining={joiningId === session.id}
+                  isJoined={joinedSessionIds.has(session.id)}
+                  onJoin={() => void handleJoin(session.id)}
+                  onWaitlist={() => void handleWaitlist(session.id)}
+                  isPast={isPast}
+                />
+              )
+            })}
+          </div>
+          <div className="mt-6">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(page) => void loadSessions(page)}
+            />
+          </div>
+        </>
       ) : (
         <EmptyState
           icon={CalendarDays}
@@ -165,6 +201,7 @@ const SessionCard = ({
   isJoining,
   isJoined,
   onJoin,
+  onWaitlist,
   isPast = false,
 }: {
   session: TrainingSessionResponse
@@ -172,24 +209,25 @@ const SessionCard = ({
   isJoining: boolean
   isJoined: boolean
   onJoin: () => void
+  onWaitlist: () => void
   isPast?: boolean
 }) => {
-  const { t } = useTranslation('sessions')
+  const { t } = useTranslation(['sessions', 'common'])
   const spotsLeft = session.maxParticipants - session.currentParticipants
   const isFull = spotsLeft <= 0
   const trainerName =
     [session.trainer.firstname, session.trainer.lastname]
       .filter(Boolean)
-      .join(' ') || 'Trainer'
+      .join(' ') || t('fallbacks.trainer')
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25 }}
-      className={`rounded-2xl border border-border bg-card p-5 shadow-soft ${isPast ? 'opacity-70' : ''}`}
+      className={`h-full rounded-2xl border border-border bg-card p-5 shadow-soft ${isPast ? 'opacity-70' : ''}`}
     >
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
             <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
@@ -197,9 +235,9 @@ const SessionCard = ({
                 ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
                 : 'bg-violet-500/10 text-violet-600 dark:text-violet-400'
             }`}>
-              {session.type}
+              {t('common:enums.trainingType.' + session.type)}
             </span>
-            <StatusBadge status={session.status} />
+            <StatusBadge status={session.status} colors={sessionStatusColors} label={t('status.' + session.status)} />
             {isJoined && !isPast && (
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
                 <CheckCircle className="h-3 w-3" />
@@ -208,10 +246,10 @@ const SessionCard = ({
             )}
           </div>
           <h3 className="mt-3 text-base font-semibold text-foreground">
-            {formatEnum(session.type)} training
+            {t('common:enums.trainingType.' + session.type)}
           </h3>
           <p className="mt-1 text-sm text-muted-foreground">
-            With {trainerName}
+            {t('withTrainer', { name: trainerName })}
           </p>
         </div>
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
@@ -222,12 +260,12 @@ const SessionCard = ({
       <div className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
         <InfoTile
           icon={Clock}
-          label="Starts"
+          label={t('startsAt')}
           value={formatDateTime(session.startTime)}
         />
         <InfoTile
           icon={Users2}
-          label="Capacity"
+          label={t('capacity')}
           value={`${session.currentParticipants}/${session.maxParticipants}`}
         />
       </div>
@@ -240,7 +278,17 @@ const SessionCard = ({
               {t('alreadyJoined')}
             </p>
           ) : isFull ? (
-            <p className="text-xs text-muted-foreground">{t('sessionFull')}</p>
+            <button
+              type="button"
+              disabled={isJoining}
+              onClick={onWaitlist}
+              className="inline-flex h-9 items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 text-sm font-semibold text-foreground transition-all hover:bg-accent disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isJoining ? (
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-foreground border-t-transparent" />
+              ) : null}
+              {isJoining ? t('joining') : t('sessionFull')}
+            </button>
           ) : (
             <button
               type="button"
@@ -260,29 +308,6 @@ const SessionCard = ({
       )}
     </motion.div>
   )
-}
-
-const StatusBadge = ({ status }: { status: string }) => {
-  const colors: Record<string, string> = {
-    SCHEDULED: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-    COMPLETED: 'bg-muted text-muted-foreground',
-    CANCELLED: 'bg-red-500/10 text-red-600 dark:text-red-400',
-  }
-  return (
-    <span className={`rounded-full px-2 py-1 text-xs font-semibold ${colors[status] ?? 'bg-muted text-muted-foreground'}`}>
-      {status}
-    </span>
-  )
-}
-
-const formatDateTime = (value: string) => {
-  const date = new Date(value)
-  return new Intl.DateTimeFormat(undefined, {
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  }).format(date)
 }
 
 export default Sessions

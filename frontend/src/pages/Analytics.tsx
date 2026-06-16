@@ -31,6 +31,8 @@ import {
   type AttendanceStatsResponse,
   type DashboardAnalyticsResponse,
 } from '../services/dashboard.service'
+import { formatCurrency } from '../lib/utils'
+import { useMountedRef } from '../utils/useMountedRef'
 
 const Analytics = () => {
   const { t } = useTranslation('analytics')
@@ -39,6 +41,7 @@ const Analytics = () => {
   const [revenueData, setRevenueData] = useState<{ date: string; revenue: number }[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [period, setPeriod] = useState<7 | 14 | 30>(30)
+  const mounted = useMountedRef()
 
   useEffect(() => {
     const load = async () => {
@@ -56,13 +59,15 @@ const Analytics = () => {
           getRevenueStats(from, to),
         ])
 
-        if (analyticsResult.status === 'fulfilled') setAnalytics(analyticsResult.value)
-        if (attendanceResult.status === 'fulfilled') setAttendance(attendanceResult.value)
-        if (revenueResult.status === 'fulfilled') setRevenueData(revenueResult.value)
+        if (mounted.current) {
+          if (analyticsResult.status === 'fulfilled') setAnalytics(analyticsResult.value)
+          if (attendanceResult.status === 'fulfilled') setAttendance(attendanceResult.value)
+          if (revenueResult.status === 'fulfilled') setRevenueData(revenueResult.value)
+        }
       } catch {
         // handled by Promise.allSettled
       } finally {
-        setIsLoading(false)
+        if (mounted.current) setIsLoading(false)
       }
     }
     void load()
@@ -111,7 +116,7 @@ const Analytics = () => {
       <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {t('title')}
+            {t('badge')}
           </p>
           <h1 className="mt-2 text-2xl font-bold text-foreground md:text-3xl">
             {t('title')}
@@ -162,7 +167,7 @@ const Analytics = () => {
             <MetricCard
               icon={DollarSign}
               label={t('metrics.revenue')}
-              value={`$${analytics?.revenue?.toLocaleString() ?? '0'}`}
+              value={formatCurrency(analytics?.revenue)}
               tone="bg-violet-500"
             />
             <MetricCard
@@ -175,19 +180,19 @@ const Analytics = () => {
 
           <section className="grid gap-4 md:grid-cols-3">
             <SummaryCard
-              label={t('chart.totalCheckIns', { defaultValue: 'Total check-ins' })}
+              label={t('chart.totalCheckIns')}
               value={totalCheckIns.toString()}
               detail={`${period}d`}
               tone="bg-sky-500"
             />
             <SummaryCard
-              label={t('chart.avgCheckIns', { defaultValue: 'Daily average' })}
+              label={t('chart.avgCheckIns')}
               value={avgCheckIns.toString()}
-              detail={t('chart.perDay', { defaultValue: 'per day' })}
+              detail={t('chart.perDay')}
               tone="bg-indigo-500"
             />
             <SummaryCard
-              label={t('chart.peakDay', { defaultValue: 'Peak day' })}
+              label={t('chart.peakDay')}
               value={peakDay ? peakDay.checkIns.toString() : '—'}
               detail={
                 peakDay
@@ -259,8 +264,8 @@ const Analytics = () => {
             {revenueChartData.length > 0 && (
               <Card>
                 <CardHeader>
-                  <CardTitle>{t('revenue.title', { defaultValue: 'Revenue Overview' })}</CardTitle>
-                  <CardDescription>{t('revenue.subtitle', { defaultValue: `Total: $${totalRevenue.toLocaleString()} over ${period}d` })}</CardDescription>
+                  <CardTitle>{t('revenue.title')}</CardTitle>
+                  <CardDescription>{t('revenue.subtitle', { amount: totalRevenue.toLocaleString(), period })}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="h-64">
@@ -285,7 +290,7 @@ const Analytics = () => {
                           tick={{ fill: 'hsl(var(--muted-foreground))' }}
                           tickLine={false}
                           axisLine={false}
-                          tickFormatter={(value) => `$${value}`}
+                          tickFormatter={(value) => formatCurrency(value)}
                         />
                         <Tooltip
                           contentStyle={{
@@ -294,7 +299,7 @@ const Analytics = () => {
                             borderRadius: '12px',
                             fontSize: '12px',
                           }}
-                          formatter={(value) => [`$${Number(value).toLocaleString()}`, 'Revenue']}
+                          formatter={(value) => [formatCurrency(Number(value)), t('metrics.revenue')]}
                         />
                         <Area
                           type="monotone"
@@ -355,12 +360,12 @@ const Analytics = () => {
               {analytics && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>{t('quickStats.title', { defaultValue: 'Quick Stats' })}</CardTitle>
+                    <CardTitle>{t('quickStats.title')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
                       <QuickStatRow
-                        label={t('quickStats.conversionRate', { defaultValue: 'Client conversion' })}
+                        label={t('quickStats.conversionRate')}
                         value={
                           analytics.activeMemberships > 0 && analytics.activeClients > 0
                             ? `${Math.round((analytics.activeMemberships / analytics.activeClients) * 100)}%`
@@ -368,15 +373,15 @@ const Analytics = () => {
                         }
                       />
                       <QuickStatRow
-                        label={t('quickStats.revenuePerClient', { defaultValue: 'Revenue / client' })}
+                        label={t('quickStats.revenuePerClient')}
                         value={
                           analytics.activeClients > 0
-                            ? `$${Math.round(analytics.revenue / analytics.activeClients)}`
+                            ? formatCurrency(Math.round(analytics.revenue / analytics.activeClients))
                             : '—'
                         }
                       />
                       <QuickStatRow
-                        label={t('quickStats.avgCheckIn', { defaultValue: 'Avg check-ins/day' })}
+                        label={t('quickStats.avgCheckIn')}
                         value={avgCheckIns.toString()}
                       />
                     </div>
@@ -409,7 +414,7 @@ const MetricCard = ({
   >
     <Card className="h-full">
       <CardContent className="flex h-full flex-col justify-between p-5">
-        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-xs font-medium text-muted-foreground">{label}</p>
             <p className="mt-2 text-2xl font-bold text-foreground">{value}</p>

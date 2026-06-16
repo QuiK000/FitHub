@@ -1,11 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import {
   CheckCircle2,
   Dumbbell,
+  ListPlus,
+  Play,
   Plus,
+  StopCircle,
+  UserPlus,
   Users2,
+  XCircle,
 } from 'lucide-react'
 import {
   Card,
@@ -14,48 +19,112 @@ import {
   CardHeader,
   CardTitle,
 } from '../components/ui/card'
+import { Button } from '../components/ui/button'
 import { useAuthStore } from '../store/useAuthStore'
 import {
   getMyPlans,
   getAssignedPlans,
+  startAssignment,
+  completeAssignment,
+  cancelAssignment,
   type ClientWorkoutPlanResponse,
   type WorkoutPlanResponse,
 } from '../services/workout.service'
-import { formatEnum, formatDate, type IconType } from '../lib/utils'
+import { formatDate, type IconType } from '../lib/utils'
 import { EmptyState } from '../components/ui/empty-state'
+import { StatusBadge } from '../components/ui/status-badge'
 import { CreatePlanModal } from '../components/workouts/CreatePlanModal'
+import { AddExerciseModal } from '../components/workouts/AddExerciseModal'
+import { AssignPlanModal } from '../components/workouts/AssignPlanModal'
+import { getApiErrorMessage } from '../utils/errorHandler'
+import { useMountedRef } from '../utils/useMountedRef'
+import toast from '../utils/toast'
+
+const workoutStatusColors: Record<string, string> = {
+  ASSIGNED: 'bg-amber-500/10 text-amber-600',
+  NOT_STARTED: 'bg-amber-500/10 text-amber-600',
+  IN_PROGRESS: 'bg-blue-500/10 text-blue-600',
+  COMPLETED: 'bg-emerald-500/10 text-emerald-600',
+  CANCELLED: 'bg-red-500/10 text-red-600',
+}
 
 const TrainerWorkouts = () => {
-  const { t } = useTranslation(['sessions', 'common'])
+  const { t } = useTranslation(['workouts', 'common'])
   const user = useAuthStore((state) => state.user)
   const [plans, setPlans] = useState<WorkoutPlanResponse[]>([])
   const [assignments, setAssignments] = useState<ClientWorkoutPlanResponse[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isCreateOpen, setIsCreateOpen] = useState(false)
 
-  const loadData = async () => {
+  const [selectedPlan, setSelectedPlan] = useState<WorkoutPlanResponse | null>(null)
+  const [isAddExerciseOpen, setIsAddExerciseOpen] = useState(false)
+  const [isAssignOpen, setIsAssignOpen] = useState(false)
+  const [actioningId, setActioningId] = useState<string | null>(null)
+  const mounted = useMountedRef()
+
+  const loadData = useCallback(async () => {
     setIsLoading(true)
     try {
       const [plansResult, assignmentsResult] = await Promise.allSettled([
         getMyPlans(0, 20),
         getAssignedPlans(0, 20),
       ])
-      if (plansResult.status === 'fulfilled') setPlans(plansResult.value.content)
-      if (assignmentsResult.status === 'fulfilled') setAssignments(assignmentsResult.value.content)
+      if (mounted.current) {
+        if (plansResult.status === 'fulfilled') setPlans(plansResult.value.content)
+        if (assignmentsResult.status === 'fulfilled') setAssignments(assignmentsResult.value.content)
+      }
     } catch (err) {
       console.error(err)
     } finally {
-      setIsLoading(false)
+      if (mounted.current) setIsLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     void loadData()
-  }, [])
+  }, [loadData])
 
-  const trainerName = user?.trainerProfile?.firstname ?? 'Trainer'
+  const handleOpenAddExercise = (plan: WorkoutPlanResponse) => {
+    setSelectedPlan(plan)
+    setIsAddExerciseOpen(true)
+  }
 
-  const activeAssignments = assignments.filter((a) => a.status === 'IN_PROGRESS' || a.status === 'ASSIGNED')
+  const handleOpenAssign = (plan: WorkoutPlanResponse) => {
+    setSelectedPlan(plan)
+    setIsAssignOpen(true)
+  }
+
+  const handleAssignmentAction = async (
+    assignmentId: string,
+    action: 'start' | 'complete' | 'cancel',
+  ) => {
+    setActioningId(assignmentId)
+    try {
+      if (action === 'start') {
+        await startAssignment(assignmentId)
+        toast.success(t('common:toast.assignmentStarted'))
+      } else if (action === 'complete') {
+        await completeAssignment(assignmentId)
+        toast.success(t('common:toast.assignmentCompleted'))
+      } else {
+        await cancelAssignment(assignmentId)
+        toast.success(t('common:toast.assignmentCancelled'))
+      }
+      await loadData()
+    } catch (err) {
+      toast.error(getApiErrorMessage(err))
+    } finally {
+      setActioningId(null)
+    }
+  }
+
+  const trainerName = user?.trainerProfile
+    ? `${user.trainerProfile.firstname} ${user.trainerProfile.lastname}`
+    : t('detail.trainer')
+
+  const activeAssignments = assignments.filter(
+    (a) => a.status === 'IN_PROGRESS' || a.status === 'ASSIGNED',
+  )
   const completedAssignments = assignments.filter((a) => a.status === 'COMPLETED')
 
   return (
@@ -66,10 +135,10 @@ const TrainerWorkouts = () => {
             {t('title')}
           </p>
           <h1 className="mt-2 text-2xl font-bold text-foreground md:text-3xl">
-            Trainer workspace, {trainerName}
+            {t('detail.workspaceTitle', { name: trainerName })}
           </h1>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            Manage your workout plans, client assignments, and training sessions.
+            {t('detail.workspaceDesc')}
           </p>
         </div>
         <button
@@ -78,7 +147,7 @@ const TrainerWorkouts = () => {
           className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-soft transition-all hover:bg-primary/90"
         >
           <Plus className="h-4 w-4" />
-          Create plan
+          {t('createPlan.createButton')}
         </button>
       </div>
 
@@ -93,23 +162,23 @@ const TrainerWorkouts = () => {
           <section className="grid gap-4 md:grid-cols-3">
             <SummaryCard
               icon={Dumbbell}
-              label="My Plans"
+              label={t('detail.myPlans')}
               value={plans.length.toString()}
-              detail="Workout plans created"
+              detail={t('detail.plansCreated')}
               tone="bg-violet-500"
             />
             <SummaryCard
               icon={Users2}
-              label="Active Assignments"
+              label={t('detail.activeAssignments')}
               value={activeAssignments.length.toString()}
-              detail="Plans assigned to clients"
+              detail={t('detail.plansAssigned')}
               tone="bg-emerald-500"
             />
             <SummaryCard
               icon={CheckCircle2}
-              label="Completed"
+              label={t('detail.completedLabel')}
               value={completedAssignments.length.toString()}
-              detail="Successfully completed"
+              detail={t('detail.completedDetail')}
               tone="bg-blue-500"
             />
           </section>
@@ -117,8 +186,8 @@ const TrainerWorkouts = () => {
           <section className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr),minmax(360px,0.8fr)]">
             <Card>
               <CardHeader>
-                <CardTitle>My Workout Plans</CardTitle>
-                <CardDescription>Plans you've created for your clients.</CardDescription>
+                <CardTitle>{t('activePlans.title')}</CardTitle>
+                <CardDescription>{t('detail.plansForClients')}</CardDescription>
               </CardHeader>
               <CardContent>
                 {plans.length ? (
@@ -134,17 +203,37 @@ const TrainerWorkouts = () => {
                           <div>
                             <p className="text-sm font-semibold text-foreground">{plan.name}</p>
                             <p className="mt-1 text-xs text-muted-foreground">
-                              {formatEnum(plan.difficultyLevel)} · {plan.durationWeeks} weeks
+                              {t(`difficulty.${plan.difficultyLevel}`)} · {t('planCard.weeks', { count: plan.durationWeeks })}
                             </p>
                           </div>
                           <span className={`rounded-full px-2 py-1 text-xs font-semibold ${plan.active ? 'bg-emerald-500/10 text-emerald-600' : 'bg-muted text-muted-foreground'}`}>
-                            {plan.active ? 'Active' : 'Inactive'}
+                            {plan.active ? t('detail.active') : t('detail.inactive')}
                           </span>
                         </div>
                         <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">{plan.description}</p>
                         <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
-                          <span>{plan.exercises.length} exercises</span>
-                          <span>{plan.sessionsPerWeek} sessions/week</span>
+                          <span>{t('detail.exerciseCount', { count: plan.exercises.length })}</span>
+                          <span>{t('planCard.sessionsPerWeek', { count: plan.sessionsPerWeek })}</span>
+                        </div>
+                        <div className="mt-3 flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1 rounded-xl text-xs"
+                            onClick={() => handleOpenAddExercise(plan)}
+                          >
+                            <ListPlus className="h-3.5 w-3.5" />
+                            {t('planCard.addExercise')}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1 rounded-xl text-xs"
+                            onClick={() => handleOpenAssign(plan)}
+                          >
+                            <UserPlus className="h-3.5 w-3.5" />
+                            {t('planCard.assign')}
+                          </Button>
                         </div>
                       </motion.div>
                     ))}
@@ -152,8 +241,8 @@ const TrainerWorkouts = () => {
                 ) : (
                   <EmptyState
                     icon={Dumbbell}
-                    title="No workout plans yet"
-                    description="Create your first workout plan to assign to clients."
+                    title={t('activePlans.empty')}
+                    description={t('detail.createFirst')}
                   />
                 )}
               </CardContent>
@@ -162,8 +251,8 @@ const TrainerWorkouts = () => {
             <div className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>Recent Assignments</CardTitle>
-                  <CardDescription>Latest client plan assignments.</CardDescription>
+                  <CardTitle>{t('planHistory.title')}</CardTitle>
+                  <CardDescription>{t('detail.latestAssignments')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   {assignments.length ? (
@@ -176,10 +265,14 @@ const TrainerWorkouts = () => {
                                 {assignment.workoutPlan.name}
                               </p>
                               <p className="mt-0.5 text-xs text-muted-foreground">
-                                Assigned {formatDate(assignment.assignedDate)}
+                                {t('planCard.assignedDate', { date: formatDate(assignment.assignedDate) })}
                               </p>
                             </div>
-                            <StatusBadge status={assignment.status} />
+                            <StatusBadge
+                              status={assignment.status}
+                              colors={workoutStatusColors}
+                              label={t(`status.${assignment.status}`)}
+                            />
                           </div>
                           {assignment.completionPercentage != null && (
                             <div className="mt-2">
@@ -190,8 +283,56 @@ const TrainerWorkouts = () => {
                                 />
                               </div>
                               <p className="mt-1 text-xs text-muted-foreground">
-                                {Math.round(assignment.completionPercentage)}% complete
+                                {t('detail.completePercent', { count: Math.round(assignment.completionPercentage) })}
                               </p>
+                            </div>
+                          )}
+                          {assignment.status === 'ASSIGNED' && (
+                            <div className="mt-2 flex items-center gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="rounded-xl text-xs"
+                                disabled={actioningId === assignment.id}
+                                onClick={() => handleAssignmentAction(assignment.id, 'start')}
+                              >
+                                <Play className="h-3 w-3" />
+                                {t('assignmentActions.start')}
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="rounded-xl text-xs text-destructive hover:text-destructive"
+                                disabled={actioningId === assignment.id}
+                                onClick={() => handleAssignmentAction(assignment.id, 'cancel')}
+                              >
+                                <XCircle className="h-3 w-3" />
+                                {t('assignmentActions.cancel')}
+                              </Button>
+                            </div>
+                          )}
+                          {assignment.status === 'IN_PROGRESS' && (
+                            <div className="mt-2 flex items-center gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="rounded-xl text-xs"
+                                disabled={actioningId === assignment.id}
+                                onClick={() => handleAssignmentAction(assignment.id, 'complete')}
+                              >
+                                <CheckCircle2 className="h-3 w-3" />
+                                {t('assignmentActions.complete')}
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="rounded-xl text-xs text-destructive hover:text-destructive"
+                                disabled={actioningId === assignment.id}
+                                onClick={() => handleAssignmentAction(assignment.id, 'cancel')}
+                              >
+                                <StopCircle className="h-3 w-3" />
+                                {t('assignmentActions.cancel')}
+                              </Button>
                             </div>
                           )}
                         </div>
@@ -200,8 +341,8 @@ const TrainerWorkouts = () => {
                   ) : (
                     <EmptyState
                       icon={Users2}
-                      title="No assignments yet"
-                      description="Assign your workout plans to clients to get started."
+                      title={t('planHistory.empty')}
+                      description={t('detail.assignToGetStarted')}
                     />
                   )}
                 </CardContent>
@@ -219,21 +360,38 @@ const TrainerWorkouts = () => {
           await loadData()
         }}
       />
-    </div>
-  )
-}
 
-const StatusBadge = ({ status }: { status: string }) => {
-  const colors: Record<string, string> = {
-    ASSIGNED: 'bg-amber-500/10 text-amber-600',
-    IN_PROGRESS: 'bg-blue-500/10 text-blue-600',
-    COMPLETED: 'bg-emerald-500/10 text-emerald-600',
-    CANCELLED: 'bg-red-500/10 text-red-600',
-  }
-  return (
-    <span className={`rounded-full px-2 py-1 text-xs font-semibold ${colors[status] ?? 'bg-muted text-muted-foreground'}`}>
-      {formatEnum(status)}
-    </span>
+      {selectedPlan && (
+        <>
+          <AddExerciseModal
+            isOpen={isAddExerciseOpen}
+            onClose={() => {
+              setIsAddExerciseOpen(false)
+              setSelectedPlan(null)
+            }}
+            plan={selectedPlan}
+            onAdded={async () => {
+              setIsAddExerciseOpen(false)
+              setSelectedPlan(null)
+              await loadData()
+            }}
+          />
+          <AssignPlanModal
+            isOpen={isAssignOpen}
+            onClose={() => {
+              setIsAssignOpen(false)
+              setSelectedPlan(null)
+            }}
+            plan={selectedPlan}
+            onAssigned={async () => {
+              setIsAssignOpen(false)
+              setSelectedPlan(null)
+              await loadData()
+            }}
+          />
+        </>
+      )}
+    </div>
   )
 }
 
@@ -257,7 +415,7 @@ const SummaryCard = ({
   >
     <Card className="h-full">
       <CardContent className="flex h-full flex-col justify-between p-5">
-        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-xs font-medium text-muted-foreground">{label}</p>
             <p className="mt-2 text-2xl font-bold text-foreground">{value}</p>

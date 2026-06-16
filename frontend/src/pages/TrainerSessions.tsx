@@ -1,7 +1,7 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useState, useCallback, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
-import { CalendarDays, Plus, Users2, X } from 'lucide-react'
+import { CalendarDays, Plus, Search, Users2, X } from 'lucide-react'
 import { Input } from '../components/ui/input'
 import { Button } from '../components/ui/button'
 import { Label } from '../components/ui/label'
@@ -11,14 +11,14 @@ import { StatusBadge, sessionStatusColors } from '../components/ui/status-badge'
 import {
   getTrainingSessions,
   createSession,
-  updateSession,
   checkInClient,
   getAttendanceBySession,
   type TrainingSessionResponse,
   type CreateTrainingSessionRequest,
-  type UpdateTrainingSessionRequest,
   type AttendanceSessionResponse,
 } from '../services/workout.service'
+import { searchClients, type ClientProfileResponse } from '../services/user.service'
+import { useMountedRef } from '../utils/useMountedRef'
 import { getApiErrorMessage } from '../utils/errorHandler'
 import { formatDateTime } from '../lib/utils'
 import toast from '../utils/toast'
@@ -30,24 +30,49 @@ const TrainerSessions = () => {
   const [currentPage, setCurrentPage] = useState(0)
   const [totalPages, setTotalPages] = useState(1)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
-  const [editingSession, setEditingSession] = useState<TrainingSessionResponse | null>(null)
   const [selectedSession, setSelectedSession] = useState<TrainingSessionResponse | null>(null)
   const [attendances, setAttendances] = useState<AttendanceSessionResponse[]>([])
   const [isLoadingAttendances, setIsLoadingAttendances] = useState(false)
   const [checkInClientId, setCheckInClientId] = useState('')
+  const [clientSearchQuery, setClientSearchQuery] = useState('')
+  const [clientSearchResults, setClientSearchResults] = useState<ClientProfileResponse[]>([])
+  const [selectedClient, setSelectedClient] = useState<ClientProfileResponse | null>(null)
+  const mounted = useMountedRef()
+
+  const doClientSearch = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setClientSearchResults([])
+      return
+    }
+    try {
+      const res = await searchClients(query, 0, 10)
+      setClientSearchResults(res.content)
+    } catch {
+      setClientSearchResults([])
+    }
+  }, [])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      void doClientSearch(clientSearchQuery)
+    }, 350)
+    return () => clearTimeout(timer)
+  }, [clientSearchQuery, doClientSearch])
 
   const loadSessions = async (page = 0) => {
     setIsLoading(true)
     try {
       const result = await getTrainingSessions(page, 12)
-      setSessions(result.content)
-      setTotalPages(result.totalPages)
-      setCurrentPage(page)
+      if (mounted.current) {
+        setSessions(result.content)
+        setTotalPages(result.totalPages)
+        setCurrentPage(page)
+      }
     } catch (err) {
       console.error(err)
       toast.error(t('errors.loadFailed'))
     } finally {
-      setIsLoading(false)
+      if (mounted.current) setIsLoading(false)
     }
   }
 
@@ -56,11 +81,15 @@ const TrainerSessions = () => {
   }, [])
 
   const handleCheckIn = async (sessionId: string) => {
-    if (!checkInClientId.trim()) return
+    const clientId = selectedClient?.id ?? checkInClientId.trim()
+    if (!clientId) return
     try {
-      await checkInClient(sessionId, checkInClientId)
+      await checkInClient(sessionId, clientId)
       toast.success(t('common:toast.sessionJoined'))
       setCheckInClientId('')
+      setClientSearchQuery('')
+      setClientSearchResults([])
+      setSelectedClient(null)
       await loadAttendances(sessionId)
     } catch (err) {
       toast.error(getApiErrorMessage(err))
@@ -111,14 +140,15 @@ const TrainerSessions = () => {
                 key={session.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-2xl border border-border bg-card p-5 shadow-soft"
+                className="h-full rounded-2xl border border-border bg-card p-5 shadow-soft"
               >
-                <div className="flex items-start justify-between">
+                <div className="flex items-center justify-between">
                   <div>
                     <div className="flex items-center gap-2">
                       <StatusBadge
                         status={session.status}
-                        colorMap={sessionStatusColors}
+                        colors={sessionStatusColors}
+                        label={t('status.' + session.status)}
                       />
                       <span className="text-xs text-muted-foreground">
                         {t(`type.${session.type}`)}
@@ -180,7 +210,7 @@ const TrainerSessions = () => {
           >
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-foreground">
-                {t('common:buttons.edit')}
+                {t('viewAttendance')}
               </h2>
               <button
                 type="button"
@@ -189,6 +219,7 @@ const TrainerSessions = () => {
                   setAttendances([])
                 }}
                 className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-background text-muted-foreground hover:bg-accent"
+                aria-label={t('common:buttons.close')}
               >
                 <X className="h-4 w-4" />
               </button>
@@ -196,17 +227,57 @@ const TrainerSessions = () => {
 
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <Label>{t('common:labels.search')}</Label>
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Client ID"
-                    value={checkInClientId}
-                    onChange={(e) => setCheckInClientId(e.target.value)}
-                  />
-                  <Button onClick={() => void handleCheckIn(selectedSession.id)}>
-                    {t('join')}
-                  </Button>
+                <Label>{t('checkInClient')}</Label>
+                <div className="relative">
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        placeholder={t('common:labels.search')}
+                        value={selectedClient ? `${selectedClient.firstname} ${selectedClient.lastname}` : clientSearchQuery}
+                        onChange={(e) => {
+                          setClientSearchQuery(e.target.value)
+                          setSelectedClient(null)
+                          setCheckInClientId('')
+                        }}
+                        className="pl-9"
+                      />
+                    </div>
+                  <Button onClick={() => void handleCheckIn(selectedSession.id)} disabled={!selectedClient && !checkInClientId.trim()}>
+                    {t('checkInClient')}
+                    </Button>
+                  </div>
+                  {clientSearchResults.length > 0 && !selectedClient && (
+                    <div className="absolute left-0 right-0 top-full z-10 mt-1 max-h-40 overflow-y-auto rounded-xl border border-border bg-card shadow-lg">
+                      {clientSearchResults.map((client) => (
+                        <button
+                          key={client.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedClient(client)
+                            setCheckInClientId(client.id)
+                            setClientSearchQuery('')
+                            setClientSearchResults([])
+                          }}
+                          className="flex w-full items-center gap-3 px-3 py-2 text-left text-sm transition hover:bg-accent"
+                        >
+                          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                            {client.firstname[0]}{client.lastname[0]}
+                          </div>
+                          <div>
+                            <p className="font-medium text-foreground">{client.firstname} {client.lastname}</p>
+                            <p className="text-xs text-muted-foreground">{client.phone}</p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
+                {selectedClient && (
+                  <p className="text-xs text-muted-foreground">
+                    {selectedClient.firstname} {selectedClient.lastname} — {selectedClient.phone}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">

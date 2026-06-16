@@ -24,6 +24,7 @@ import {
   type NotificationSummaryResponse,
 } from '../services/notification.service'
 import toast from '../utils/toast'
+import { useMountedRef } from '../utils/useMountedRef'
 
 const Notifications = () => {
   const { t } = useTranslation(['notifications', 'common'])
@@ -31,6 +32,7 @@ const Notifications = () => {
   const [summary, setSummary] = useState<NotificationSummaryResponse | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const eventSourceRef = useRef<EventSource | null>(null)
+  const mounted = useMountedRef()
 
   const loadData = async () => {
     setIsLoading(true)
@@ -39,12 +41,14 @@ const Notifications = () => {
         getNotifications(0, 30),
         getNotificationSummary(),
       ])
-      if (notiPage.status === 'fulfilled') setNotifications(notiPage.value.content)
-      if (summaryData.status === 'fulfilled') setSummary(summaryData.value)
+      if (mounted.current) {
+        if (notiPage.status === 'fulfilled') setNotifications(notiPage.value.content)
+        if (summaryData.status === 'fulfilled') setSummary(summaryData.value)
+      }
     } catch (err) {
       console.error(err)
     } finally {
-      setIsLoading(false)
+      if (mounted.current) setIsLoading(false)
     }
   }
 
@@ -53,8 +57,10 @@ const Notifications = () => {
   }, [])
 
   useEffect(() => {
+    const token = localStorage.getItem('access_token')
+    if (!token) return
+
     try {
-      const token = localStorage.getItem('access_token')
       const es = new EventSource(
         `${import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080/api/v1'}/notifications/stream?token=${token}`,
       )
@@ -103,7 +109,7 @@ const Notifications = () => {
       <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {t('title')}
+            {t('badge')}
           </p>
           <h1 className="mt-2 text-2xl font-bold text-foreground md:text-3xl">
             {t('title')}
@@ -147,9 +153,9 @@ const Notifications = () => {
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-background">
             <BellOff className="h-6 w-6 text-muted-foreground" />
           </div>
-          <p className="mt-4 text-sm font-semibold text-foreground">No notifications</p>
+          <p className="mt-4 text-sm font-semibold text-foreground">{t('noData')}</p>
           <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-            You will see updates about sessions, memberships, and workout plans here.
+            {t('noDataDesc')}
           </p>
         </div>
       )}
@@ -183,6 +189,7 @@ const notificationIcons: Record<string, typeof Bell> = {
 const priorityColors: Record<string, string> = {
   LOW: 'bg-muted text-muted-foreground',
   NORMAL: 'bg-primary/10 text-primary',
+  MEDIUM: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
   HIGH: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
   URGENT: 'bg-red-500/10 text-red-600 dark:text-red-400',
 }
@@ -194,6 +201,7 @@ const NotificationRow = ({
   notification: NotificationResponse
   onMarkRead: () => void
 }) => {
+  const { t } = useTranslation(['notifications'])
   const Icon = notificationIcons[notification.type] ?? Bell
 
   return (
@@ -212,7 +220,7 @@ const NotificationRow = ({
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
-            <p className={`text-sm font-semibold ${notification.read ? 'text-foreground' : 'text-foreground'}`}>
+            <p className="text-sm font-semibold text-foreground">
               {notification.title}
             </p>
             {!notification.read && (
@@ -221,7 +229,7 @@ const NotificationRow = ({
                 onClick={onMarkRead}
                 className="shrink-0 text-xs font-medium text-primary hover:underline"
               >
-                Mark read
+                {t('markRead')}
               </button>
             )}
           </div>

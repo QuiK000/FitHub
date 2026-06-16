@@ -15,7 +15,6 @@ import {
   deactivateExercise,
   type ExerciseResponse,
   type CreateExerciseRequest,
-  type UpdateExerciseRequest,
   type ExerciseCategory,
   type MuscleGroup,
 } from '../services/workout.service'
@@ -45,7 +44,7 @@ const ExerciseManagement = () => {
   const loadExercises = async (page = 0, searchQuery?: string) => {
     setIsLoading(true)
     try {
-      const result = await getExercises(page, 12)
+      const result = await getExercises(searchQuery ? 0 : page, searchQuery ? 100 : 12)
       let filtered = result.content
       if (searchQuery) {
         filtered = filtered.filter(
@@ -55,7 +54,7 @@ const ExerciseManagement = () => {
         )
       }
       setExercises(filtered)
-      setTotalPages(result.totalPages)
+      setTotalPages(searchQuery ? 1 : result.totalPages)
       setCurrentPage(page)
     } catch (err) {
       console.error(err)
@@ -127,16 +126,16 @@ const ExerciseManagement = () => {
                 key={exercise.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-2xl border border-border bg-card p-4 shadow-soft"
+                className="h-full rounded-2xl border border-border bg-card p-4 shadow-soft"
               >
-                <div className="flex items-start justify-between">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
                       <Dumbbell className="h-5 w-5 text-primary" />
                     </div>
                     <div>
                       <h3 className="font-medium text-foreground">{exercise.name}</h3>
-                      <p className="text-xs text-muted-foreground">{exercise.category}</p>
+                      <p className="text-xs text-muted-foreground">{t(`common:enums.exerciseCategory.${exercise.category}`)}</p>
                     </div>
                   </div>
                   <span
@@ -149,7 +148,7 @@ const ExerciseManagement = () => {
                     {exercise.active ? t('common:status.active') : t('common:status.inactive')}
                   </span>
                 </div>
-                <p className="mt-2 text-sm text-muted-foreground">{exercise.primaryMuscleGroup}</p>
+                <p className="mt-2 text-sm text-muted-foreground">{t(`common:enums.muscleGroup.${exercise.primaryMuscleGroup}`)}</p>
                 <div className="mt-4 flex gap-2">
                   <Button
                     variant="outline"
@@ -159,8 +158,9 @@ const ExerciseManagement = () => {
                     {t('common:buttons.edit')}
                   </Button>
                   <Button
-                    variant={exercise.active ? 'destructive' : 'default'}
+                    variant={exercise.active ? 'outline' : 'default'}
                     size="sm"
+                    className={exercise.active ? 'text-destructive hover:bg-destructive/10 hover:text-destructive border-destructive/30' : ''}
                     onClick={() => void handleToggleActive(exercise)}
                   >
                     {exercise.active ? t('exercises.deactivate') : t('exercises.activate')}
@@ -262,6 +262,7 @@ const ExerciseFormModal = ({
             type="button"
             onClick={onClose}
             className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-background text-muted-foreground hover:bg-accent"
+            aria-label={t('common:buttons.close')}
           >
             <X className="h-4 w-4" />
           </button>
@@ -297,7 +298,7 @@ const ExerciseFormModal = ({
                 className="flex h-10 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground shadow-soft focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
               >
                 {exerciseCategories.map((cat) => (
-                  <option key={cat} value={cat}>{cat}</option>
+                  <option key={cat} value={cat}>{t(`common:enums.exerciseCategory.${cat}`)}</option>
                 ))}
               </select>
             </div>
@@ -310,7 +311,7 @@ const ExerciseFormModal = ({
                 className="flex h-10 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground shadow-soft focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
               >
                 {muscleGroups.map((mg) => (
-                  <option key={mg} value={mg}>{mg}</option>
+                  <option key={mg} value={mg}>{t(`common:enums.muscleGroup.${mg}`)}</option>
                 ))}
               </select>
             </div>

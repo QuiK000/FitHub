@@ -21,6 +21,7 @@ import {
 import { getSpecializations, type SpecializationResponse } from '../services/specialization.service'
 import { useAuthStore } from '../store/useAuthStore'
 import { getApiErrorMessage } from '../utils/errorHandler'
+import { useMountedRef } from '../utils/useMountedRef'
 import toast from '../utils/toast'
 
 type TrainerForm = {
@@ -36,13 +37,13 @@ type TrainerFormErrors = Partial<Record<keyof TrainerForm, string>>
 const createFormFromProfile = (profile: TrainerProfileResponse | null): TrainerForm => ({
   firstname: profile?.firstname ?? '',
   lastname: profile?.lastname ?? '',
-  specializationIds: profile?.specializations?.map(() => '') ?? [],
+  specializationIds: [],
   experienceYears: profile?.experienceYears?.toString() ?? '1',
   description: profile?.description ?? '',
 })
 
 const TrainerProfile = () => {
-  const { t } = useTranslation('profile')
+  const { t } = useTranslation(['trainers', 'common'])
   const navigate = useNavigate()
   const fetchCurrentUser = useAuthStore((state) => state.fetchCurrentUser)
   const [profile, setProfile] = useState<TrainerProfileResponse | null>(null)
@@ -53,6 +54,8 @@ const TrainerProfile = () => {
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const mounted = useMountedRef()
+
   useEffect(() => {
     const load = async () => {
       setIsLoading(true)
@@ -62,18 +65,26 @@ const TrainerProfile = () => {
           getMyTrainerProfile(),
           getSpecializations(0, 50),
         ])
-        if (profileData.status === 'fulfilled') {
-          setProfile(profileData.value)
-          setForm(createFormFromProfile(profileData.value))
-        }
-        if (specsData.status === 'fulfilled') {
-          setSpecializations(specsData.value.content)
+        if (mounted.current) {
+          if (profileData.status === 'fulfilled') {
+            setProfile(profileData.value)
+            setForm(createFormFromProfile(profileData.value))
+          }
+          if (specsData.status === 'fulfilled') {
+            setSpecializations(specsData.value.content)
+            if (profileData.status === 'fulfilled' && profileData.value?.specializations) {
+              const specIds = profileData.value.specializations
+                .map((name) => specsData.value.content.find((s) => s.name === name)?.id)
+                .filter((id): id is string => !!id)
+              setForm((prev) => ({ ...prev, specializationIds: specIds }))
+            }
+          }
         }
       } catch (err) {
         console.error(err)
-        setError(getApiErrorMessage(err, 'Unable to load trainer profile.'))
+        setError(getApiErrorMessage(err, t('common:errors.serverError')))
       } finally {
-        setIsLoading(false)
+        if (mounted.current) setIsLoading(false)
       }
     }
     void load()
@@ -105,14 +116,14 @@ const TrainerProfile = () => {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const errors: TrainerFormErrors = {}
-    if (!form.firstname.trim()) errors.firstname = 'First name is required.'
-    if (!form.lastname.trim()) errors.lastname = 'Last name is required.'
-    if (!form.experienceYears || Number(form.experienceYears) < 1) errors.experienceYears = 'Experience must be at least 1 year.'
-    if (!form.description.trim()) errors.description = 'Description is required.'
+    if (!form.firstname.trim()) errors.firstname = t('common:validation.firstNameRequired')
+    if (!form.lastname.trim()) errors.lastname = t('common:validation.lastNameRequired')
+    if (!form.experienceYears || Number(form.experienceYears) < 1) errors.experienceYears = t('common:validation.experienceRequired')
+    if (!form.description.trim()) errors.description = t('common:validation.descriptionRequired')
 
     setFormErrors(errors)
     if (Object.keys(errors).length > 0) {
-      toast.error(t('errors.fixFields', { ns: 'common' }))
+      toast.error(t('errors.fixFields'))
       return
     }
 
@@ -126,7 +137,7 @@ const TrainerProfile = () => {
           experienceYears: Number(form.experienceYears),
           description: form.description.trim(),
         })
-        toast.success('Profile updated successfully.')
+        toast.success(t('common:toast.updated'))
       } else {
         await createTrainerProfile({
           firstname: form.firstname.trim(),
@@ -135,13 +146,13 @@ const TrainerProfile = () => {
           experienceYears: Number(form.experienceYears),
           description: form.description.trim(),
         })
-        toast.success('Profile created successfully.')
+        toast.success(t('common:toast.created'))
       }
       await fetchCurrentUser()
       navigate('/dashboard', { replace: true })
     } catch (err) {
       console.error(err)
-      toast.error(getApiErrorMessage(err, 'Unable to save trainer profile.'))
+      toast.error(getApiErrorMessage(err, t('common:errors.serverError')))
     } finally {
       setIsSaving(false)
     }
@@ -149,20 +160,20 @@ const TrainerProfile = () => {
 
   const fullName = profile
     ? `${profile.firstname} ${profile.lastname}`
-    : 'New Trainer'
+    : t('newTrainer')
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {profile ? t('badge') : 'Trainer Setup'}
+            {profile ? t('badge') : t('setup')}
           </p>
           <h1 className="mt-2 text-2xl font-bold text-foreground md:text-3xl">
             {fullName}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {profile ? t('subtitle') : 'Complete your trainer profile to get started.'}
+            {profile ? t('subtitle') : t('setupDesc')}
           </p>
         </div>
       </div>
@@ -181,41 +192,41 @@ const TrainerProfile = () => {
         >
           <Card className="border-border bg-card shadow-soft">
             <CardHeader>
-              <CardTitle>{profile ? 'Edit Profile' : 'Create Profile'}</CardTitle>
+              <CardTitle>{profile ? t('editProfile') : t('createProfile')}</CardTitle>
               <CardDescription>
-                {profile ? 'Update your trainer information.' : 'Fill in your details to create your trainer profile.'}
+                {profile ? t('editProfileDesc') : t('createProfileDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="grid gap-4 md:grid-cols-2">
-                  <FormField
-                    label="First name"
+                   <FormField
+                    label={t('common:labels.firstName')}
                     value={form.firstname}
                     error={formErrors.firstname}
                     onChange={(v) => updateField('firstname', v)}
-                    placeholder="John"
+                    placeholder={t('common:labels.firstName')}
                   />
-                  <FormField
-                    label="Last name"
+                   <FormField
+                    label={t('common:labels.lastName')}
                     value={form.lastname}
                     error={formErrors.lastname}
                     onChange={(v) => updateField('lastname', v)}
-                    placeholder="Doe"
+                    placeholder={t('common:labels.lastName')}
                   />
                 </div>
 
                 <FormField
-                  label="Years of experience"
+                  label={t('experienceYears')}
                   type="number"
                   value={form.experienceYears}
                   error={formErrors.experienceYears}
                   onChange={(v) => updateField('experienceYears', v)}
-                  placeholder="5"
+                  placeholder={t('experienceYears')}
                 />
 
                 <div className="space-y-1.5">
-                  <Label>Specializations</Label>
+                  <Label>{t('specializations')}</Label>
                   <div className="flex flex-wrap gap-2">
                     {specializations.map((spec) => (
                       <button
@@ -235,7 +246,7 @@ const TrainerProfile = () => {
                       </button>
                     ))}
                     {specializations.length === 0 && (
-                      <p className="text-xs text-muted-foreground">No specializations available.</p>
+                      <p className="text-xs text-muted-foreground">{t('noSpecializations')}</p>
                     )}
                   </div>
                   {formErrors.specializationIds && (
@@ -244,7 +255,7 @@ const TrainerProfile = () => {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="description">Bio / Description</Label>
+                  <Label htmlFor="description">{t('bioDescription')}</Label>
                   <textarea
                     id="description"
                     value={form.description}
@@ -252,7 +263,7 @@ const TrainerProfile = () => {
                     className={`min-h-[100px] w-full rounded-xl border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring ${
                       formErrors.description ? 'border-destructive' : 'border-border'
                     }`}
-                    placeholder="Tell clients about your experience, specialties, and training philosophy..."
+                    placeholder={t('bioPlaceholder')}
                   />
                   {formErrors.description && (
                     <p className="text-xs text-destructive">{formErrors.description}</p>
@@ -266,7 +277,7 @@ const TrainerProfile = () => {
                     disabled={isSaving}
                     className="inline-flex h-9 items-center justify-center rounded-xl px-4 text-sm font-medium text-foreground transition hover:bg-accent disabled:opacity-60"
                   >
-                    Cancel
+                    {t('common:buttons.cancel')}
                   </button>
                   <button
                     type="submit"
@@ -276,7 +287,7 @@ const TrainerProfile = () => {
                     {isSaving && (
                       <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
                     )}
-                    {isSaving ? 'Saving...' : profile ? 'Save changes' : 'Create profile'}
+                    {isSaving ? t('common:buttons.loading') : profile ? t('common:buttons.saveChanges') : t('common:buttons.create')}
                   </button>
                 </div>
               </form>

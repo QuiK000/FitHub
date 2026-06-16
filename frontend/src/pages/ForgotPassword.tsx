@@ -26,14 +26,14 @@ const ForgotPassword = () => {
       const response = await forgotPassword({ email: email.trim() })
       const message =
         response.message ||
-        'Password reset instructions have been sent to your email.'
+        t('forgotPassword.success.sent')
       setSuccess(message)
       toast.success(message)
     } catch (err) {
       console.error(err)
       const message = getApiErrorMessage(
         err,
-        'Unable to send password reset instructions.',
+        t('forgotPassword.errors.sendFailed'),
       )
       setError(message)
       toast.error(message)

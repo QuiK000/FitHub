@@ -25,7 +25,8 @@ import {
 } from '../components/ui/card'
 import { Input } from '../components/ui/input'
 import { EmptyState } from '../components/ui/empty-state'
-import { formatEnum, formatDate, type IconType } from '../lib/utils'
+import { formatDate, type IconType } from '../lib/utils'
+import { useMountedRef } from '../utils/useMountedRef'
 import {
   type BodyMeasurementResponse,
   type CreateBodyMeasurementRequest,
@@ -73,6 +74,7 @@ const Progress = () => {
   const [records, setRecords] = useState<PersonalRecordResponse[]>([])
   const [photos, setPhotos] = useState<ProgressPhotoResponse[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const mounted = useMountedRef()
 
   const loadAll = async () => {
     setIsLoading(true)
@@ -86,16 +88,18 @@ const Progress = () => {
           getProgressPhotos(0, 10),
         ])
 
-      if (historyData.status === 'fulfilled') setHistory(historyData.value)
-      if (activeGoalsData.status === 'fulfilled') setActiveGoals(activeGoalsData.value.content)
-      if (completedGoalsData.status === 'fulfilled') setCompletedGoals(completedGoalsData.value.content)
-      if (recordsData.status === 'fulfilled') setRecords(recordsData.value.content)
-      if (photosData.status === 'fulfilled') setPhotos(photosData.value.content)
+      if (mounted.current) {
+        if (historyData.status === 'fulfilled') setHistory(historyData.value)
+        if (activeGoalsData.status === 'fulfilled') setActiveGoals(activeGoalsData.value.content)
+        if (completedGoalsData.status === 'fulfilled') setCompletedGoals(completedGoalsData.value.content)
+        if (recordsData.status === 'fulfilled') setRecords(recordsData.value.content)
+        if (photosData.status === 'fulfilled') setPhotos(photosData.value.content)
+      }
     } catch (err) {
       console.error(err)
       toast.error(t('common:toast.progressLoadFailed'))
     } finally {
-      setIsLoading(false)
+      if (mounted.current) setIsLoading(false)
     }
   }
 
@@ -119,11 +123,13 @@ const Progress = () => {
         </div>
       </div>
 
-      <div className="flex gap-1 overflow-x-auto rounded-xl border border-border bg-muted p-1">
+      <div className="flex gap-1 overflow-x-auto rounded-xl border border-border bg-muted p-1" role="tablist">
         {getTabs(t).map((tab) => (
           <button
             key={tab.key}
             type="button"
+            role="tab"
+            aria-selected={activeTab === tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={`inline-flex items-center gap-2 whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition ${
               activeTab === tab.key
@@ -361,7 +367,7 @@ const GoalsTab = ({
       toast.success(t('common:toast.progressUpdated'))
       await onRefresh()
     } catch (err) {
-      toast.error(getApiErrorMessage(err, 'Failed to update progress.'))
+      toast.error(getApiErrorMessage(err, t('common:messages.failed')))
     } finally {
       setUpdatingGoalId(null)
     }
@@ -373,7 +379,7 @@ const GoalsTab = ({
       toast.success(t('common:toast.goalCompleted'))
       await onRefresh()
     } catch (err) {
-      toast.error(getApiErrorMessage(err, 'Failed to complete goal.'))
+      toast.error(getApiErrorMessage(err, t('common:messages.failed')))
     }
   }
 
@@ -565,7 +571,7 @@ const MetricCard = ({
   detail?: string
 }) => (
   <Card>
-    <CardContent className="flex items-start justify-between gap-4 p-5">
+      <CardContent className="flex items-center justify-between gap-4 p-5">
       <div>
         <p className="text-xs font-medium text-muted-foreground">{label}</p>
         <p className="mt-2 text-2xl font-bold text-foreground">{value}</p>
@@ -584,40 +590,44 @@ const MetricCard = ({
   </Card>
 )
 
-const MeasurementCard = ({ measurement }: { measurement: BodyMeasurementResponse }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 8 }}
-    animate={{ opacity: 1, y: 0 }}
-    className="rounded-2xl border border-border bg-card p-5"
-  >
-    <div className="flex items-center justify-between gap-4">
-      <div>
-        <p className="text-sm font-semibold text-foreground">
-          {formatDate(measurement.measurementDate)}
-        </p>
-        {measurement.notes && (
-          <p className="mt-1 text-xs text-muted-foreground">{measurement.notes}</p>
-        )}
+const MeasurementCard = ({ measurement }: { measurement: BodyMeasurementResponse }) => {
+  const { t } = useTranslation(['progress', 'common'])
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="rounded-2xl border border-border bg-card p-5"
+    >
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <p className="text-sm font-semibold text-foreground">
+            {formatDate(measurement.measurementDate)}
+          </p>
+          {measurement.notes && (
+            <p className="mt-1 text-xs text-muted-foreground">{measurement.notes}</p>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          {measurement.weightChange != null && (
+            <span className={`rounded-full px-2 py-1 text-xs font-semibold ${measurement.weightChange <= 0 ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-red-500/10 text-red-600 dark:text-red-400'}`}>
+              {measurement.weightChange > 0 ? '+' : ''}{measurement.weightChange.toFixed(1)} kg
+            </span>
+          )}
+        </div>
       </div>
-      <div className="flex items-center gap-2">
-        {measurement.weightChange != null && (
-          <span className={`rounded-full px-2 py-1 text-xs font-semibold ${measurement.weightChange <= 0 ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-red-500/10 text-red-600 dark:text-red-400'}`}>
-            {measurement.weightChange > 0 ? '+' : ''}{measurement.weightChange.toFixed(1)} kg
-          </span>
-        )}
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <MeasurementTile label={t('measurement.weight')} value={measurement.weight} unit="kg" />
+        <MeasurementTile label={t('measurement.bodyFat')} value={measurement.bodyFatPercentage} unit="%" />
+        <MeasurementTile label={t('measurement.muscle')} value={measurement.muscleMass} unit="kg" />
+        <MeasurementTile label={t('measurement.bmi')} value={measurement.bmi} unit="" />
       </div>
-    </div>
-    <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-      <MeasurementTile label="Weight" value={measurement.weight} unit="kg" />
-      <MeasurementTile label="Body fat" value={measurement.bodyFatPercentage} unit="%" />
-      <MeasurementTile label="Muscle" value={measurement.muscleMass} unit="kg" />
-      <MeasurementTile label="BMI" value={measurement.bmi} unit="" />
-    </div>
-  </motion.div>
-)
+    </motion.div>
+  )
+}
 
 const PhotoCard = ({ photo }: { photo: ProgressPhotoResponse }) => {
   const [imgError, setImgError] = useState(false)
+  const { t } = useTranslation(['progress', 'common'])
 
   return (
     <motion.div
@@ -631,6 +641,7 @@ const PhotoCard = ({ photo }: { photo: ProgressPhotoResponse }) => {
             src={photo.photoUrl}
             alt={`Progress photo ${formatDate(photo.photoDate)}`}
             className="h-full w-full object-cover"
+            loading="lazy"
             onError={() => setImgError(true)}
           />
         ) : (
@@ -641,7 +652,7 @@ const PhotoCard = ({ photo }: { photo: ProgressPhotoResponse }) => {
         <div className="flex items-center justify-between">
           <p className="text-sm font-semibold text-foreground">{formatDate(photo.photoDate)}</p>
           <span className="rounded-full bg-muted px-2 py-1 text-xs text-muted-foreground">
-            {formatEnum(photo.angle)}
+            {t(`photos.modal.angles.${({ FRONT: 'front', BACK: 'back', SIDE_LEFT: 'sideLeft', SIDE_RIGHT: 'sideRight' } as const)[photo.angle]}`)}
           </span>
         </div>
         {photo.notes && (
@@ -669,21 +680,24 @@ const MeasurementTile = ({
   </div>
 )
 
-const GoalRow = ({ goal }: { goal: GoalResponse }) => (
-  <div className="rounded-2xl border border-border bg-background p-4">
-    <div className="flex items-start justify-between gap-3">
-      <div>
-        <p className="text-sm font-semibold text-foreground">{goal.title}</p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          {formatEnum(goal.goalType)} · {goal.currentValue}/{goal.targetValue} {goal.unit.toLowerCase()}
-        </p>
+const GoalRow = ({ goal }: { goal: GoalResponse }) => {
+  const { t } = useTranslation(['progress', 'common'])
+  return (
+    <div className="rounded-2xl border border-border bg-background p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold text-foreground">{goal.title}</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {t(`goals.modal.types.${goal.goalType.toLowerCase()}`)} · {goal.currentValue}/{goal.targetValue} {goal.unit.toLowerCase()}
+          </p>
+        </div>
+        <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+          {Math.round(goal.progressPercentage)}%
+        </span>
       </div>
-      <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
-        {Math.round(goal.progressPercentage)}%
-      </span>
     </div>
-  </div>
-)
+  )
+}
 
 const GoalCard = ({
   goal,
@@ -697,6 +711,7 @@ const GoalCard = ({
   onComplete: (goalId: string) => Promise<void>
 }) => {
   const [newValues, setNewValues] = useState(goal.currentValue.toString())
+  const { t } = useTranslation(['progress', 'common'])
 
   return (
     <motion.div
@@ -711,7 +726,7 @@ const GoalCard = ({
             <p className="mt-1 text-sm text-muted-foreground">{goal.description}</p>
           )}
           <p className="mt-1 text-xs text-muted-foreground">
-            {formatEnum(goal.goalType)} · {goal.unit.toLowerCase()}
+            {t(`goals.modal.types.${goal.goalType.toLowerCase()}`)} · {goal.unit.toLowerCase()}
           </p>
         </div>
         <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
@@ -724,7 +739,7 @@ const GoalCard = ({
           {goal.currentValue} / {goal.targetValue} {goal.unit.toLowerCase()}
         </span>
         {goal.daysRemaining != null && (
-          <span className="text-muted-foreground">· {goal.daysRemaining} days left</span>
+          <span className="text-muted-foreground">· {goal.daysRemaining} {t('goals.daysLeft')}</span>
         )}
       </div>
 
@@ -734,7 +749,7 @@ const GoalCard = ({
           value={newValues}
           onChange={(e) => setNewValues(e.target.value)}
           className="h-9 w-28 text-sm"
-          placeholder="Current"
+          placeholder={t('goals.update')}
         />
         <button
           type="button"
@@ -743,7 +758,7 @@ const GoalCard = ({
           className="inline-flex h-9 items-center justify-center gap-1.5 rounded-xl bg-primary px-3 text-xs font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:opacity-60"
         >
           <Edit3 className="h-3 w-3" />
-          Update
+          {t('goals.update')}
         </button>
         {goal.progressPercentage >= 100 && (
           <button
@@ -752,7 +767,7 @@ const GoalCard = ({
             className="inline-flex h-9 items-center justify-center gap-1.5 rounded-xl border border-border bg-background px-3 text-xs font-semibold text-foreground transition hover:bg-accent"
           >
             <CheckCircle2 className="h-3 w-3" />
-            Complete
+            {t('goals.complete')}
           </button>
         )}
       </div>
@@ -760,64 +775,70 @@ const GoalCard = ({
   )
 }
 
-const RecordRow = ({ record }: { record: PersonalRecordResponse }) => (
-  <div className="rounded-2xl border border-border bg-background p-3">
-    <div className="flex items-start justify-between gap-3">
-      <div>
-        <p className="text-sm font-semibold text-foreground">{record.exercise.name}</p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          {formatEnum(record.recordType)} · {record.value} {record.unit.toLowerCase()}
-        </p>
-      </div>
-      {record.improvement != null && record.improvement > 0 && (
-        <span className="rounded-full bg-emerald-500/10 px-2 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-          +{record.improvement}
-        </span>
-      )}
-    </div>
-  </div>
-)
-
-const RecordCard = ({ record }: { record: PersonalRecordResponse }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 8 }}
-    animate={{ opacity: 1, y: 0 }}
-    className="rounded-2xl border border-border bg-card p-4"
-  >
-    <div className="flex items-start justify-between gap-3">
-      <div>
-        <p className="text-sm font-semibold text-foreground">{record.exercise.name}</p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          {formatEnum(record.exercise.category)} · {formatDate(record.recordDate)}
-        </p>
-      </div>
-      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/10">
-        <Trophy className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-      </div>
-    </div>
-    <div className="mt-4 grid grid-cols-2 gap-3">
-      <div className="rounded-xl bg-muted px-3 py-2">
-        <p className="text-xs text-muted-foreground">{formatEnum(record.recordType)}</p>
-        <p className="mt-1 text-sm font-bold text-foreground">
-          {record.value} {record.unit.toLowerCase()}
-        </p>
-      </div>
-      {record.previousRecord != null && (
-        <div className="rounded-xl bg-muted px-3 py-2">
-          <p className="text-xs text-muted-foreground">Previous</p>
-          <p className="mt-1 text-sm font-semibold text-muted-foreground">
-            {record.previousRecord} {record.unit.toLowerCase()}
+const RecordRow = ({ record }: { record: PersonalRecordResponse }) => {
+  const { t } = useTranslation(['progress', 'common'])
+  return (
+    <div className="rounded-2xl border border-border bg-background p-3">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold text-foreground">{record.exercise.name}</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {t(`records.modal.types.${record.recordType.toLowerCase()}`)} · {record.value} {record.unit.toLowerCase()}
           </p>
         </div>
-      )}
+        {record.improvement != null && record.improvement > 0 && (
+          <span className="rounded-full bg-emerald-500/10 px-2 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+            +{record.improvement}
+          </span>
+        )}
+      </div>
     </div>
-    {record.improvement != null && record.improvement > 0 && (
-      <p className="mt-3 text-xs font-medium text-emerald-600 dark:text-emerald-400">
-        Improved by {record.improvement} {record.unit.toLowerCase()}
-      </p>
-    )}
-  </motion.div>
-)
+  )
+}
+
+const RecordCard = ({ record }: { record: PersonalRecordResponse }) => {
+  const { t } = useTranslation(['progress', 'common'])
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="rounded-2xl border border-border bg-card p-4"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold text-foreground">{record.exercise.name}</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {t(`common:enums.exerciseCategory.${record.exercise.category}`)} · {formatDate(record.recordDate)}
+          </p>
+        </div>
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/10">
+          <Trophy className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+        </div>
+      </div>
+      <div className="mt-4 grid grid-cols-2 gap-3">
+        <div className="rounded-xl bg-muted px-3 py-2">
+          <p className="text-xs text-muted-foreground">{t(`records.modal.types.${record.recordType.toLowerCase()}`)}</p>
+          <p className="mt-1 text-sm font-bold text-foreground">
+            {record.value} {record.unit.toLowerCase()}
+          </p>
+        </div>
+        {record.previousRecord != null && (
+          <div className="rounded-xl bg-muted px-3 py-2">
+            <p className="text-xs text-muted-foreground">{t('records.previous')}</p>
+            <p className="mt-1 text-sm font-semibold text-muted-foreground">
+              {record.previousRecord} {record.unit.toLowerCase()}
+            </p>
+          </div>
+        )}
+      </div>
+      {record.improvement != null && record.improvement > 0 && (
+        <p className="mt-3 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+          {t('records.improvedBy', { value: record.improvement, unit: record.unit.toLowerCase() })}
+        </p>
+      )}
+    </motion.div>
+  )
+}
 
 const CreateMeasurementModal = ({
   onClose,
@@ -843,14 +864,14 @@ const CreateMeasurementModal = ({
       await createBodyMeasurement(form)
       await onCreated()
     } catch (err) {
-      toast.error(getApiErrorMessage(err, 'Failed to save measurement.'))
+      toast.error(getApiErrorMessage(err, t('common:messages.failed')))
     } finally {
       setIsSubmitting(false)
     }
   }
 
   return (
-    <div className="fixed inset-0 z-30 flex items-center justify-center bg-background/70 px-4 py-6 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 px-4 py-6 backdrop-blur-sm">
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -941,14 +962,14 @@ const CreateGoalModal = ({
       await createGoal(payload)
       await onCreated()
     } catch (err) {
-      toast.error(getApiErrorMessage(err, 'Failed to create goal.'))
+      toast.error(getApiErrorMessage(err, t('common:messages.failed')))
     } finally {
       setIsSubmitting(false)
     }
   }
 
   return (
-    <div className="fixed inset-0 z-30 flex items-center justify-center bg-background/70 px-4 py-6 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 px-4 py-6 backdrop-blur-sm">
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -1048,14 +1069,14 @@ const CreateRecordModal = ({
       await createPersonalRecord(payload)
       await onCreated()
     } catch (err) {
-      toast.error(getApiErrorMessage(err, 'Failed to save record.'))
+      toast.error(getApiErrorMessage(err, t('common:messages.failed')))
     } finally {
       setIsSubmitting(false)
     }
   }
 
   return (
-    <div className="fixed inset-0 z-30 flex items-center justify-center bg-background/70 px-4 py-6 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 px-4 py-6 backdrop-blur-sm">
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -1176,14 +1197,14 @@ const CreatePhotoModal = ({
       })
       await onCreated()
     } catch (err) {
-      toast.error(getApiErrorMessage(err, 'Failed to upload photo.'))
+      toast.error(getApiErrorMessage(err, t('common:messages.failed')))
     } finally {
       setIsSubmitting(false)
     }
   }
 
   return (
-    <div className="fixed inset-0 z-30 flex items-center justify-center bg-background/70 px-4 py-6 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 px-4 py-6 backdrop-blur-sm">
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}

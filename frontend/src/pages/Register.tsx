@@ -19,17 +19,17 @@ const Register = () => {
 
   const validate = () => {
     if (!email || !password || !confirmPassword) {
-      setError('Please fill in all required fields.')
+      setError(t('register.errors.allFieldsRequired'))
       return false
     }
 
     if (password.length < 8) {
-      setError('Password must be at least 8 characters long.')
+      setError(t('register.errors.passwordTooShort'))
       return false
     }
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match.')
+      setError(t('register.errors.passwordMismatch'))
       return false
     }
 
@@ -53,7 +53,7 @@ const Register = () => {
       })
     } catch (err) {
       console.error(err)
-      setError('Registration failed. Please check your details and try again.')
+      setError(t('register.errors.registrationFailed'))
     } finally {
       setIsSubmitting(false)
     }

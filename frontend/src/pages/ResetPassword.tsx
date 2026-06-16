@@ -21,10 +21,10 @@ const ResetPassword = () => {
   const [success, setSuccess] = useState<string | null>(null)
 
   const tokenPreview = useMemo(() => {
-    if (!token) return 'No token provided'
+    if (!token) return t('auth:resetPassword.noToken')
     if (token.length <= 8) return token
     return `${token.slice(0, 4)}••••${token.slice(-4)}`
-  }, [token])
+  }, [token, t])
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -32,12 +32,12 @@ const ResetPassword = () => {
     setSuccess(null)
 
     if (password.length < 8) {
-      setError('Password must be at least 8 characters long.')
+      setError(t('resetPassword.errors.passwordTooShort'))
       return
     }
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match.')
+      setError(t('resetPassword.errors.passwordMismatch'))
       return
     }
 
@@ -49,7 +49,7 @@ const ResetPassword = () => {
         password,
         confirmPassword,
       })
-      const message = response.message || 'Your password has been reset.'
+      const message = response.message || t('resetPassword.success.reset')
       setSuccess(message)
       toast.success(message)
       window.setTimeout(() => {
@@ -57,7 +57,7 @@ const ResetPassword = () => {
       }, 1200)
     } catch (err) {
       console.error(err)
-      const message = getApiErrorMessage(err, 'Unable to reset your password.')
+      const message = getApiErrorMessage(err, t('resetPassword.errors.resetFailed'))
       setError(message)
       toast.error(message)
     } finally {
@@ -92,7 +92,7 @@ const ResetPassword = () => {
         <div className="rounded-2xl border border-border bg-card p-6 shadow-soft-lg">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="rounded-xl border border-border bg-muted px-3 py-2 text-xs text-muted-foreground">
-              Token preview: {tokenPreview}
+              {t('resetPassword.tokenPreview', { preview: tokenPreview })}
             </div>
 
             <div className="space-y-2">

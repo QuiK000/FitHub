@@ -37,14 +37,8 @@ type OnboardingErrors = Partial<Record<keyof OnboardingForm, string>>
 
 const phonePattern = /^\+[1-9]\d{1,14}$/
 
-const genderOptions: { label: string; value: ClientGender }[] = [
-  { label: 'Male', value: 'MALE' },
-  { label: 'Female', value: 'FEMALE' },
-  { label: 'Other', value: 'OTHER' },
-]
-
 const Onboarding = () => {
-  const { t } = useTranslation('onboarding')
+  const { t } = useTranslation(['onboarding', 'common'])
   const navigate = useNavigate()
   const fetchCurrentUser = useAuthStore((state) => state.fetchCurrentUser)
   const [form, setForm] = useState<OnboardingForm>({
@@ -61,8 +55,8 @@ const Onboarding = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const canSubmit = useMemo(
-    () => Object.keys(validateOnboardingForm(form)).length === 0,
-    [form],
+    () => Object.keys(validateOnboardingForm(form, t)).length === 0,
+    [form, t],
   )
 
   const updateField = (field: keyof OnboardingForm, value: string) => {
@@ -76,11 +70,11 @@ const Onboarding = () => {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    const nextErrors = validateOnboardingForm(form)
+    const nextErrors = validateOnboardingForm(form, t)
     setErrors(nextErrors)
 
     if (Object.keys(nextErrors).length > 0) {
-      toast.error(t('errors.fillFields', { ns: 'common' }))
+      toast.error(t('errors.fillFields'))
       return
     }
 
@@ -107,7 +101,7 @@ const Onboarding = () => {
       toast.error(
         getApiErrorMessage(
           err,
-          'Unable to create profile right now. Please check your details and retry.',
+          t('common:errors.serverError'),
         ),
       )
     } finally {
@@ -142,26 +136,26 @@ const Onboarding = () => {
               <div className="grid gap-4 md:grid-cols-2">
                 <FormField
                   id="firstname"
-                  label="First name"
+                  label={t('fields.firstName')}
                   value={form.firstname}
                   error={errors.firstname}
                   onChange={(value) => updateField('firstname', value)}
-                  placeholder="John"
+                  placeholder={t('placeholders.firstName')}
                 />
                 <FormField
                   id="lastname"
-                  label="Last name"
+                  label={t('fields.lastName')}
                   value={form.lastname}
                   error={errors.lastname}
                   onChange={(value) => updateField('lastname', value)}
-                  placeholder="Doe"
+                  placeholder={t('placeholders.lastName')}
                 />
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
                 <FormField
                   id="phone"
-                  label="Phone (E.164)"
+                  label={t('fields.phone')}
                   value={form.phone}
                   error={errors.phone}
                   onChange={(value) => updateField('phone', value)}
@@ -169,7 +163,7 @@ const Onboarding = () => {
                 />
                 <FormField
                   id="birthdate"
-                  label="Birthdate"
+                  label={t('fields.birthdate')}
                   type="date"
                   value={form.birthdate}
                   error={errors.birthdate}
@@ -180,7 +174,7 @@ const Onboarding = () => {
               <div className="grid gap-4 md:grid-cols-3">
                 <IconField
                   id="height"
-                  label="Height (cm)"
+                  label={t('fields.height')}
                   icon={<Ruler className="h-4 w-4 text-muted-foreground" />}
                   type="number"
                   value={form.height}
@@ -189,7 +183,7 @@ const Onboarding = () => {
                 />
                 <IconField
                   id="weight"
-                  label="Weight (kg)"
+                  label={t('fields.weight')}
                   icon={<Weight className="h-4 w-4 text-muted-foreground" />}
                   type="number"
                   step="0.1"
@@ -199,7 +193,7 @@ const Onboarding = () => {
                 />
                 <IconField
                   id="dailyWaterTarget"
-                  label="Water target (ml)"
+                  label={t('fields.waterTarget')}
                   icon={<Droplets className="h-4 w-4 text-muted-foreground" />}
                   type="number"
                   value={form.dailyWaterTarget}
@@ -209,7 +203,7 @@ const Onboarding = () => {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="gender">Gender</Label>
+                <Label htmlFor="gender">{t('fields.gender')}</Label>
                 <div className="relative">
                   <UserRound className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
                   <select
@@ -218,15 +212,13 @@ const Onboarding = () => {
                     onChange={(event) =>
                       updateField('gender', event.target.value as ClientGender)
                     }
-                    className={`flex h-11 w-full rounded-md border bg-background px-9 py-2 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring ${
+                    className={`flex h-10 w-full rounded-xl border bg-background px-9 py-2 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring ${
                       errors.gender ? 'border-destructive' : 'border-border'
                     }`}
                   >
-                    {genderOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
+                    <option value="MALE">{t('fields.genderLabels.male')}</option>
+                    <option value="FEMALE">{t('fields.genderLabels.female')}</option>
+                    <option value="OTHER">{t('fields.genderLabels.other')}</option>
                   </select>
                 </div>
                 {errors.gender && (
@@ -252,22 +244,22 @@ const Onboarding = () => {
   )
 }
 
-const validateOnboardingForm = (form: OnboardingForm): OnboardingErrors => {
+const validateOnboardingForm = (form: OnboardingForm, t: (key: string) => string): OnboardingErrors => {
   const errors: OnboardingErrors = {}
 
-  if (!form.firstname.trim()) errors.firstname = 'First name is required.'
-  if (!form.lastname.trim()) errors.lastname = 'Last name is required.'
+  if (!form.firstname.trim()) errors.firstname = t('common:validation.firstNameRequired')
+  if (!form.lastname.trim()) errors.lastname = t('common:validation.lastNameRequired')
   if (!phonePattern.test(form.phone.trim())) {
-    errors.phone = 'Use E.164 format, for example +12025550123.'
+    errors.phone = t('common:validation.phoneFormat')
   }
-  if (!form.gender) errors.gender = 'Gender is required.'
-  if (!isPositiveNumber(form.height)) errors.height = 'Height must be positive.'
-  if (!isPositiveNumber(form.weight)) errors.weight = 'Weight must be positive.'
+  if (!form.gender) errors.gender = t('common:validation.genderRequired')
+  if (!isPositiveNumber(form.height)) errors.height = t('common:validation.heightPositive')
+  if (!isPositiveNumber(form.weight)) errors.weight = t('common:validation.weightPositive')
   if (!isPositiveInteger(form.dailyWaterTarget)) {
-    errors.dailyWaterTarget = 'Water target must be a positive whole number.'
+    errors.dailyWaterTarget = t('common:validation.waterTargetPositive')
   }
   if (form.birthdate && Number.isNaN(Date.parse(form.birthdate))) {
-    errors.birthdate = 'Enter a valid birthdate.'
+    errors.birthdate = t('common:validation.birthdateValid')
   }
 
   return errors

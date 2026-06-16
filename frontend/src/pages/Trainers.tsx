@@ -19,8 +19,10 @@ import {
   type TrainerProfileResponse,
 } from '../services/trainer.service'
 import { EmptyState } from '../components/ui/empty-state'
+import { Pagination } from '../components/ui/pagination'
 import { getApiErrorMessage } from '../utils/errorHandler'
 import toast from '../utils/toast'
+import { useMountedRef } from '../utils/useMountedRef'
 
 const Trainers = () => {
   const { t } = useTranslation(['trainers', 'common'])
@@ -32,17 +34,24 @@ const Trainers = () => {
   const [selectedTrainer, setSelectedTrainer] = useState<TrainerProfileResponse | null>(null)
   const [reviews, setReviews] = useState<TrainerReviewResponse[]>([])
   const [isLoadingReviews, setIsLoadingReviews] = useState(false)
+  const [currentPage, setCurrentPage] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
+  const mounted = useMountedRef()
 
-  const loadTrainers = async (query?: string) => {
+  const loadTrainers = async (query?: string, page = 0) => {
     setIsLoading(true)
     try {
-      const page = await getTrainers(0, 20, query)
-      setTrainers(page.content)
+      const pageResult = await getTrainers(page, 12, query)
+      if (mounted.current) {
+        setTrainers(pageResult.content)
+        setTotalPages(pageResult.totalPages)
+        setCurrentPage(page)
+      }
     } catch (err) {
       console.error(err)
       toast.error(t('common:toast.trainersLoadFailed'))
     } finally {
-      setIsLoading(false)
+      if (mounted.current) setIsLoading(false)
     }
   }
 
@@ -51,7 +60,11 @@ const Trainers = () => {
   }, [])
 
   const handleSearch = () => {
-    void loadTrainers(search.trim() || undefined)
+    void loadTrainers(search.trim() || undefined, 0)
+  }
+
+  const handlePageChange = (page: number) => {
+    void loadTrainers(search.trim() || undefined, page)
   }
 
   const handleSelectTrainer = async (trainer: TrainerProfileResponse) => {
@@ -72,7 +85,7 @@ const Trainers = () => {
       <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {t('title')}
+            {t('badge')}
           </p>
           <h1 className="mt-2 text-2xl font-bold text-foreground md:text-3xl">
             {t('title')}
@@ -90,7 +103,7 @@ const Trainers = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            placeholder="Search trainers..."
+            placeholder={t('searchPlaceholder')}
             className="pl-9"
           />
         </div>
@@ -99,7 +112,7 @@ const Trainers = () => {
           onClick={handleSearch}
           className="inline-flex h-10 items-center justify-center rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-soft transition-all hover:bg-primary/90"
         >
-          Search
+          {t('searchButton')}
         </button>
       </div>
 
@@ -110,20 +123,29 @@ const Trainers = () => {
           ))}
         </div>
       ) : trainers.length ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {trainers.map((trainer) => (
-            <TrainerCard
-              key={trainer.id}
-              trainer={trainer}
-              onSelect={() => void handleSelectTrainer(trainer)}
+        <>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {trainers.map((trainer) => (
+              <TrainerCard
+                key={trainer.id}
+                trainer={trainer}
+                onSelect={() => void handleSelectTrainer(trainer)}
+              />
+            ))}
+          </div>
+          <div className="mt-6">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
             />
-          ))}
-        </div>
+          </div>
+        </>
       ) : (
         <EmptyState
           icon={User2}
-          title="No trainers found"
-          description="Try adjusting your search or check back later."
+          title={t('noData')}
+          description={t('noDataDesc')}
         />
       )}
 
@@ -156,6 +178,7 @@ const TrainerCard = ({
   trainer: TrainerProfileResponse
   onSelect: () => void
 }) => {
+  const { t } = useTranslation('trainers')
   const initials = [trainer.firstname, trainer.lastname]
     .filter(Boolean)
     .map((n) => n[0])
@@ -167,11 +190,11 @@ const TrainerCard = ({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25 }}
-      className="rounded-2xl border border-border bg-card p-5 shadow-soft transition-shadow hover:shadow-soft-md"
+      className="h-full rounded-2xl border border-border bg-card p-5 shadow-soft transition-shadow hover:shadow-soft-md"
     >
-      <div className="flex items-start gap-4">
+      <div className="flex items-center gap-4">
         <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary text-lg font-bold text-primary-foreground">
-          {initials || 'T'}
+          {initials || t('common:fallbacks.initialT')}
         </div>
         <div className="min-w-0 flex-1">
           <h3 className="text-base font-semibold text-foreground">
@@ -179,7 +202,7 @@ const TrainerCard = ({
           </h3>
           <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
             <Clock className="h-3.5 w-3.5" />
-            {trainer.experienceYears} years experience
+            {t('yearsExperience', { count: trainer.experienceYears })}
           </div>
         </div>
       </div>
@@ -209,7 +232,7 @@ const TrainerCard = ({
         className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-accent"
       >
         <MessageSquare className="h-4 w-4" />
-        View details & reviews
+        {t('viewDetails')}
       </button>
     </motion.div>
   )
@@ -230,10 +253,11 @@ const TrainerDetailModal = ({
   onClose: () => void
   onReviewCreated: () => Promise<void>
 }) => {
+  const { t } = useTranslation(['trainers', 'common'])
   const [showReviewForm, setShowReviewForm] = useState(false)
 
   return (
-    <div className="fixed inset-0 z-30 flex items-center justify-center bg-background/70 px-4 py-6 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 px-4 py-6 backdrop-blur-sm">
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -242,13 +266,13 @@ const TrainerDetailModal = ({
         <div className="mb-5 flex items-start justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Trainer profile
+              {t('detail.profileLabel')}
             </p>
             <h2 className="mt-1 text-xl font-bold text-foreground">
               {trainer.firstname} {trainer.lastname}
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              {trainer.experienceYears} years experience
+              {t('detail.experience', { count: trainer.experienceYears })}
             </p>
           </div>
           <button
@@ -278,7 +302,7 @@ const TrainerDetailModal = ({
         )}
 
         <div className="mb-5 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-foreground">Reviews</h3>
+          <h3 className="text-sm font-semibold text-foreground">{t('reviews.title')}</h3>
           {isClient && (
             <button
               type="button"
@@ -286,7 +310,7 @@ const TrainerDetailModal = ({
               className="inline-flex h-8 items-center justify-center gap-1.5 rounded-xl bg-primary px-3 text-xs font-semibold text-primary-foreground transition hover:bg-primary/90"
             >
               <Star className="h-3 w-3" />
-              Write review
+              {t('reviews.writeReview')}
             </button>
           )}
         </div>
@@ -316,7 +340,7 @@ const TrainerDetailModal = ({
           </div>
         ) : (
           <p className="rounded-xl border border-dashed border-border bg-muted/30 px-4 py-6 text-center text-sm text-muted-foreground">
-            No reviews yet. Be the first to leave feedback.
+            {t('reviews.noReviews')}
           </p>
         )}
       </motion.div>
@@ -349,7 +373,7 @@ const ReviewForm = ({
       toast.success(t('common:toast.reviewSubmitted'))
       await onCreated()
     } catch (err) {
-      toast.error(getApiErrorMessage(err, 'Failed to submit review.'))
+      toast.error(getApiErrorMessage(err, t('errors.reviewFailed')))
     } finally {
       setIsSubmitting(false)
     }
@@ -358,13 +382,14 @@ const ReviewForm = ({
   return (
     <form onSubmit={handleSubmit} className="mb-5 space-y-4 rounded-2xl border border-border bg-muted/40 p-4">
       <div className="space-y-1.5">
-        <span className="text-xs text-foreground">Rating</span>
-        <div className="flex gap-1">
+        <span className="text-xs text-foreground">{t('reviews.rating')}</span>
+        <div className="flex gap-1" role="radiogroup" aria-label={t('reviews.rating')}>
           {[1, 2, 3, 4, 5].map((star) => (
             <button
               key={star}
               type="button"
               onClick={() => setRating(star)}
+              aria-label={t('reviews.starCount', { count: star })}
               className="transition hover:scale-110"
             >
               <Star
@@ -379,21 +404,21 @@ const ReviewForm = ({
         </div>
       </div>
       <label className="space-y-1.5">
-        <span className="text-xs text-foreground">Comment (optional)</span>
+        <span className="text-xs text-foreground">{t('reviews.commentOptional')}</span>
         <textarea
           className="min-h-[80px] w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
-          placeholder="Share your experience..."
+          placeholder={t('reviews.commentPlaceholder')}
           value={comment}
           onChange={(e) => setComment(e.target.value)}
         />
       </label>
       <div className="flex justify-end gap-2">
         <button type="button" onClick={onCancel} disabled={isSubmitting} className="inline-flex h-9 items-center justify-center rounded-xl px-4 text-sm font-medium text-foreground transition hover:bg-accent disabled:opacity-60">
-          Cancel
+          {t('common:buttons.cancel')}
         </button>
         <button type="submit" disabled={isSubmitting} className="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:opacity-60">
           {isSubmitting && <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />}
-          Submit
+          {t('reviews.submitButton')}
         </button>
       </div>
     </form>

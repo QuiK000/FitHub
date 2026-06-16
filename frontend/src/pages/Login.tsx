@@ -67,14 +67,14 @@ const Login = () => {
           navigate('/onboarding', { replace: true })
         } else {
           console.error('Unexpected profile lookup error', profileErr)
-          setError('Unable to determine profile status. Please try again.')
+          setError(t('login.errors.profileError'))
         }
       }
     } catch (err) {
       console.error(err)
       const message = getApiErrorMessage(
         err,
-        'Invalid credentials or server unavailable.',
+        t('login.errors.invalidCredentials'),
       )
       setError(message)
       toast.error(message)

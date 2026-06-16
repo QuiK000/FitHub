@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import {
   Activity,
   BarChart3,
@@ -9,6 +8,7 @@ import {
   CheckCircle2,
   Clock3,
   CreditCard,
+  DollarSign,
   Droplets,
   Dumbbell,
   HeartPulse,
@@ -34,6 +34,10 @@ import {
   getMyActiveAssignments,
   getTrainingSessions,
 } from '../services/workout.service'
+import {
+  getMyTrainerAnalytics,
+  getDashboardAnalytics,
+} from '../services/dashboard.service'
 import { useAuthStore } from '../store/useAuthStore'
 import type { MembershipResponse } from '../types'
 import type { DailyWaterIntakeResponse } from '../types'
@@ -45,11 +49,14 @@ import type {
   ClientWorkoutPlanResponse,
   TrainingSessionResponse,
 } from '../types'
-import { formatEnum, formatDate, clampPercentage, type IconType } from '../lib/utils'
+import type { TrainerAnalyticsResponse, DashboardAnalyticsResponse } from '../types'
+import { formatDate, clampPercentage, formatCurrency, type IconType } from '../lib/utils'
+import { useMountedRef } from '../utils/useMountedRef'
 import { ProgressBar } from '../components/ui/progress-bar'
 import { EmptyState } from '../components/ui/empty-state'
 import { SkeletonCard, SkeletonBlock, SkeletonLine } from '../components/ui/skeleton'
-import { StatusPill } from '../components/ui/status-pill'
+import { MetricCard } from '../components/ui/metric-card'
+import { StatusBadge, assignmentStatusColors } from '../components/ui/status-badge'
 import { InfoTile } from '../components/ui/info-tile'
 
 type DashboardData = {
@@ -66,10 +73,12 @@ type DashboardErrors = Partial<Record<keyof DashboardData, string>>
 const todayIso = () => new Date().toISOString().slice(0, 10)
 
 const Dashboard = () => {
-  const { t } = useTranslation('dashboard')
+  const { t } = useTranslation(['dashboard', 'common'])
   const user = useAuthStore((state) => state.user)
   const roles = useAuthStore((state) => state.roles)
   const isClient = roles.includes('CLIENT')
+  const isTrainer = roles.includes('TRAINER')
+  const isAdmin = roles.includes('ADMIN')
   const [data, setData] = useState<DashboardData>({
     membership: null,
     water: null,
@@ -80,10 +89,29 @@ const Dashboard = () => {
   })
   const [errors, setErrors] = useState<DashboardErrors>({})
   const [isLoading, setIsLoading] = useState(true)
+  const [trainerAnalytics, setTrainerAnalytics] = useState<TrainerAnalyticsResponse | null>(null)
+  const [adminAnalytics, setAdminAnalytics] = useState<DashboardAnalyticsResponse | null>(null)
+  const mounted = useMountedRef()
 
   useEffect(() => {
     if (!isClient) {
-      setIsLoading(false)
+      const loadTrainerAdminData = async () => {
+        setIsLoading(true)
+        try {
+          if (isTrainer) {
+            const data = await getMyTrainerAnalytics()
+            if (mounted.current) setTrainerAnalytics(data)
+          } else if (isAdmin) {
+            const data = await getDashboardAnalytics()
+            if (mounted.current) setAdminAnalytics(data)
+          }
+        } catch {
+          // analytics will remain null, values show as 0
+        } finally {
+          if (mounted.current) setIsLoading(false)
+        }
+      }
+      void loadTrainerAdminData()
       return
     }
 
@@ -142,69 +170,70 @@ const Dashboard = () => {
         null,
       )
 
-      setData({
-        membership,
-        water,
-        assignments,
-        nextSession: getNextUpcomingSession(sessionsPage.content),
-        goals: goalsPage.content,
-        latestMeasurement,
-      })
-      setErrors(nextErrors)
-      setIsLoading(false)
+      if (mounted.current) {
+        setData({
+          membership,
+          water,
+          assignments,
+          nextSession: getNextUpcomingSession(sessionsPage.content),
+          goals: goalsPage.content,
+          latestMeasurement,
+        })
+        setErrors(nextErrors)
+        setIsLoading(false)
+      }
     }
 
     void loadDashboard()
-  }, [isClient])
+  }, [isClient, isTrainer, isAdmin])
 
   const greetingName =
     user?.clientProfile?.firstname ??
     user?.clientProfile?.lastname ??
     user?.email?.split('@')[0] ??
-    'there'
+    t('fallbacks.there')
 
   const activeAssignment = data.assignments[0] ?? null
   const waterProgress = clampPercentage(data.water?.progress ?? 0)
   const membershipDays = data.membership
     ? getDaysRemaining(data.membership.endDate)
     : null
-  const membershipLabel = data.membership
-    ? formatEnum(data.membership.type)
-    : 'No active plan'
 
   const focusCards = useMemo(
     () => [
       {
-        title: t('membership.title'),
-        value: membershipDays === null ? t('membership.notActive') : t('membership.days', { count: membershipDays }),
+        title: t('membership.title', { ns: 'dashboard' }),
+        value: membershipDays === null
+          ? t('membership.notActive', { ns: 'dashboard' })
+          : t('membership.days', { count: membershipDays, ns: 'dashboard' }),
         label:
           membershipDays === null
-            ? t('membership.explorePlan')
-            : t('membership.validUntil', { date: formatDate(data.membership?.endDate) }),
+            ? t('membership.explorePlan', { ns: 'dashboard' })
+            : t('membership.validUntil', { date: formatDate(data.membership?.endDate), ns: 'dashboard' }),
         icon: CreditCard,
         tone: 'bg-emerald-500',
       },
       {
-        title: t('water.title'),
+        title: t('water.title', { ns: 'dashboard' }),
         value: `${Math.round(waterProgress)}%`,
-        label: t('water.mlLogged', { total: data.water?.totalMl ?? 0, target: data.water?.targetMl ?? user?.clientProfile?.dailyWaterTarget ?? 0 }),
+        label: t('water.mlLogged', { total: data.water?.totalMl ?? 0, target: data.water?.targetMl ?? user?.clientProfile?.dailyWaterTarget ?? 0, ns: 'dashboard' }),
         icon: Droplets,
         tone: 'bg-sky-500',
       },
       {
-        title: t('workoutPlan.title'),
+        title: t('workoutPlan.title', { ns: 'dashboard' }),
         value: activeAssignment
           ? `${Math.round(activeAssignment.completionPercentage ?? 0)}%`
-          : t('workoutPlan.none'),
-        label: activeAssignment?.workoutPlan.name ?? t('workoutPlan.noActive'),
+          : t('workoutPlan.none', { ns: 'dashboard' }),
+        label: activeAssignment?.workoutPlan.name ?? t('workoutPlan.noActive', { ns: 'dashboard' }),
         icon: Dumbbell,
         tone: 'bg-violet-500',
       },
       {
-        title: t('goals.title'),
+        title: t('goals.title', { ns: 'dashboard' }),
         value: data.goals.length.toString(),
         label:
-          data.goals[0]?.title ?? t('goals.noGoals'),
+          data.goals[0]?.title ?? t('goals.noGoals', { ns: 'dashboard' }),
         icon: Target,
         tone: 'bg-amber-500',
       },
@@ -218,6 +247,7 @@ const Dashboard = () => {
       membershipDays,
       user?.clientProfile?.dailyWaterTarget,
       waterProgress,
+      t,
     ],
   )
 
@@ -226,41 +256,70 @@ const Dashboard = () => {
       <div className="space-y-6">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Dashboard
+            {t('trainer.badge', { ns: 'dashboard' })}
           </p>
           <h1 className="mt-2 text-2xl font-bold text-foreground md:text-3xl">
-            Welcome back, {user?.trainerProfile?.firstname ?? user?.email?.split('@')[0] ?? 'Admin'}
+            {t('trainer.welcome', { name: user?.trainerProfile?.firstname ?? user?.email?.split('@')[0] ?? t('fallbacks.there'), ns: 'dashboard' })}
           </h1>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            Overview of your gym operations and key metrics.
+            {t('trainer.overview', { ns: 'dashboard' })}
           </p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <MetricCard
-            icon={Users2}
-            label="Quick Access"
-            value="—"
-            tone="bg-blue-500"
-          />
-          <MetricCard
-            icon={Dumbbell}
-            label="Workouts"
-            value="—"
-            tone="bg-violet-500"
-          />
-          <MetricCard
-            icon={CalendarDays}
-            label="Sessions"
-            value="—"
-            tone="bg-emerald-500"
-          />
-          <MetricCard
-            icon={BarChart3}
-            label="Analytics"
-            value="—"
-            tone="bg-amber-500"
-          />
+        <div className={`grid gap-4 md:grid-cols-2 ${isTrainer ? 'xl:grid-cols-3' : 'xl:grid-cols-4'}`}>
+          {isLoading
+            ? Array.from({ length: isTrainer ? 3 : 4 }).map((_, i) => (
+                <div key={i} className="h-36 animate-pulse rounded-2xl bg-muted" />
+              ))
+            : isTrainer ? (
+              <>
+                <MetricCard
+                  icon={Users2}
+                  title={t('trainer.quickAccess', { ns: 'dashboard' })}
+                  value={trainerAnalytics?.totalClients?.toString() ?? '0'}
+                  tone="bg-blue-500"
+                />
+                <MetricCard
+                  icon={Dumbbell}
+                  title={t('trainer.workouts', { ns: 'dashboard' })}
+                  value={trainerAnalytics?.totalSessions?.toString() ?? '0'}
+                  tone="bg-violet-500"
+                />
+                <MetricCard
+                  icon={CheckCircle2}
+                  title={t('trainer.sessions', { ns: 'dashboard' })}
+                  value={trainerAnalytics?.attendanceRate != null ? `${Math.round(trainerAnalytics.attendanceRate)}%` : '0%'}
+                  tone="bg-emerald-500"
+                />
+              </>
+            ) : (
+              <>
+                <MetricCard
+                  icon={Users2}
+                  title={t('admin.activeClients', { ns: 'dashboard' })}
+                  value={adminAnalytics?.activeClients?.toString() ?? '0'}
+                  tone="bg-blue-500"
+                />
+                <MetricCard
+                  icon={CreditCard}
+                  title={t('admin.activeMemberships', { ns: 'dashboard' })}
+                  value={adminAnalytics?.activeMemberships?.toString() ?? '0'}
+                  tone="bg-violet-500"
+                />
+                <MetricCard
+                  icon={DollarSign}
+                  title={t('admin.revenue', { ns: 'dashboard' })}
+                  value={formatCurrency(adminAnalytics?.revenue)}
+                  tone="bg-emerald-500"
+                />
+                <MetricCard
+                  icon={Activity}
+                  title={t('admin.todayCheckIns', { ns: 'dashboard' })}
+                  value={adminAnalytics?.todayCheckIns?.toString() ?? '0'}
+                  tone="bg-amber-500"
+                />
+              </>
+            )}
         </div>
 
         <Card>
@@ -268,14 +327,14 @@ const Dashboard = () => {
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
               <Activity className="h-6 w-6 text-primary" />
             </div>
-            <h2 className="mt-4 text-lg font-bold text-foreground">Trainer Dashboard</h2>
+            <h2 className="mt-4 text-lg font-bold text-foreground">{t('trainer.title', { ns: 'dashboard' })}</h2>
             <p className="mt-2 max-w-md text-sm text-muted-foreground">
-              Use the navigation sidebar to access workout plans, sessions, analytics, and client management.
+              {t('trainer.desc', { ns: 'dashboard' })}
             </p>
             <div className="mt-5 flex flex-wrap justify-center gap-2">
-              <ActionLink to="/workouts" label="Manage Plans" icon={Dumbbell} />
-              <ActionLink to="/sessions" label="View Sessions" icon={CalendarDays} />
-              <ActionLink to="/analytics" label="Analytics" icon={BarChart3} />
+              <ActionLink to="/trainer-workouts" label={t('trainer.managePlans', { ns: 'dashboard' })} icon={Dumbbell} />
+              <ActionLink to="/trainer-sessions" label={t('trainer.viewSessions', { ns: 'dashboard' })} icon={CalendarDays} />
+              <ActionLink to="/analytics" label={t('trainer.analytics', { ns: 'dashboard' })} icon={BarChart3} />
             </div>
           </CardContent>
         </Card>
@@ -313,7 +372,7 @@ const Dashboard = () => {
       </section>
 
       <section className="grid gap-4 xl:grid-cols-[minmax(0,1.25fr),minmax(360px,0.75fr)]">
-        <Card className="overflow-hidden">
+        <Card>
           <CardHeader>
             <div className="flex items-center justify-between gap-4">
               <div>
@@ -377,7 +436,6 @@ const Dashboard = () => {
               <MembershipPanel
                 membership={data.membership}
                 daysRemaining={membershipDays}
-                membershipLabel={membershipLabel}
               />
             )}
           </CardContent>
@@ -424,7 +482,7 @@ const unwrapResult = <T,>(
 ): T => {
   if (result.status === 'fulfilled') return result.value
   console.error(`Failed to load dashboard ${String(key)}`, result.reason)
-  errors[key] = 'Failed to load'
+  errors[key] = 'loadFailed'
   return fallback
 }
 
@@ -451,49 +509,20 @@ const formatTime = (value: string) =>
     minute: '2-digit',
   }).format(new Date(value))
 
-type MetricCardProps = {
-  title?: string
-  value: string
-  label: string
-  icon: IconType
-  tone: string
-}
-
-const MetricCard = ({ title, value, label, icon: Icon, tone }: MetricCardProps) => (
-  <motion.div
-    initial={{ opacity: 0, y: 10 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.25 }}
-  >
-    <Card className="h-full">
-      <CardContent className="flex min-h-[140px] items-start justify-between gap-4 p-5">
-        <div className="flex flex-col justify-between">
-          <div>
-            <p className="text-xs font-medium text-muted-foreground">{title}</p>
-            <p className="mt-2 text-2xl font-bold text-foreground">{value}</p>
-          </div>
-          <p className="mt-3 line-clamp-2 text-xs text-muted-foreground">{label}</p>
-        </div>
-        <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${tone}`}>
-          <Icon className="h-5 w-5 text-white" />
-        </div>
-      </CardContent>
-    </Card>
-  </motion.div>
-)
-
 const WorkoutPlanPanel = ({
   assignment,
 }: {
   assignment: ClientWorkoutPlanResponse | null
 }) => {
+  const { t } = useTranslation(['dashboard', 'common'])
+
   if (!assignment) {
     return (
       <EmptyState
         icon={Dumbbell}
-        title="No active workout plan"
-        description="Once a trainer assigns your plan, today's training focus will appear here."
-        actionLabel="Browse workouts"
+        title={t('workoutPlan.noActive')}
+        description={t('workoutPlan.noActiveDesc')}
+        actionLabel={t('workoutPlan.browseWorkouts')}
         to="/workouts"
       />
     )
@@ -503,28 +532,31 @@ const WorkoutPlanPanel = ({
 
   return (
     <div className="rounded-2xl border border-border bg-muted/40 p-4">
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-center justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Active workout plan
+            {t('workoutPlan.activeWorkoutPlan')}
           </p>
           <h3 className="mt-2 text-lg font-semibold text-foreground">
             {assignment.workoutPlan.name}
           </h3>
           <p className="mt-1 text-sm text-muted-foreground">
-            {formatEnum(assignment.workoutPlan.difficultyLevel)} ·{' '}
-            {assignment.workoutPlan.sessionsPerWeek} sessions/week
+            {t('common:enums.difficultyLevel.' + assignment.workoutPlan.difficultyLevel)} ·{' '}
+            {t('workoutPlan.sessionsPerWeek', { count: assignment.workoutPlan.sessionsPerWeek })}
           </p>
         </div>
-        <StatusPill label={formatEnum(assignment.status)} />
+        <StatusBadge
+          status={assignment.status}
+          colors={assignmentStatusColors}
+          label={t('common:enums.assignmentStatus.' + assignment.status)}
+        />
       </div>
 
       <ProgressBar value={progress} className="mt-5" />
       <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
-        <span>{Math.round(progress)}% complete</span>
+        <span>{Math.round(progress)}{t('workoutPlan.complete')}</span>
         <span>
-          {assignment.completedWorkouts ?? 0} / {assignment.totalWorkouts ?? 0}{' '}
-          workouts
+          {t('workoutPlan.logged', { completed: assignment.completedWorkouts ?? 0, total: assignment.totalWorkouts ?? 0 })}
         </span>
       </div>
     </div>
@@ -536,13 +568,15 @@ const NextSessionPanel = ({
 }: {
   session: TrainingSessionResponse | null
 }) => {
+  const { t } = useTranslation(['dashboard', 'common'])
+
   if (!session) {
     return (
       <EmptyState
         icon={CalendarDays}
-        title="No upcoming sessions"
-        description="Join a class or book a personal session when the next schedule opens."
-        actionLabel="View sessions"
+        title={t('nextSession.noUpcoming')}
+        description={t('nextSession.noUpcomingDesc')}
+        actionLabel={t('nextSession.viewSessions')}
         to="/sessions"
       />
     )
@@ -550,16 +584,16 @@ const NextSessionPanel = ({
 
   return (
     <div className="rounded-2xl border border-border bg-muted/40 p-4">
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-center justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Next session
+            {t('nextSession.title')}
           </p>
           <h3 className="mt-2 text-lg font-semibold text-foreground">
-            {formatEnum(session.type)} training
+            {t('common:enums.trainingType.' + session.type)} {t('nextSession.training')}
           </h3>
           <p className="mt-1 text-sm text-muted-foreground">
-            With {session.trainer.firstname} {session.trainer.lastname}
+            {t('nextSession.withTrainer', { name: `${session.trainer.firstname} ${session.trainer.lastname}` })}
           </p>
         </div>
         <CalendarDays className="h-5 w-5 text-primary" />
@@ -568,12 +602,12 @@ const NextSessionPanel = ({
       <div className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
         <InfoTile
           icon={Clock3}
-          label="Starts"
+          label={t('nextSession.starts')}
           value={`${formatDate(session.startTime)} · ${formatTime(session.startTime)}`}
         />
         <InfoTile
           icon={Users2}
-          label="Capacity"
+          label={t('nextSession.capacity')}
           value={`${session.currentParticipants}/${session.maxParticipants}`}
         />
       </div>
@@ -588,6 +622,7 @@ const WaterPanel = ({
   water: DailyWaterIntakeResponse | null
   fallbackTarget: number | null
 }) => {
+  const { t } = useTranslation('dashboard')
   const target = water?.targetMl ?? fallbackTarget ?? 0
   const total = water?.totalMl ?? 0
   const progress = target > 0 ? clampPercentage((total / target) * 100) : 0
@@ -596,9 +631,9 @@ const WaterPanel = ({
     return (
       <EmptyState
         icon={Droplets}
-        title="No hydration target yet"
-        description="Set your daily water target from your profile to start tracking intake."
-        actionLabel="Update profile"
+        title={t('water.noTarget')}
+        description={t('water.noTargetDesc')}
+        actionLabel={t('water.updateProfile')}
         to="/profile"
       />
     )
@@ -608,9 +643,9 @@ const WaterPanel = ({
     <div>
       <div className="flex items-end justify-between">
         <div>
-          <p className="text-3xl font-bold text-foreground">{total} ml</p>
+          <p className="text-3xl font-bold text-foreground">{t('water.mlLogged', { total, target })}</p>
           <p className="mt-1 text-sm text-muted-foreground">
-            of {target} ml target
+            {t('water.ofTarget', { target })}
           </p>
         </div>
         <div className="rounded-full bg-sky-500/10 px-3 py-1 text-sm font-semibold text-sky-600 dark:text-sky-300">
@@ -620,12 +655,11 @@ const WaterPanel = ({
       <ProgressBar value={progress} className="mt-5" />
       {water?.intakes.length ? (
         <p className="mt-3 text-xs text-muted-foreground">
-          {water.intakes.length} intake{water.intakes.length === 1 ? '' : 's'}{' '}
-          logged today.
+          {t('water.intakesLogged', { count: water.intakes.length })}
         </p>
       ) : (
         <p className="mt-3 text-xs text-muted-foreground">
-          No water logged today. Start with one glass and build momentum.
+          {t('water.noIntakes')}
         </p>
       )}
     </div>
@@ -635,33 +669,35 @@ const WaterPanel = ({
 const MembershipPanel = ({
   membership,
   daysRemaining,
-  membershipLabel,
 }: {
   membership: MembershipResponse | null
   daysRemaining: number | null
-  membershipLabel: string
 }) => {
+  const { t } = useTranslation(['dashboard', 'common'])
+
   if (!membership) {
     return (
       <EmptyState
         icon={CreditCard}
-        title="No active membership"
-        description="You do not have an active membership yet. Explore plans to unlock training access."
-        actionLabel="Explore plans"
+        title={t('membership.noActive')}
+        description={t('membership.noActiveDesc')}
+        actionLabel={t('membership.explorePlans')}
         to="/memberships"
       />
     )
   }
 
+  const membershipLabel = t('common:enums.membershipType.' + membership.type)
+
   return (
     <div className="space-y-4">
       <div className="rounded-2xl bg-primary p-5 text-primary-foreground">
-        <p className="text-sm opacity-80">Active plan</p>
+        <p className="text-sm opacity-80">{t('membership.activePlan')}</p>
         <div className="mt-3 flex items-end justify-between gap-4">
           <div>
             <p className="text-2xl font-bold">{membershipLabel}</p>
             <p className="mt-1 text-sm opacity-80">
-              {daysRemaining} day{daysRemaining === 1 ? '' : 's'} remaining
+              {t('membership.daysRemaining', { count: daysRemaining ?? undefined })}
             </p>
           </div>
           <CheckCircle2 className="h-8 w-8 opacity-90" />
@@ -670,13 +706,13 @@ const MembershipPanel = ({
       <div className="grid gap-3 text-sm sm:grid-cols-2">
         <InfoTile
           icon={CalendarDays}
-          label="Valid until"
+          label={t('membership.validUntilDate')}
           value={formatDate(membership.endDate)}
         />
         <InfoTile
           icon={Trophy}
-          label="Visits left"
-          value={membership.visitsLeft === null ? 'Unlimited' : String(membership.visitsLeft)}
+          label={t('membership.visitsLeft')}
+          value={membership.visitsLeft === null ? t('membership.unlimited') : String(membership.visitsLeft)}
         />
       </div>
     </div>
@@ -689,72 +725,79 @@ const ProgressPanel = ({
 }: {
   goals: GoalResponse[]
   latestMeasurement: BodyMeasurementResponse | null
-}) => (
-  <div className="grid gap-4 lg:grid-cols-2">
-    <div className="space-y-3">
-      {goals.length ? (
-        goals.map((goal) => (
-          <div key={goal.id} className="rounded-2xl border border-border p-4">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-sm font-semibold text-foreground">
-                  {goal.title}
-                </p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {formatEnum(goal.goalType)} · {goal.currentValue}/
-                  {goal.targetValue} {goal.unit.toLowerCase()}
-                </p>
+}) => {
+  const { t } = useTranslation(['dashboard', 'common'])
+
+  return (
+    <div className="grid gap-4 lg:grid-cols-2">
+      <div className="space-y-3">
+        {goals.length ? (
+          goals.map((goal) => (
+            <div key={goal.id} className="rounded-2xl border border-border p-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-semibold text-foreground">
+                    {goal.title}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {t('common:enums.goalType.' + goal.goalType)} · {goal.currentValue}/
+                    {goal.targetValue} {goal.unit.toLowerCase()}
+                  </p>
+                </div>
+                <StatusBadge
+                  status=""
+                  label={`${Math.round(goal.progressPercentage)}%`}
+                />
               </div>
-              <StatusPill label={`${Math.round(goal.progressPercentage)}%`} />
+              <ProgressBar value={goal.progressPercentage} className="mt-4" />
             </div>
-            <ProgressBar value={goal.progressPercentage} className="mt-4" />
+          ))
+        ) : (
+          <EmptyState
+            icon={Target}
+            title={t('goals.noActiveGoals')}
+            description={t('goals.noActiveGoalsDesc')}
+            actionLabel={t('goals.openProgress')}
+            to="/progress"
+          />
+        )}
+      </div>
+
+      {latestMeasurement ? (
+        <div className="rounded-2xl border border-border p-4">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            {t('measurements.latest')}
+          </p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {formatDate(latestMeasurement.measurementDate)}
+          </p>
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            <MeasurementTile label={t('measurements.weight')} value={latestMeasurement.weight} unit="kg" />
+            <MeasurementTile
+              label={t('measurements.bodyFat')}
+              value={latestMeasurement.bodyFatPercentage}
+              unit="%"
+            />
+            <MeasurementTile
+              label={t('measurements.muscle')}
+              value={latestMeasurement.muscleMass}
+              unit="kg"
+            />
+            <MeasurementTile label={t('measurements.bmi')} value={latestMeasurement.bmi} unit="" />
           </div>
-        ))
+        </div>
       ) : (
         <EmptyState
-          icon={Target}
-          title="No active goals"
-          description="Create your first goal to turn progress into something visible."
-          actionLabel="Open progress"
+          icon={HeartPulse}
+          title={t('goals.noMeasurements')}
+          description={t('goals.noMeasurementsDesc')}
+          actionLabel={t('goals.addMeasurement')}
           to="/progress"
         />
       )}
     </div>
-
-    {latestMeasurement ? (
-      <div className="rounded-2xl border border-border p-4">
-        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          Latest measurement
-        </p>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {formatDate(latestMeasurement.measurementDate)}
-        </p>
-        <div className="mt-4 grid grid-cols-2 gap-3">
-          <MeasurementTile label="Weight" value={latestMeasurement.weight} unit="kg" />
-          <MeasurementTile
-            label="Body fat"
-            value={latestMeasurement.bodyFatPercentage}
-            unit="%"
-          />
-          <MeasurementTile
-            label="Muscle"
-            value={latestMeasurement.muscleMass}
-            unit="kg"
-          />
-          <MeasurementTile label="BMI" value={latestMeasurement.bmi} unit="" />
-        </div>
-      </div>
-    ) : (
-      <EmptyState
-        icon={HeartPulse}
-        title="No measurements yet"
-        description="Log your first body measurement to unlock trend tracking."
-        actionLabel="Add measurement"
-        to="/progress"
-      />
-    )}
-  </div>
-)
+  )
+}
 
 const MeasurementTile = ({
   label,

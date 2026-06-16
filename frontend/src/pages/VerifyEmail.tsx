@@ -34,13 +34,13 @@ const VerifyEmail = () => {
 
     try {
       const response = await verifyEmail({ token: token.trim() })
-      setSuccess(response.message || 'Email verified successfully. Redirecting...')
+      setSuccess(response.message || t('verifyEmail.success.verified'))
       window.setTimeout(() => {
         navigate('/login', { replace: true })
       }, 1000)
     } catch (err) {
       console.error(err)
-      setError('Verification failed. Please check the code and try again.')
+      setError(t('verifyEmail.errors.verificationFailed'))
     } finally {
       setIsSubmitting(false)
     }
@@ -48,7 +48,7 @@ const VerifyEmail = () => {
 
   const handleResend = async () => {
     if (!email.trim()) {
-      setError('Please enter your account email to resend your verification code.')
+      setError(t('verifyEmail.errors.emailRequired'))
       return
     }
 
@@ -58,10 +58,10 @@ const VerifyEmail = () => {
 
     try {
       const response = await resendVerification({ email: email.trim() })
-      setResendSuccess(response.message || 'Verification code resent successfully.')
+      setResendSuccess(response.message || t('verifyEmail.success.resent'))
     } catch (err) {
       console.error(err)
-      setError('Could not resend verification code. Please try again shortly.')
+      setError(t('verifyEmail.errors.resendFailed'))
     } finally {
       setIsResending(false)
     }

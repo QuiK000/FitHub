@@ -32,15 +32,24 @@ import {
   getWorkoutPlanById,
 } from '../services/workout.service'
 import { LogWorkoutModal } from '../components/workouts/LogWorkoutModal'
-import { formatEnum, formatDate, clampPercentage, type IconType } from '../lib/utils'
+import { formatDate, clampPercentage } from '../lib/utils'
 import { ProgressBar } from '../components/ui/progress-bar'
 import { EmptyState } from '../components/ui/empty-state'
 import { SkeletonBlock } from '../components/ui/skeleton'
-import { StatusPill } from '../components/ui/status-pill'
+import { StatusBadge } from '../components/ui/status-badge'
+import { MetricCard } from '../components/ui/metric-card'
 import toast from '../utils/toast'
 
+const workoutStatusColors: Record<string, string> = {
+  ASSIGNED: 'bg-amber-500/10 text-amber-600',
+  NOT_STARTED: 'bg-muted text-muted-foreground',
+  IN_PROGRESS: 'bg-blue-500/10 text-blue-600',
+  COMPLETED: 'bg-emerald-500/10 text-emerald-600',
+  CANCELLED: 'bg-red-500/10 text-red-600',
+}
+
 const WorkoutDetail = () => {
-  const { t } = useTranslation(['progress', 'common'])
+  const { t } = useTranslation(['workouts', 'common'])
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const [assignment, setAssignment] = useState<ClientWorkoutPlanResponse | null>(
@@ -68,7 +77,7 @@ const WorkoutDetail = () => {
       setRecentLogs(logsPage.content)
     } catch (err) {
       console.error(err)
-      setError('Unable to load this workout plan.')
+      setError(t('detail.notAvailable'))
     } finally {
       setIsLoading(false)
     }
@@ -88,7 +97,7 @@ const WorkoutDetail = () => {
   const trainerName =
     plan &&
     ([plan.trainer.firstname, plan.trainer.lastname].filter(Boolean).join(' ') ||
-      'Trainer')
+      t('detail.trainer'))
 
   const handleLogged = async () => {
     toast.success(t('common:toast.workoutLogged'))
@@ -115,21 +124,21 @@ const WorkoutDetail = () => {
   if (!plan || !assignment) {
     return (
       <Card>
-        <CardContent className="flex min-h-72 flex-col items-center justify-center p-8 text-center">
+        <CardContent className="flex min-h-48 flex-col items-center justify-center p-8 text-center">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-destructive/10">
             <Dumbbell className="h-6 w-6 text-destructive" />
           </div>
           <h1 className="mt-5 text-2xl font-bold text-foreground">
-            Workout plan not found
+            {t('detail.notFound')}
           </h1>
           <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-            {error ?? 'This assignment may no longer be available.'}
+            {error ?? t('detail.notAvailable')}
           </p>
           <Link
             to="/workouts"
             className="mt-5 inline-flex h-10 items-center justify-center rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground"
           >
-            Back to workouts
+            {t('detail.backToWorkouts')}
           </Link>
         </CardContent>
       </Card>
@@ -145,10 +154,10 @@ const WorkoutDetail = () => {
             className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to plans
+            {t('detail.backToPlans')}
           </Link>
           <p className="mt-5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Workout plan
+            {t('detail.workoutPlan')}
           </p>
           <h1 className="mt-2 text-2xl font-bold text-foreground md:text-3xl">
             {plan.name}
@@ -157,9 +166,19 @@ const WorkoutDetail = () => {
             {plan.description}
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
-            <StatusPill label={formatEnum(plan.difficultyLevel)} />
-            <StatusPill label={formatEnum(assignment.status)} />
-            <StatusPill label={`${Math.round(progress)}% complete`} />
+            <StatusBadge 
+              status={plan.difficultyLevel} 
+              label={t(`difficulty.${plan.difficultyLevel}`)} 
+            />
+            <StatusBadge 
+              status={assignment.status} 
+              colors={workoutStatusColors}
+              label={t(`status.${assignment.status}`)} 
+            />
+            <StatusBadge 
+              status="COMPLETED" 
+              label={`${Math.round(progress)}${t('detail.complete')}`} 
+            />
           </div>
         </div>
 
@@ -170,28 +189,31 @@ const WorkoutDetail = () => {
           className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-soft transition-all hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
         >
           <Dumbbell className="h-4 w-4" />
-          Log workout
+          {t('detail.logWorkout')}
         </button>
       </div>
 
       <section className="grid gap-4 md:grid-cols-3">
         <MetricCard
           icon={CalendarDays}
-          label="Program length"
-          value={`${plan.durationWeeks} weeks`}
-          detail={`${plan.sessionsPerWeek} sessions per week`}
+          title={t('detail.programLength')}
+          value={`${plan.durationWeeks} ${t('detail.weeks')}`}
+          label={`${plan.sessionsPerWeek} ${t('detail.sessionsPerWeek')}`}
+          tone="bg-primary/10"
         />
         <MetricCard
           icon={ListChecks}
-          label="Logged workouts"
+          title={t('detail.loggedWorkouts')}
           value={`${assignment.completedWorkouts ?? 0}/${assignment.totalWorkouts ?? 0}`}
-          detail="Completed from this assignment"
+          label={t('detail.completedFrom')}
+          tone="bg-primary/10"
         />
         <MetricCard
           icon={User2}
-          label="Trainer"
-          value={trainerName ?? 'Trainer'}
-          detail="Assigned to your plan"
+          title={t('detail.trainer')}
+          value={trainerName ?? t('detail.trainer')}
+          label={t('detail.assignedTo')}
+          tone="bg-primary/10"
         />
       </section>
 
@@ -200,9 +222,9 @@ const WorkoutDetail = () => {
           <CardHeader>
             <div className="flex items-center justify-between gap-4">
               <div>
-                <CardTitle>Exercise Schedule</CardTitle>
+                <CardTitle>{t('detail.exerciseSchedule')}</CardTitle>
                 <CardDescription>
-                  Follow the plan day by day and log each completed exercise.
+                  {t('detail.exerciseScheduleDesc')}
                 </CardDescription>
               </div>
               <PauseCircle className="h-5 w-5 text-muted-foreground" />
@@ -218,8 +240,8 @@ const WorkoutDetail = () => {
             ) : (
               <EmptyState
                 icon={FileText}
-                title="No exercises in this plan"
-                description="Your trainer has not added exercises to this plan yet."
+                title={t('detail.noExercises')}
+                description={t('detail.noTrainerExercises')}
               />
             )}
           </CardContent>
@@ -228,9 +250,9 @@ const WorkoutDetail = () => {
         <div className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Progress</CardTitle>
+              <CardTitle>{t('detail.progress')}</CardTitle>
               <CardDescription>
-                Completion updates after workouts are logged.
+                {t('detail.completionUpdates')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -240,25 +262,25 @@ const WorkoutDetail = () => {
                     {Math.round(progress)}%
                   </p>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    Assignment completion
+                    {t('detail.assignmentCompletion')}
                   </p>
                 </div>
                 <CheckCircle2 className="h-8 w-8 text-primary" />
               </div>
               <ProgressBar value={progress} className="mt-5" />
               <div className="mt-4 grid gap-3 text-sm">
-                <InfoRow label="Start date" value={formatDate(assignment.startDate)} />
-                <InfoRow label="End date" value={formatDate(assignment.endDate)} />
-                <InfoRow label="Assigned" value={formatDate(assignment.assignedDate)} />
+                <InfoRow label={t('detail.startDate')} value={formatDate(assignment.startDate)} />
+                <InfoRow label={t('detail.endDate')} value={formatDate(assignment.endDate)} />
+                <InfoRow label={t('detail.assigned')} value={formatDate(assignment.assignedDate)} />
               </div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
+              <CardTitle>{t('detail.recentActivity')}</CardTitle>
               <CardDescription>
-                Latest logs across your workout history.
+                {t('detail.recentActivityDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -271,8 +293,8 @@ const WorkoutDetail = () => {
               ) : (
                 <EmptyState
                   icon={Target}
-                  title="No workout logs yet"
-                  description="Log your first workout from this plan to start building history."
+                  title={t('detail.noLogs')}
+                  description={t('detail.noLogsDesc')}
                 />
               )}
             </CardContent>
@@ -308,120 +330,107 @@ const groupExercisesByDay = (exercises: WorkoutPlanExerciseResponse[]) => {
     .sort(([dayA], [dayB]) => dayA - dayB)
 }
 
-const MetricCard = ({
-  icon: Icon,
-  label,
-  value,
-  detail,
-}: {
-  icon: IconType
-  label: string
-  value: string
-  detail: string
-}) => (
-  <Card>
-    <CardContent className="flex items-start justify-between gap-4 p-5">
-      <div>
-        <p className="text-xs font-medium text-muted-foreground">{label}</p>
-        <p className="mt-2 text-xl font-bold text-foreground">{value}</p>
-        <p className="mt-1 text-xs text-muted-foreground">{detail}</p>
-      </div>
-      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-        <Icon className="h-5 w-5 text-primary" />
-      </div>
-    </CardContent>
-  </Card>
-)
-
 const DayBlock = ({
   day,
   exercises,
 }: {
   day: number
   exercises: WorkoutPlanExerciseResponse[]
-}) => (
-  <motion.div
-    initial={{ opacity: 0, y: 8 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.2 }}
-    className="rounded-2xl border border-border bg-background p-4"
-  >
-    <div className="mb-4 flex items-center justify-between gap-3">
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          Day {day}
-        </p>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {exercises.length} exercise{exercises.length === 1 ? '' : 's'}
-        </p>
-      </div>
-      <Activity className="h-5 w-5 text-primary" />
-    </div>
-    <div className="space-y-3">
-      {exercises.map((exercise) => (
-        <ExerciseRow key={exercise.id} exercise={exercise} />
-      ))}
-    </div>
-  </motion.div>
-)
+}) => {
+  const { t } = useTranslation(['workouts', 'common'])
 
-const ExerciseRow = ({ exercise }: { exercise: WorkoutPlanExerciseResponse }) => (
-  <div className="grid gap-3 rounded-xl bg-muted px-3 py-3 md:grid-cols-[minmax(0,1fr),auto]">
-    <div className="flex min-w-0 items-start gap-3">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-background">
-        <Dumbbell className="h-4 w-4 text-primary" />
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+      className="rounded-2xl border border-border bg-background p-4"
+    >
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            {t('detail.day', { n: day })}
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {t('detail.exercises', { count: exercises.length })}
+          </p>
+        </div>
+        <Activity className="h-5 w-5 text-primary" />
       </div>
-      <div className="min-w-0">
-        <p className="truncate text-sm font-semibold text-foreground">
-          {exercise.exercise.name}
-        </p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          {formatEnum(exercise.exercise.category)} ·{' '}
-          {formatEnum(exercise.exercise.primaryMuscleGroup)}
-        </p>
-        {exercise.notes && (
-          <p className="mt-2 text-xs text-muted-foreground">{exercise.notes}</p>
+      <div className="space-y-3">
+        {exercises.map((exercise) => (
+          <ExerciseRow key={exercise.id} exercise={exercise} />
+        ))}
+      </div>
+    </motion.div>
+  )
+}
+
+const ExerciseRow = ({ exercise }: { exercise: WorkoutPlanExerciseResponse }) => {
+  const { t } = useTranslation(['workouts', 'common'])
+
+  return (
+    <div className="grid gap-3 rounded-xl bg-muted px-3 py-3 md:grid-cols-[minmax(0,1fr),auto]">
+      <div className="flex min-w-0 items-start gap-3">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-background">
+          <Dumbbell className="h-4 w-4 text-primary" />
+        </div>
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold text-foreground">
+            {exercise.exercise.name}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {t('common:enums.exerciseCategory.' + exercise.exercise.category)} ·{' '}
+            {t('common:enums.muscleGroup.' + exercise.exercise.primaryMuscleGroup)}
+          </p>
+          {exercise.notes && (
+            <p className="mt-2 text-xs text-muted-foreground">{exercise.notes}</p>
+          )}
+        </div>
+      </div>
+      <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground md:justify-end">
+        {exercise.sets && exercise.reps && (
+          <span className="rounded-full bg-background px-2 py-1">
+            {t('detail.setsReps', { sets: exercise.sets, reps: exercise.reps })}
+          </span>
+        )}
+        {exercise.durationSeconds && (
+          <span className="rounded-full bg-background px-2 py-1">
+            {t('detail.restTime', { n: exercise.durationSeconds })}
+          </span>
+        )}
+        {exercise.restSeconds && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-background px-2 py-1">
+            <Clock className="h-3 w-3" />
+            {t('detail.restTime', { n: exercise.restSeconds })}
+          </span>
         )}
       </div>
     </div>
-    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground md:justify-end">
-      {exercise.sets && exercise.reps && (
-        <span className="rounded-full bg-background px-2 py-1">
-          {exercise.sets} sets x {exercise.reps} reps
-        </span>
-      )}
-      {exercise.durationSeconds && (
-        <span className="rounded-full bg-background px-2 py-1">
-          {exercise.durationSeconds}s
-        </span>
-      )}
-      {exercise.restSeconds && (
-        <span className="inline-flex items-center gap-1 rounded-full bg-background px-2 py-1">
-          <Clock className="h-3 w-3" />
-          {exercise.restSeconds}s rest
-        </span>
-      )}
-    </div>
-  </div>
-)
+  )
+}
 
-const RecentLog = ({ log }: { log: WorkoutLogResponse }) => (
-  <div className="rounded-2xl border border-border bg-background p-3">
-    <p className="text-sm font-semibold text-foreground">{log.exercise.name}</p>
-    <p className="mt-1 text-xs text-muted-foreground">
-      {formatDate(log.workoutDate)} · {formatEnum(log.exercise.primaryMuscleGroup)}
-    </p>
-    <p className="mt-3 text-xs text-muted-foreground">
-      {[
-        log.setsCompleted ? `${log.setsCompleted} sets` : null,
-        log.repsCompleted ? `${log.repsCompleted} reps` : null,
-        log.weightUsed ? `${log.weightUsed} kg` : null,
-      ]
-        .filter(Boolean)
-        .join(' · ') || 'Workout logged'}
-    </p>
-  </div>
-)
+const RecentLog = ({ log }: { log: WorkoutLogResponse }) => {
+  const { t } = useTranslation(['workouts', 'common'])
+
+  return (
+    <div className="rounded-2xl border border-border bg-background p-3">
+      <p className="text-sm font-semibold text-foreground">{log.exercise.name}</p>
+      <p className="mt-1 text-xs text-muted-foreground">
+        {formatDate(log.workoutDate)} · {t('common:enums.muscleGroup.' + log.exercise.primaryMuscleGroup)}
+      </p>
+      <p className="mt-3 text-xs text-muted-foreground">
+        {[
+          log.setsCompleted ? `${log.setsCompleted} ${t('planCard.sets')}` : null,
+          log.repsCompleted ? `${log.repsCompleted} ${t('planCard.reps')}` : null,
+          log.weightUsed ? `${log.weightUsed} ${t('planCard.kg')}` : null,
+        ]
+          .filter(Boolean)
+          .join(' · ') || t('planCard.workoutLogged')}
+      </p>
+    </div>
+  )
+}
 
 const InfoRow = ({ label, value }: { label: string; value: string }) => (
   <div className="flex items-center justify-between gap-4 rounded-xl bg-muted px-3 py-2">
