@@ -1,14 +1,14 @@
 {
   "badge": "Профіль",
   "title": "{{name}}",
-  "subtitle": "Керуйте особистими даними та тренувальними метриками.",
+  "subtitle": "Керуйте своїми особистими даними та тренувальними показниками.",
   "editButton": "Редагувати профіль",
   "accountDetails": {
-    "title": "Деталі акаунту",
-    "subtitle": "Основна інформація, що використовується у FitHub.",
+    "title": "Деталі облікового запису",
+    "subtitle": "Основна інформація, що використовується у вашому досвіді FitHub.",
     "email": "Електронна пошта",
     "phone": "Телефон",
-    "accountStatus": "Статус акаунту",
+    "accountStatus": "Статус облікового запису",
     "memberSince": "Член з",
     "birthdate": "Дата народження",
     "gender": "Стать",
@@ -20,36 +20,41 @@
   },
   "physicalStats": {
     "title": "Фізичні показники",
-    "subtitle": "Дані, які тренери використовують для налаштування сесій.",
+    "subtitle": "Дані, які ваші тренери використовують для адаптації ваших сесій.",
     "currentWeight": "Поточна вага",
     "weightValue": "{{weight}} кг",
     "weightPlaceholder": "Додайте вагу",
     "height": "Зріст",
     "heightValue": "{{height}} см",
     "heightPlaceholder": "Додайте зріст",
-    "hydrationTarget": "Денна ціль води",
-    "hydrationValue": "{{target}} мл",
-    "hydrationPlaceholder": "Встановіть ціль"
+    "hydrationTarget": "Щоденна ціль гідратації",
+    "hydrationValue": "{{target}} ml",
+    "hydrationPlaceholder": "Встановіть свою ціль"
   },
   "editModal": {
     "badge": "Редагувати профіль",
-    "subtitle": "Оновіть основну інформацію та метрики.",
+    "subtitle": "Оновіть базову інформацію та показники.",
     "firstName": "Ім'я",
     "lastName": "Прізвище",
     "phone": "Телефон",
-    "phonePlaceholder": "+12025550123",
+    "phonePlaceholder": "+380501234567",
     "birthdate": "Дата народження",
     "height": "Зріст (см)",
     "weight": "Вага (кг)",
-    "waterTarget": "Ціль води (мл)",
+    "waterTarget": "Ціль води (ml)",
     "gender": "Стать",
+    "genderLabels": {
+      "male": "Чоловік",
+      "female": "Жінка",
+      "other": "Інше"
+    },
     "cancelButton": "Скасувати",
     "saveButton": "Зберегти зміни"
   },
   "loading": "Завантаження профілю...",
   "errors": {
-    "loadFailed": "Не вдалося завантажити профіль.",
+    "loadFailed": "Не вдалося завантажити ваш профіль зараз.",
     "saveFailed": "Не вдалося зберегти зміни профілю.",
-    "fixFields": "Будь ласка, виправте позначені поля."
+    "fixFields": "Будь ласка, виправте виділені поля профілю."
   }
 }

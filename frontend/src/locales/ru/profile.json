@@ -1,55 +1,60 @@
 {
   "badge": "Профиль",
   "title": "{{name}}",
-  "subtitle": "Управляйте личными данными и тренировочными метриками.",
+  "subtitle": "Управляйте личными данными и тренировочными показателями.",
   "editButton": "Редактировать профиль",
   "accountDetails": {
-    "title": "Детали аккаунта",
-    "subtitle": "Основная информация, используемая в FitHub.",
+    "title": "Данные аккаунта",
+    "subtitle": "Основная информация, используемая в вашем FitHub.",
     "email": "Электронная почта",
     "phone": "Телефон",
     "accountStatus": "Статус аккаунта",
     "memberSince": "Участник с",
     "birthdate": "Дата рождения",
     "gender": "Пол",
-    "active": "Активный",
-    "inactive": "Неактивный",
+    "active": "Активен",
+    "inactive": "Неактивен",
     "phonePlaceholder": "Добавьте номер телефона",
     "birthdatePlaceholder": "Добавьте дату рождения",
-    "notAvailable": "Недоступно"
+    "notAvailable": "Нет данных"
   },
   "physicalStats": {
     "title": "Физические показатели",
-    "subtitle": "Данные, которые тренеры используют для настройки сессий.",
+    "subtitle": "Данные, которые ваши тренеры используют для настройки тренировок.",
     "currentWeight": "Текущий вес",
     "weightValue": "{{weight}} кг",
     "weightPlaceholder": "Добавьте вес",
     "height": "Рост",
     "heightValue": "{{height}} см",
     "heightPlaceholder": "Добавьте рост",
-    "hydrationTarget": "Дневная цель воды",
+    "hydrationTarget": "Дневная цель по воде",
     "hydrationValue": "{{target}} мл",
     "hydrationPlaceholder": "Установите цель"
   },
   "editModal": {
     "badge": "Редактировать профиль",
-    "subtitle": "Обновите основную информацию и метрики.",
+    "subtitle": "Обновите базовую информацию и показатели.",
     "firstName": "Имя",
     "lastName": "Фамилия",
     "phone": "Телефон",
-    "phonePlaceholder": "+12025550123",
+    "phonePlaceholder": "+79001234567",
     "birthdate": "Дата рождения",
     "height": "Рост (см)",
     "weight": "Вес (кг)",
-    "waterTarget": "Цель воды (мл)",
+    "waterTarget": "Цель по воде (мл)",
     "gender": "Пол",
-    "cancelButton": "Отменить",
+    "genderLabels": {
+      "male": "Мужчина",
+      "female": "Женщина",
+      "other": "Другое"
+    },
+    "cancelButton": "Отмена",
     "saveButton": "Сохранить изменения"
   },
-  "loading": "Загрузка профиля...",
+  "loading": "Загрузка вашего профиля...",
   "errors": {
-    "loadFailed": "Не удалось загрузить профиль.",
+    "loadFailed": "Не удалось загрузить ваш профиль.",
     "saveFailed": "Не удалось сохранить изменения профиля.",
-    "fixFields": "Пожалуйста, исправьте отмеченные поля."
+    "fixFields": "Пожалуйста, исправьте выделенные поля профиля."
   }
 }

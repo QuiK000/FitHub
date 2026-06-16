@@ -11,12 +11,24 @@
     "height": "Height (cm)",
     "weight": "Weight (kg)",
     "waterTarget": "Water target (ml)",
-    "gender": "Gender"
+    "gender": "Gender",
+    "genderLabels": {
+      "male": "Male",
+      "female": "Female",
+      "other": "Other"
+    }
   },
+  "placeholders": {
+    "firstName": "First name",
+    "lastName": "Last name",
+    "phone": "+12025550123"
+  },
+  "loading": "Checking your profile...",
   "submit": "Finish onboarding",
   "submitting": "Creating profile...",
   "errors": {
-    "fillFields": "Please complete the highlighted onboarding fields."
+    "fillFields": "Please complete the highlighted onboarding fields.",
+    "verifyFailed": "Unable to verify your profile status. Please try again."
   },
   "success": {
     "created": "Profile created. Welcome to FitHub."

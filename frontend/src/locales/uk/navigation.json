@@ -14,7 +14,9 @@
       "sessions": "Сесії",
       "notifications": "Сповіщення",
       "admin": "Адмін",
-      "myPlans": "Мої плани"
+      "myPlans": "Мої плани",
+      "trainerSessions": "Мої сесії",
+      "exerciseManagement": "Вправи"
     },
     "trainingLoad": {
       "label": "Тренувальне навантаження",
@@ -27,6 +29,7 @@
     "performanceHub": "Центр продуктивності",
     "liveMembers": "Онлайн члени",
     "online": "{{count}} онлайн",
-    "member": "Член"
+    "member": "Член",
+    "fithubMember": "Учасник FitHub"
   }
 }

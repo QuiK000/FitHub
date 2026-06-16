@@ -14,7 +14,9 @@
       "sessions": "Сессии",
       "notifications": "Уведомления",
       "admin": "Админ",
-      "myPlans": "Мои планы"
+      "myPlans": "Мои планы",
+      "trainerSessions": "Мои тренировки",
+      "exerciseManagement": "Упражнения"
     },
     "trainingLoad": {
       "label": "Тренировочная нагрузка",
@@ -27,6 +29,7 @@
     "performanceHub": "Центр производительности",
     "liveMembers": "Онлайн члены",
     "online": "{{count}} онлайн",
-    "member": "Член"
+    "member": "Член",
+    "fithubMember": "Участник FitHub"
   }
 }

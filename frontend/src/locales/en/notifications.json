@@ -1,4 +1,5 @@
 {
+  "badge": "Notifications",
   "title": "Stay updated",
   "unreadCount": "You have {{count}} unread notification(s).",
   "allCaughtUp": "All caught up.",

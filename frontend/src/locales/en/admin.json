@@ -1,11 +1,25 @@
 {
+  "badge": "Admin",
   "title": "Administration",
   "subtitle": "Manage memberships, broadcast notifications, and view system analytics.",
   "tabs": {
     "overview": "Overview",
     "memberships": "Memberships",
     "reviews": "Reviews",
-    "broadcast": "Broadcast"
+    "broadcast": "Broadcast",
+    "exercises": "Exercises"
+  },
+  "exercises": {
+    "title": "Exercise Management",
+    "subtitle": "Create, edit, and manage the exercise library",
+    "create": "New Exercise",
+    "edit": "Edit Exercise",
+    "name": "Exercise Name",
+    "category": "Category",
+    "muscleGroup": "Muscle Group",
+    "description": "Description",
+    "activate": "Activate",
+    "deactivate": "Deactivate"
   },
   "overview": {
     "activeClients": "Active clients",
@@ -14,17 +28,28 @@
     "todayCheckIns": "Today check-ins"
   },
   "memberships": {
-    "searchPlaceholder": "Enter client ID",
-    "searchButton": "Search",
+    "findClient": "Find Client",
+    "searchPlaceholder": "Search by name or email...",
+    "searchHint": "Start typing a client's name or email to search",
+    "noClientsFound": "No clients found",
+    "noPhone": "No phone",
+    "memberSince": "Member since {{date}}",
+    "selectClientFirst": "Select a client first",
+    "selectClientHint": "Search for a client above to manage their memberships.",
+    "noMemberships": "This client doesn't have any memberships yet.",
     "createButton": "Create membership",
     "noResults": "No memberships found for this client.",
     "actions": {
       "activate": "Activate",
       "freeze": "Freeze",
       "unfreeze": "Unfreeze",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "extend": "Extend"
     },
+    "visitsLeft": "{{count}} visits left",
+    "unlimited": "Unlimited visits",
     "createModal": {
+      "badge": "New membership",
       "title": "Create membership",
       "clientId": "Client ID",
       "planType": "Plan type",
@@ -38,6 +63,19 @@
       "visitsLimitPlaceholder": "e.g. 10",
       "createButton": "Create"
     }
+  },
+  "reviews": {
+    "title": "Review Moderation",
+    "filters": {
+      "all": "All",
+      "visible": "Visible",
+      "hidden": "Hidden"
+    },
+    "trainerReview": "Trainer review",
+    "noReviews": "No reviews found",
+    "noReviewsDesc": "Reviews from clients will appear here.",
+    "visible": "Visible",
+    "hidden": "Hidden"
   },
   "broadcast": {
     "title": "Broadcast notification",

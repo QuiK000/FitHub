@@ -55,7 +55,10 @@
     "title": "Запишіть виконану роботу для однієї вправи.",
     "exercise": "Вправа",
     "selectExercise": "Оберіть вправу",
-    "sets": "Виконано повторів",
+    "sets": "Кількість підходів",
+    "reps": "Повторення",
+    "setsPlaceholder": "напр. 3",
+    "repsPlaceholder": "напр. 10",
     "weight": "Вага (кг)",
     "weightPlaceholder": "Необов'язково",
     "duration": "Тривалість (сек)",
@@ -127,7 +130,8 @@
     "assigning": "Призначення...",
     "assignButton": "Призначити план",
     "toastSuccess": "План призначено клієнту.",
-    "toastError": "Не вдалося призначити план."
+    "toastError": "Не вдалося призначити план.",
+    "searchFailed": "Не вдалося знайти клієнтів."
   },
   "assignmentActions": {
     "start": "Почати",
@@ -194,6 +198,7 @@
   "difficulty": {
     "BEGINNER": "Початківець",
     "INTERMEDIATE": "Середній",
-    "ADVANCED": "Просунутий"
+    "ADVANCED": "Просунутий",
+    "EXPERT": "Експерт"
   }
 }

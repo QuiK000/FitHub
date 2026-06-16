@@ -55,7 +55,10 @@
     "title": "Запишите выполненную работу для одного упражнения.",
     "exercise": "Упражнение",
     "selectExercise": "Выберите упражнение",
-    "sets": "Выполнено повторов",
+    "sets": "Количество подходов",
+    "reps": "Повторения",
+    "setsPlaceholder": "напр. 3",
+    "repsPlaceholder": "напр. 10",
     "weight": "Вес (кг)",
     "weightPlaceholder": "Необязательно",
     "duration": "Длительность (сек)",
@@ -127,7 +130,8 @@
     "assigning": "Назначение...",
     "assignButton": "Назначить план",
     "toastSuccess": "План назначен клиенту.",
-    "toastError": "Не удалось назначить план."
+    "toastError": "Не удалось назначить план.",
+    "searchFailed": "Не удалось найти клиентов."
   },
   "assignmentActions": {
     "start": "Начать",
@@ -194,6 +198,7 @@
   "difficulty": {
     "BEGINNER": "Начинающий",
     "INTERMEDIATE": "Средний",
-    "ADVANCED": "Продвинутый"
+    "ADVANCED": "Продвинутый",
+    "EXPERT": "Эксперт"
   }
 }

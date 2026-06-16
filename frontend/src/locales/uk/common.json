@@ -16,9 +16,9 @@
     "send": "Надіслати"
   },
   "labels": {
-    "email": "Електронна адреса",
+    "email": "Електронна пошта",
     "password": "Пароль",
-    "confirmPassword": "Підтвердіть пароль",
+    "confirmPassword": "Підтвердити пароль",
     "firstName": "Ім'я",
     "lastName": "Прізвище",
     "phone": "Телефон",
@@ -41,48 +41,186 @@
     "failed": "Операція не вдалася"
   },
   "toast": {
-    "joinedSession": "Успішно приєднано до сесії.",
-    "membershipCreated": "Абонемент створено.",
-    "broadcastSent": "Розсилку надіслано.",
-    "allRead": "Всі повідомлення позначено як прочитані.",
-    "readFailed": "Не вдалося позначити повідомлення.",
+    "joinedSession": "Ви приєдналися до сесії.",
+    "membershipCreated": "Членство створено.",
+    "broadcastSent": "Сповіщення надіслано.",
+    "allRead": "Усі сповіщення позначено як прочитані.",
+    "readFailed": "Не вдалося позначити сповіщення як прочитані.",
     "trainersLoadFailed": "Не вдалося завантажити тренерів.",
     "reviewSubmitted": "Відгук надіслано.",
-    "progressLoadFailed": "Не вдалося завантажити дані прогресу.",
+    "progressLoadFailed": "Не вдалося завантажити дані проgresу.",
     "measurementSaved": "Вимірювання збережено.",
-    "goalCreated": "Ціль створено.",
+    "goalCreated": "Мету створено.",
     "progressUpdated": "Прогрес оновлено.",
-    "goalCompleted": "Ціль завершено!",
+    "goalCompleted": "Мету досягнуто!",
     "recordSaved": "Рекорд збережено.",
-    "waterAmountError": "Введіть додатне значення води.",
-    "caloriesError": "Цільові калорії мають бути додатним числом.",
+    "waterAmountError": "Введіть додатне значення кількості води.",
+    "caloriesError": "Цільова кількість калорій має бути додатним числом.",
     "mealPlanCreated": "План харчування створено на сьогодні.",
-    "workoutLogged": "Тренування успішно записано.",
-    "profileFixFields": "Будь ласка, виправте позначені поля.",
-    "onboardingFixFields": "Будь ласка, заповніть позначені поля.",
-    "profileCreated": "Профіль створено. Вітаємо у FitHub.",
+    "workoutLogged": "Тренування зареєстровано успішно.",
+    "profileFixFields": "Будь ласка, виправте виділені поля профілю.",
+    "onboardingFixFields": "Будь ласка, заповніть виділені поля реєстрації.",
+    "profileCreated": "Профіль створено. Ласкаво просимо до FitHub.",
     "noSessions": "Не вдалося завантажити сесії.",
-    "sessionJoined": "Успішно приєднано до сесії.",
+    "sessionJoined": "Ви приєдналися до сесії.",
     "joinFailed": "Не вдалося приєднатися до сесії.",
-    "reviewVisibilityUpdated": "Видимість відгуку оновлено."
+    "reviewVisibilityUpdated": "Видимість відгуку оновлено.",
+    "planCreated": "План тренувань створено.",
+    "planAssigned": "План призначено клієнту.",
+    "exerciseAdded": "Вправу додано до плану.",
+    "assignmentStarted": "Завдання розпочато.",
+    "assignmentCompleted": "Завдання завершено.",
+    "assignmentCancelled": "Завдання скасовано.",
+    "profileDeactivated": "Профіль деактивовано.",
+    "updated": "Профіль успішно оновлено.",
+    "created": "Профіль успішно створено."
+  },
+  "gender": {
+    "male": "Чоловік",
+    "female": "Жінка",
+    "other": "Інше"
+  },
+  "fallbacks": {
+    "client": "Клієнт",
+    "trainer": "Тренер",
+    "admin": "Адміністратор",
+    "member": "Учасник",
+    "fithubMember": "Учасник FitHub",
+    "there": "тут",
+    "initialT": "Т"
   },
   "errors": {
     "required": "Це поле обов'язкове",
-    "invalidEmail": "Невірна електронна адреса",
-    "networkError": "Помилка мережі. Спробуйте ще раз.",
-    "serverError": "Помилка сервера. Спробуйте пізніше.",
+    "invalidEmail": "Невірна адреса електронної пошти",
+    "badRequest": "Невірний запит. Будь ласка, перевірте введені дані.",
+    "conflict": "Цей ресурс уже існує.",
+    "validationError": "Помилка валідації. Будь ласка, перевірте введені дані.",
+    "networkError": "Помилка мережі. Будь ласка, спробуйте ще раз.",
+    "serverError": "Помилка сервера. Будь ласка, спробуйте пізніше.",
     "unauthorized": "Не авторизовано. Будь ласка, увійдіть.",
-    "forbidden": "У вас немає доступу до цього ресурсу.",
-    "notFound": "Ресурс не знайдено."
+    "forbidden": "У вас немає дозволу на доступ до цього ресурсу.",
+    "notFound": "Ресурс не знайдено.",
+    "loadFailed": "Не вдалося завантажити дані.",
+    "resourceNotFound": "Ресурс не знайдено.",
+    "rateLimitError": "Забагато запитів. Будь ласка, спробуйте пізніше.",
+    "error": "Сталася помилка."
+  },
+  "pagination": {
+    "previous": "Назад",
+    "next": "Далі",
+    "page": "Сторінка {{current}} з {{total}}",
+    "showing": "Показано {{from}}–{{to}} з {{total}}"
+  },
+  "validation": {
+    "firstNameRequired": "Ім'я обов'язкове.",
+    "lastNameRequired": "Прізвище обов'язкове.",
+    "phoneFormat": "Використовуйте формат E.164, наприклад +12025550123.",
+    "genderRequired": "Стать обов'язкова.",
+    "heightPositive": "Зріст має бути додатним.",
+    "weightPositive": "Вага має бути додатною.",
+    "waterTargetPositive": "Цільова кількість води має бути додатним цілим числом.",
+    "birthdateValid": "Введіть дійсну дату народження.",
+    "experienceRequired": "Досвід має бути щонайменше 1 рік.",
+    "descriptionRequired": "Опис обов'язковий."
   },
   "footer": {
-    "copyright": "\u00a9 2026 FitHub. Всі права захищені.",
-    "terms": "Умови використання",
+    "copyright": "© 2026 FitHub. Усі права захищено.",
+    "terms": "Умови надання послуг",
     "privacy": "Політика конфіденційності"
   },
   "status": {
     "active": "Активний",
     "inactive": "Неактивний",
     "loading": "Завантаження..."
+  },
+  "enums": {
+    "difficultyLevel": {
+      "BEGINNER": "Початківець",
+      "INTERMEDIATE": "Середній",
+      "ADVANCED": "Просунутий",
+      "EXPERT": "Експерт"
+    },
+    "trainingType": {
+      "GROUP": "Групове",
+      "PERSONAL": "Індивідуальне"
+    },
+    "membershipType": {
+      "MONTHLY": "Щомісячний",
+      "YEARLY": "Щорічний",
+      "VISITS": "Відвідування"
+    },
+    "membershipStatus": {
+      "ACTIVE": "Активний",
+      "EXPIRED": "Закінчився",
+      "FROZEN": "Заморожений",
+      "CANCELLED": "Скасований",
+      "CREATED": "Створений"
+    },
+    "paymentStatus": {
+      "PAID": "Оплачено",
+      "PENDING": "Очікує",
+      "COMPLETED": "Завершено",
+      "FAILED": "Не вдалося"
+    },
+    "goalType": {
+      "WEIGHT_LOSS": "Схуднення",
+      "MUSCLE_GAIN": "Набір м'язової маси",
+      "ENDURANCE": "Витривалість",
+      "STRENGTH": "Сила"
+    },
+    "recordType": {
+      "MAX_WEIGHT": "Максимальна вага",
+      "MAX_REPS": "Максимальна кількість повторень",
+      "MAX_DISTANCE": "Максимальна дистанція",
+      "BEST_TIME": "Найкращий час"
+    },
+    "photoAngle": {
+      "FRONT": "Спереду",
+      "BACK": "Ззаду",
+      "SIDE_LEFT": "Зліва",
+      "SIDE_RIGHT": "Справа"
+    },
+    "sessionStatus": {
+      "SCHEDULED": "Заплановано",
+      "COMPLETED": "Завершено",
+      "CANCELLED": "Скасовано",
+      "IN_PROGRESS": "В процесі"
+    },
+    "assignmentStatus": {
+      "ASSIGNED": "Призначено",
+      "IN_PROGRESS": "В процесі",
+      "COMPLETED": "Завершено",
+      "CANCELLED": "Скасовано"
+    },
+    "exerciseCategory": {
+      "STRENGTH": "Сила",
+      "CARDIO": "Кардіо",
+      "FLEXIBILITY": "Гнучкість",
+      "BALANCE": "Баланс",
+      "PLYOMETRIC": "Пліометрика",
+      "OLYMPIC_LIFTING": "Олімпійська тяга",
+      "POWERLIFTING": "Пауерліфтинг",
+      "CALISTHENICS": "Калістеніка",
+      "STRETCHING": "Розтяжка",
+      "YOGA": "Йога",
+      "PILATES": "Пілатес"
+    },
+    "muscleGroup": {
+      "CHEST": "Груди",
+      "BACK": "Спина",
+      "SHOULDERS": "Плечі",
+      "BICEPS": "Біцепси",
+      "TRICEPS": "Трицепси",
+      "FOREARMS": "Передпліччя",
+      "CORE": "Кор",
+      "ABS": "Прес",
+      "OBLIQUES": "Косі м'язи",
+      "LOWER_BACK": "Поперек",
+      "QUADS": "Квадрицепси",
+      "HAMSTRINGS": "Задня поверхня стегна",
+      "GLUTES": "Сідниці",
+      "CALVES": "Ікри",
+      "FULL_BODY": "Все тіло"
+    }
   }
 }

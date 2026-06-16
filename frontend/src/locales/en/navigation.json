@@ -14,7 +14,9 @@
       "sessions": "Sessions",
       "notifications": "Notifications",
       "admin": "Admin",
-      "myPlans": "My Plans"
+      "myPlans": "My Plans",
+      "trainerSessions": "My Sessions",
+      "exerciseManagement": "Exercises"
     },
     "trainingLoad": {
       "label": "Training Load",
@@ -27,6 +29,7 @@
     "performanceHub": "Performance Hub",
     "liveMembers": "Live members",
     "online": "{{count}} online",
-    "member": "Member"
+    "member": "Member",
+    "fithubMember": "FitHub member"
   }
 }

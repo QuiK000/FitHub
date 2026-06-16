@@ -1,49 +1,87 @@
 {
+  "badge": "Адмін",
   "title": "Адміністрування",
-  "subtitle": "Керуйте абонементами, розсилайте повідомлення та переглядайте аналітику.",
+  "subtitle": "Керуйте членствами, надсилайте сповіщення та переглядайте аналітику системи.",
   "tabs": {
     "overview": "Огляд",
-    "memberships": "Абонементи",
+    "memberships": "Членства",
     "reviews": "Відгуки",
-    "broadcast": "Розсилка"
+    "broadcast": "Розсилка",
+    "exercises": "Вправи"
+  },
+  "exercises": {
+    "title": "Керування вправами",
+    "subtitle": "Створюйте, редагуйте та керуйте бібліотекою вправ",
+    "create": "Нова вправа",
+    "edit": "Редагувати вправу",
+    "name": "Назва вправи",
+    "category": "Категорія",
+    "muscleGroup": "Група м'язів",
+    "description": "Опис",
+    "activate": "Активувати",
+    "deactivate": "Деактивувати"
   },
   "overview": {
     "activeClients": "Активні клієнти",
-    "activeMemberships": "Активні абонементи",
+    "activeMemberships": "Активні членства",
     "revenue": "Дохід",
-    "todayCheckIns": "Сьогоднішні реєстрації"
+    "todayCheckIns": "Сьогоднішні відвідування"
   },
   "memberships": {
-    "searchPlaceholder": "Введіть ID клієнта",
-    "searchButton": "Пошук",
-    "createButton": "Створити абонемент",
-    "noResults": "Абонементів для цього клієнта не знайдено.",
+    "findClient": "Знайти клієнта",
+    "searchPlaceholder": "Пошук за ім'ям або email...",
+    "searchHint": "Почніть вводити ім'я або email клієнта для пошуку",
+    "noClientsFound": "Клієнтів не знайдено",
+    "noPhone": "Без телефону",
+    "memberSince": "Клієнт з {{date}}",
+    "selectClientFirst": "Спочатку оберіть клієнта",
+    "selectClientHint": "Шукайте клієнта вище для керування його членствами.",
+    "noMemberships": "У цього клієнта ще немає членств.",
+    "createButton": "Створити членство",
+    "noResults": "Членства для цього клієнта не знайдено.",
     "actions": {
       "activate": "Активувати",
       "freeze": "Заморозити",
       "unfreeze": "Розморозити",
-      "cancel": "Скасувати"
+      "cancel": "Скасувати",
+      "extend": "Продовжити"
     },
+    "visitsLeft": "Залишилось {{count}} відвідувань",
+    "unlimited": "Необмежені відвідування",
     "createModal": {
-      "title": "Створити абонемент",
+      "badge": "Нове членство",
+      "title": "Створити членство",
       "clientId": "ID клієнта",
       "planType": "Тип плану",
       "types": {
         "monthly": "Щомісячний",
-        "yearly": "Щорічний",
+        "yearly": "Річний",
         "visits": "За відвідуваннями"
       },
-      "durationMonths": "Тривалість (місяці)",
+      "durationMonths": "Тривалість (місяців)",
       "visitsLimit": "Ліміт відвідувань",
       "visitsLimitPlaceholder": "напр. 10",
       "createButton": "Створити"
     }
   },
+  "reviews": {
+    "title": "Модерація відгуків",
+    "filters": {
+      "all": "Усі",
+      "visible": "Видимі",
+      "hidden": "Приховані"
+    },
+    "trainerReview": "Відгук про тренера",
+    "noReviews": "Відгуків не знайдено",
+    "noReviewsDesc": "Відгуки від клієнтів з'являться тут.",
+    "visible": "Видимий",
+    "hidden": "Прихований"
+  },
   "broadcast": {
-    "title": "Розсилка повідомлень",
-    "subtitle": "Надішліть повідомлення всім користувачам.",
+    "title": "Сповіщення для всіх",
+    "subtitle": "Надішліть сповіщення всім користувачам.",
     "titleLabel": "Заголовок",
-    "titlePlaceholder": "Заголовок повідомлення",
+    "titlePlaceholder": "Заголовок сповіщення",
     "priorityLabel": "Пріоритет",
     "priorities": {
       "LOW": "Низький",
@@ -52,7 +90,7 @@
       "URGENT": "Терміновий"
     },
     "messageLabel": "Повідомлення",
-    "messagePlaceholder": "Текст повідомлення...",
+    "messagePlaceholder": "Текст сповіщення...",
     "sendButton": "Надіслати"
   }
 }

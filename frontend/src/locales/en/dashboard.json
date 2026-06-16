@@ -4,6 +4,19 @@
   "subtitle": "Your membership, hydration, training, and progress signals in one focused view for {{date}}.",
   "openWorkouts": "Open workouts",
   "trackProgress": "Track progress",
+  "trainer": {
+    "badge": "Dashboard",
+    "welcome": "Welcome back, {{name}}",
+    "overview": "Overview of your gym operations and key metrics.",
+    "title": "Trainer Dashboard",
+    "desc": "Use the navigation sidebar to access workout plans, sessions, analytics, and client management.",
+    "quickAccess": "Quick Access",
+    "workouts": "Workouts",
+    "sessions": "Sessions",
+    "analytics": "Analytics",
+    "managePlans": "Manage Plans",
+    "viewSessions": "View Sessions"
+  },
   "membership": {
     "title": "Membership",
     "notActive": "Not active",
@@ -67,9 +80,26 @@
     "noMeasurementsDesc": "Log your first body measurement to unlock trend tracking.",
     "addMeasurement": "Add measurement"
   },
+  "measurements": {
+    "latest": "Latest measurement",
+    "weight": "Weight",
+    "bodyFat": "Body fat",
+    "muscle": "Muscle",
+    "bmi": "BMI"
+  },
   "todayPlan": {
     "title": "Today's Plan",
     "desc": "The highest-value actions for your next workout day."
+  },
+  "admin": {
+    "activeClients": "Active clients",
+    "activeMemberships": "Active memberships",
+    "revenue": "Revenue",
+    "todayCheckIns": "Check-ins today"
+  },
+  "fallbacks": {
+    "there": "there",
+    "admin": "Admin"
   },
   "errors": {
     "loadFailed": "Some dashboard sections could not be refreshed. The rest of your overview is still available.",

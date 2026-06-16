@@ -64,16 +64,64 @@
     "noSessions": "Unable to load sessions.",
     "sessionJoined": "Joined session successfully.",
     "joinFailed": "Unable to join session.",
-    "reviewVisibilityUpdated": "Review visibility updated."
+    "reviewVisibilityUpdated": "Review visibility updated.",
+    "planCreated": "Workout plan created.",
+    "planAssigned": "Plan assigned to client.",
+    "exerciseAdded": "Exercise added to plan.",
+    "assignmentStarted": "Assignment started.",
+    "assignmentCompleted": "Assignment completed.",
+    "assignmentCancelled": "Assignment cancelled.",
+    "profileDeactivated": "Profile deactivated.",
+    "updated": "Profile updated successfully.",
+    "created": "Profile created successfully."
+  },
+  "gender": {
+    "male": "Male",
+    "female": "Female",
+    "other": "Other"
+  },
+  "fallbacks": {
+    "client": "Client",
+    "trainer": "Trainer",
+    "admin": "Admin",
+    "member": "Member",
+    "fithubMember": "FitHub member",
+    "there": "there",
+    "initialT": "T"
   },
   "errors": {
     "required": "This field is required",
     "invalidEmail": "Invalid email address",
+    "badRequest": "Invalid request. Please check your input.",
+    "conflict": "This resource already exists.",
+    "validationError": "Validation error. Please check your input.",
     "networkError": "Network error. Please try again.",
     "serverError": "Server error. Please try again later.",
     "unauthorized": "Unauthorized. Please log in.",
     "forbidden": "You don't have permission to access this resource.",
-    "notFound": "Resource not found."
+    "notFound": "Resource not found.",
+    "loadFailed": "Failed to load data.",
+    "resourceNotFound": "Resource not found.",
+    "rateLimitError": "Too many requests. Please try again later.",
+    "error": "An error occurred."
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {{current}} of {{total}}",
+    "showing": "Showing {{from}}–{{to}} of {{total}}"
+  },
+  "validation": {
+    "firstNameRequired": "First name is required.",
+    "lastNameRequired": "Last name is required.",
+    "phoneFormat": "Use E.164 format, for example +12025550123.",
+    "genderRequired": "Gender is required.",
+    "heightPositive": "Height must be positive.",
+    "weightPositive": "Weight must be positive.",
+    "waterTargetPositive": "Water target must be a positive whole number.",
+    "birthdateValid": "Enter a valid birthdate.",
+    "experienceRequired": "Experience must be at least 1 year.",
+    "descriptionRequired": "Description is required."
   },
   "footer": {
     "copyright": "\u00a9 2026 FitHub. All rights reserved.",
@@ -84,5 +132,95 @@
     "active": "Active",
     "inactive": "Inactive",
     "loading": "Loading..."
+  },
+  "enums": {
+    "difficultyLevel": {
+      "BEGINNER": "Beginner",
+      "INTERMEDIATE": "Intermediate",
+      "ADVANCED": "Advanced",
+      "EXPERT": "Expert"
+    },
+    "trainingType": {
+      "GROUP": "Group",
+      "PERSONAL": "Personal"
+    },
+    "membershipType": {
+      "MONTHLY": "Monthly",
+      "YEARLY": "Yearly",
+      "VISITS": "Visits"
+    },
+    "membershipStatus": {
+      "ACTIVE": "Active",
+      "EXPIRED": "Expired",
+      "FROZEN": "Frozen",
+      "CANCELLED": "Cancelled",
+      "CREATED": "Created"
+    },
+    "paymentStatus": {
+      "PAID": "Paid",
+      "PENDING": "Pending",
+      "COMPLETED": "Completed",
+      "FAILED": "Failed"
+    },
+    "goalType": {
+      "WEIGHT_LOSS": "Weight loss",
+      "MUSCLE_GAIN": "Muscle gain",
+      "ENDURANCE": "Endurance",
+      "STRENGTH": "Strength"
+    },
+    "recordType": {
+      "MAX_WEIGHT": "Max weight",
+      "MAX_REPS": "Max reps",
+      "MAX_DISTANCE": "Max distance",
+      "BEST_TIME": "Best time"
+    },
+    "photoAngle": {
+      "FRONT": "Front",
+      "BACK": "Back",
+      "SIDE_LEFT": "Side left",
+      "SIDE_RIGHT": "Side right"
+    },
+    "sessionStatus": {
+      "SCHEDULED": "Scheduled",
+      "COMPLETED": "Completed",
+      "CANCELLED": "Cancelled",
+      "IN_PROGRESS": "In progress"
+    },
+    "assignmentStatus": {
+      "ASSIGNED": "Assigned",
+      "IN_PROGRESS": "In progress",
+      "COMPLETED": "Completed",
+      "CANCELLED": "Cancelled"
+    },
+    "exerciseCategory": {
+      "STRENGTH": "Strength",
+      "CARDIO": "Cardio",
+      "FLEXIBILITY": "Flexibility",
+      "BALANCE": "Balance",
+      "PLYOMETRIC": "Plyometric",
+      "OLYMPIC_LIFTING": "Olympic Lifting",
+      "POWERLIFTING": "Powerlifting",
+      "CALISTHENICS": "Calisthenics",
+      "STRETCHING": "Stretching",
+      "YOGA": "Yoga",
+      "PILATES": "Pilates"
+    },
+    "muscleGroup": {
+      "CHEST": "Chest",
+      "BACK": "Back",
+      "SHOULDERS": "Shoulders",
+      "BICEPS": "Biceps",
+      "TRICEPS": "Triceps",
+      "FOREARMS": "Forearms",
+      "CORE": "Core",
+      "ABS": "Abs",
+      "OBLIQUES": "Obliques",
+      "LOWER_BACK": "Lower Back",
+      "QUADS": "Quads",
+      "HAMSTRINGS": "Hamstrings",
+      "GLUTES": "Glutes",
+      "CALVES": "Calves",
+      "FULL_BODY": "Full Body"
+    }
   }
 }

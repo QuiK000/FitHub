@@ -43,6 +43,11 @@
     "weight": "Weight (kg)",
     "waterTarget": "Water target (ml)",
     "gender": "Gender",
+    "genderLabels": {
+      "male": "Male",
+      "female": "Female",
+      "other": "Other"
+    },
     "cancelButton": "Cancel",
     "saveButton": "Save changes"
   },

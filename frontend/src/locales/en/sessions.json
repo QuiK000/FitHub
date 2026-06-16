@@ -1,4 +1,5 @@
 {
+  "badge": "Sessions",
   "title": "Training sessions",
   "subtitle": "Browse upcoming group and personal training sessions, join, or check in.",
   "upcoming": "Upcoming",
@@ -6,9 +7,25 @@
   "filter": {
     "all": "All"
   },
+  "errors": {
+    "loadFailed": "Unable to load training sessions.",
+    "joinFailed": "Unable to join session."
+  },
+  "fallbacks": {
+    "trainer": "Trainer"
+  },
+  "form": {
+    "sessionType": "Session Type",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "capacity": "Max Participants"
+  },
+  "viewAttendance": "View Attendance",
+  "checkInClient": "Check in client",
   "joined": "Joined",
   "alreadyJoined": "Already joined",
-  "sessionFull": "Session is full",
+  "sessionFull": "Join waitlist",
+  "waitlisted": "Added to waitlist.",
   "emptyState": {
     "title": "No sessions found",
     "description": "Check back later for new training sessions."

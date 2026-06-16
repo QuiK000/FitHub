@@ -55,7 +55,10 @@
     "title": "Record the work you completed for one exercise.",
     "exercise": "Exercise",
     "selectExercise": "Select an exercise",
-    "sets": "Reps completed",
+    "sets": "Sets completed",
+    "reps": "Reps",
+    "setsPlaceholder": "e.g. 3",
+    "repsPlaceholder": "e.g. 10",
     "weight": "Weight used (kg)",
     "weightPlaceholder": "Optional",
     "duration": "Duration (sec)",
@@ -127,7 +130,8 @@
     "assigning": "Assigning...",
     "assignButton": "Assign plan",
     "toastSuccess": "Plan assigned to client.",
-    "toastError": "Failed to assign plan."
+    "toastError": "Failed to assign plan.",
+    "searchFailed": "Failed to search clients."
   },
   "assignmentActions": {
     "start": "Start",
@@ -194,6 +198,7 @@
   "difficulty": {
     "BEGINNER": "Beginner",
     "INTERMEDIATE": "Intermediate",
-    "ADVANCED": "Advanced"
+    "ADVANCED": "Advanced",
+    "EXPERT": "Expert"
   }
 }
