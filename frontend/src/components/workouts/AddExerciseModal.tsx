@@ -153,7 +153,7 @@ export const AddExerciseModal = ({
                   ) : (
                     exercises.map((ex) => (
                       <option key={ex.id} value={ex.id}>
-                        {ex.name} — {ex.category}
+                        {ex.name} — {t('common:enums.exerciseCategory.' + ex.category)}
                       </option>
                     ))
                   )}

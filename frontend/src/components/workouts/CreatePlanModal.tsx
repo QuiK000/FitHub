@@ -16,7 +16,7 @@ type CreatePlanModalProps = {
 const difficultyOptions = ['BEGINNER', 'INTERMEDIATE', 'ADVANCED', 'EXPERT']
 
 export const CreatePlanModal = ({ isOpen, onClose, onCreated }: CreatePlanModalProps) => {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation(['workouts', 'common'])
   const [form, setForm] = useState({
     name: '',
     description: '',
@@ -40,10 +40,10 @@ export const CreatePlanModal = ({ isOpen, onClose, onCreated }: CreatePlanModalP
         sessionsPerWeek: Number(form.sessionsPerWeek),
       }
       await createWorkoutPlan(payload)
-      toast.success('Workout plan created successfully.')
+      toast.success(t('workouts:createPlan.toastSuccess'))
       await onCreated()
     } catch (err) {
-      toast.error(getApiErrorMessage(err, 'Failed to create workout plan.'))
+      toast.error(getApiErrorMessage(err, t('workouts:createPlan.toastError')))
     } finally {
       setIsSubmitting(false)
     }
@@ -52,7 +52,7 @@ export const CreatePlanModal = ({ isOpen, onClose, onCreated }: CreatePlanModalP
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-30 flex items-center justify-center bg-background/70 px-4 py-6 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 px-4 py-6 backdrop-blur-sm">
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -62,9 +62,9 @@ export const CreatePlanModal = ({ isOpen, onClose, onCreated }: CreatePlanModalP
             <div className="mb-5 flex items-center justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  New plan
+                  {t('createPlan.badge')}
                 </p>
-                <h2 className="mt-1 text-xl font-bold text-foreground">Create workout plan</h2>
+                <h2 className="mt-1 text-xl font-bold text-foreground">{t('createPlan.title')}</h2>
               </div>
               <button
                 type="button"
@@ -78,41 +78,41 @@ export const CreatePlanModal = ({ isOpen, onClose, onCreated }: CreatePlanModalP
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <label className="space-y-1.5">
-                <span className="text-xs text-foreground">Plan name *</span>
+                <span className="text-xs text-foreground">{t('createPlan.name')}</span>
                 <Input
                   value={form.name}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForm((p) => ({ ...p, name: e.target.value }))}
-                  placeholder="e.g. Strength Building Program"
+                  placeholder={t('createPlan.namePlaceholder')}
                   required
                 />
               </label>
 
               <label className="space-y-1.5">
-                <span className="text-xs text-foreground">Description</span>
+                <span className="text-xs text-foreground">{t('createPlan.description')}</span>
                 <textarea
                   className="min-h-[80px] w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
-                  placeholder="Describe the workout plan..."
+                  placeholder={t('createPlan.descriptionPlaceholder')}
                   value={form.description}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setForm((p) => ({ ...p, description: e.target.value }))}
                 />
               </label>
 
               <label className="space-y-1.5">
-                <span className="text-xs text-foreground">Difficulty level</span>
+                <span className="text-xs text-foreground">{t('createPlan.difficulty')}</span>
                 <select
                   value={form.difficultyLevel}
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setForm((p) => ({ ...p, difficultyLevel: e.target.value }))}
                   className="flex h-10 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
                 >
                   {difficultyOptions.map((opt) => (
-                    <option key={opt} value={opt}>{formatEnum(opt)}</option>
+                    <option key={opt} value={opt}>{t('common:enums.difficultyLevel.' + opt)}</option>
                   ))}
                 </select>
               </label>
 
               <div className="grid grid-cols-2 gap-3">
                 <label className="space-y-1.5">
-                  <span className="text-xs text-foreground">Duration (weeks)</span>
+                  <span className="text-xs text-foreground">{t('createPlan.duration')}</span>
                   <Input
                     type="number"
                     min={1}
@@ -122,7 +122,7 @@ export const CreatePlanModal = ({ isOpen, onClose, onCreated }: CreatePlanModalP
                   />
                 </label>
                 <label className="space-y-1.5">
-                  <span className="text-xs text-foreground">Sessions/week</span>
+                  <span className="text-xs text-foreground">{t('createPlan.sessionsPerWeek')}</span>
                   <Input
                     type="number"
                     min={1}
@@ -140,7 +140,7 @@ export const CreatePlanModal = ({ isOpen, onClose, onCreated }: CreatePlanModalP
                   disabled={isSubmitting}
                   className="inline-flex h-9 items-center justify-center rounded-xl px-4 text-sm font-medium text-foreground transition hover:bg-accent disabled:opacity-60"
                 >
-                  {t('buttons.cancel')}
+                  {t('common:buttons.cancel')}
                 </button>
                 <button
                   type="submit"
@@ -148,7 +148,7 @@ export const CreatePlanModal = ({ isOpen, onClose, onCreated }: CreatePlanModalP
                   className="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:opacity-60"
                 >
                   {isSubmitting && <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />}
-                  {t('buttons.create')}
+                  {isSubmitting ? t('createPlan.creating') : t('createPlan.createButton')}
                 </button>
               </div>
             </form>
@@ -158,10 +158,3 @@ export const CreatePlanModal = ({ isOpen, onClose, onCreated }: CreatePlanModalP
     </AnimatePresence>
   )
 }
-
-const formatEnum = (value: string) =>
-  value
-    .toLowerCase()
-    .split('_')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ')

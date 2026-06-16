@@ -55,7 +55,7 @@ export const AssignPlanModal = ({
       setClients(res.content)
     } catch (err) {
       console.error(err)
-      toast.error(getApiErrorMessage(err, 'Failed to search clients.'))
+      toast.error(getApiErrorMessage(err, t('assign.searchFailed')))
     } finally {
       setIsSearching(false)
     }

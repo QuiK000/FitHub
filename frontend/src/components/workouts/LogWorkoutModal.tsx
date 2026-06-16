@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useTranslation } from 'react-i18next'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import { Button } from '../ui/button'
@@ -11,6 +12,7 @@ import type {
 import { logWorkout } from '../../services/workout.service'
 import { getApiErrorMessage } from '../../utils/errorHandler'
 import toast from '../../utils/toast'
+
 
 type LogWorkoutModalProps = {
   isOpen: boolean
@@ -39,6 +41,7 @@ export const LogWorkoutModal = ({
   exercises,
   onLogged,
 }: LogWorkoutModalProps) => {
+  const { t } = useTranslation(['workouts', 'common'])
   const [form, setForm] = useState<LogForm>(() => createInitialForm(exercises))
   const [errors, setErrors] = useState<LogFormErrors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -68,11 +71,11 @@ export const LogWorkoutModal = ({
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    const nextErrors = validateLogForm(form)
+    const nextErrors = validateLogForm(form, t)
     setErrors(nextErrors)
 
     if (Object.keys(nextErrors).length > 0) {
-      toast.error('Please fix the highlighted workout fields.')
+      toast.error(t('logWorkout.validationError'))
       return
     }
 
@@ -94,7 +97,7 @@ export const LogWorkoutModal = ({
       await onLogged?.()
     } catch (err) {
       console.error(err)
-      toast.error(getApiErrorMessage(err, 'Unable to log your workout.'))
+      toast.error(getApiErrorMessage(err, t('logWorkout.logError')))
     } finally {
       setIsSubmitting(false)
     }
@@ -103,7 +106,7 @@ export const LogWorkoutModal = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-background/70 px-4 py-6 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 px-4 py-6 backdrop-blur-sm">
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -113,18 +116,18 @@ export const LogWorkoutModal = ({
             <div className="mb-5 flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Log workout
+                  {t('logWorkout.badge')}
                 </p>
                 <h2 className="mt-1 text-xl font-bold text-foreground">
                   {assignment.workoutPlan.name}
                 </h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Record the work you completed for one exercise.
+                  {t('logWorkout.title')}
                 </p>
               </div>
               <button
                 type="button"
-                aria-label="Close workout logger"
+                aria-label={t('common:buttons.close')}
                 onClick={onClose}
                 disabled={isSubmitting}
                 className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border bg-background text-muted-foreground transition hover:bg-accent hover:text-accent-foreground disabled:cursor-not-allowed disabled:opacity-60"
@@ -137,7 +140,7 @@ export const LogWorkoutModal = ({
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="space-y-1.5">
                   <label htmlFor="exerciseId" className="text-xs text-foreground">
-                    Exercise
+                    {t('logWorkout.exercise')}
                   </label>
                   <select
                     id="exerciseId"
@@ -152,7 +155,7 @@ export const LogWorkoutModal = ({
                         key={exercise.id}
                         value={exercise.exercise.exerciseId}
                       >
-                        {exercise.exercise.name} - Day {exercise.dayNumber}
+                        {exercise.exercise.name} {t('logWorkout.dayLabel', { n: exercise.dayNumber })}
                       </option>
                     ))}
                   </select>
@@ -163,62 +166,62 @@ export const LogWorkoutModal = ({
 
                 {selectedExercise && (
                   <div className="rounded-2xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
-                    Target:{' '}
+                    {t('logWorkout.target')}{' '}
                     <span className="font-semibold text-foreground">
                       {[
                         selectedExercise.sets && selectedExercise.reps
-                          ? `${selectedExercise.sets} sets x ${selectedExercise.reps} reps`
+                          ? t('detail.setsReps', { sets: selectedExercise.sets, reps: selectedExercise.reps })
                           : null,
                         selectedExercise.durationSeconds
                           ? `${selectedExercise.durationSeconds}s`
                           : null,
                         selectedExercise.restSeconds
-                          ? `${selectedExercise.restSeconds}s rest`
+                          ? t('detail.restTime', { n: selectedExercise.restSeconds })
                           : null,
                       ]
                         .filter(Boolean)
-                        .join(' · ') || 'Complete as prescribed'}
+                        .join(' · ') || t('logWorkout.completeAsPrescribed')}
                     </span>
                   </div>
                 )}
 
                 <div className="grid gap-3 md:grid-cols-2">
                   <LogInput
-                    label="Sets completed"
+                    label={t('logWorkout.sets')}
                     value={form.setsCompleted}
                     error={errors.setsCompleted}
                     onChange={(value) => updateField('setsCompleted', value)}
-                    placeholder="e.g. 3"
+                    placeholder={t('logWorkout.setsPlaceholder')}
                   />
                   <LogInput
-                    label="Reps completed"
+                    label={t('logWorkout.reps')}
                     value={form.repsCompleted}
                     error={errors.repsCompleted}
                     onChange={(value) => updateField('repsCompleted', value)}
-                    placeholder="e.g. 10"
+                    placeholder={t('logWorkout.repsPlaceholder')}
                   />
                 </div>
 
                 <div className="grid gap-3 md:grid-cols-3">
                   <LogInput
-                    label="Weight used (kg)"
+                    label={t('logWorkout.weight')}
                     value={form.weightUsed}
                     error={errors.weightUsed}
                     onChange={(value) => updateField('weightUsed', value)}
-                    placeholder="Optional"
+                    placeholder={t('common:labels.optional')}
                     step="0.5"
                     min="0"
                   />
                   <LogInput
-                    label="Duration (sec)"
+                    label={t('logWorkout.duration')}
                     value={form.durationSeconds}
                     error={errors.durationSeconds}
                     onChange={(value) => updateField('durationSeconds', value)}
-                    placeholder="Optional"
+                    placeholder={t('common:labels.optional')}
                     min="0"
                   />
                   <LogInput
-                    label="Difficulty (1-5)"
+                    label={t('logWorkout.difficulty')}
                     value={form.difficulty}
                     error={errors.difficulty}
                     onChange={(value) => updateField('difficulty', value)}
@@ -229,10 +232,10 @@ export const LogWorkoutModal = ({
                 </div>
 
                 <label className="space-y-1.5">
-                  <span className="text-xs text-foreground">Notes</span>
+                  <span className="text-xs text-foreground">{t('logWorkout.notes')}</span>
                   <textarea
                     className="min-h-[88px] w-full rounded-xl border border-border bg-background px-3 py-2 text-sm text-foreground shadow-soft placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
-                    placeholder="How did this workout feel?"
+                    placeholder={t('logWorkout.notesPlaceholder')}
                     value={form.notes}
                     onChange={(event) => updateField('notes', event.target.value)}
                   />
@@ -247,7 +250,7 @@ export const LogWorkoutModal = ({
                     onClick={onClose}
                     disabled={isSubmitting}
                   >
-                    Cancel
+                    {t('common:buttons.cancel')}
                   </Button>
                   <Button
                     type="submit"
@@ -258,13 +261,13 @@ export const LogWorkoutModal = ({
                     {isSubmitting && (
                       <span className="mr-2 inline-flex h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
                     )}
-                    {isSubmitting ? 'Logging...' : 'Log workout'}
+                    {isSubmitting ? t('logWorkout.logging') : t('logWorkout.logButton')}
                   </Button>
                 </div>
               </form>
             ) : (
               <div className="rounded-2xl border border-dashed border-border bg-muted/30 p-5 text-sm text-muted-foreground">
-                This plan does not have exercises yet, so there is nothing to log.
+                {t('logWorkout.noExercises')}
               </div>
             )}
           </motion.div>
@@ -287,24 +290,24 @@ const createInitialForm = (exercises: WorkoutPlanExerciseResponse[]): LogForm =>
 const toOptionalNumber = (value: string) =>
   value.trim() === '' ? undefined : Number(value)
 
-const validateLogForm = (form: LogForm): LogFormErrors => {
+const validateLogForm = (form: LogForm, t: (key: string) => string): LogFormErrors => {
   const errors: LogFormErrors = {}
 
-  if (!form.exerciseId) errors.exerciseId = 'Choose an exercise.'
+  if (!form.exerciseId) errors.exerciseId = t('workouts:logWorkout.validateExercise')
   if (form.setsCompleted && !isIntegerAtLeast(form.setsCompleted, 1)) {
-    errors.setsCompleted = 'Sets must be at least 1.'
+    errors.setsCompleted = t('workouts:logWorkout.validateSets')
   }
   if (form.repsCompleted && !isIntegerAtLeast(form.repsCompleted, 1)) {
-    errors.repsCompleted = 'Reps must be at least 1.'
+    errors.repsCompleted = t('workouts:logWorkout.validateReps')
   }
   if (form.weightUsed && !isNumberAtLeast(form.weightUsed, 0)) {
-    errors.weightUsed = 'Weight cannot be negative.'
+    errors.weightUsed = t('workouts:logWorkout.validateWeight')
   }
   if (form.durationSeconds && !isIntegerAtLeast(form.durationSeconds, 0)) {
-    errors.durationSeconds = 'Duration cannot be negative.'
+    errors.durationSeconds = t('workouts:logWorkout.validateDuration')
   }
   if (form.difficulty && !isIntegerBetween(form.difficulty, 1, 5)) {
-    errors.difficulty = 'Difficulty must be between 1 and 5.'
+    errors.difficulty = t('workouts:logWorkout.validateDifficulty')
   }
 
   return errors
