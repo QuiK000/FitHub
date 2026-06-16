@@ -16,9 +16,9 @@ export const MetricCard = ({ icon: Icon, title, value, label, tone }: MetricCard
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.25 }}
   >
-    <Card className="h-full">
-      <CardContent className="flex min-h-[140px] items-start justify-between gap-4 p-5">
-        <div className="flex flex-col justify-between">
+    <Card className="h-full overflow-hidden">
+      <CardContent className="flex min-h-[140px] items-center justify-between gap-4 p-5">
+        <div className="flex min-w-0 flex-col justify-between">
           <div>
             <p className="text-xs font-medium text-muted-foreground">{title}</p>
             <p className="mt-2 text-2xl font-bold text-foreground">{value}</p>

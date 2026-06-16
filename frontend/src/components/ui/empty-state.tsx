@@ -8,6 +8,7 @@ type EmptyStateProps = {
   description: string
   actionLabel?: string
   to?: string
+  onClick?: () => void
 }
 
 export const EmptyState = ({
@@ -16,6 +17,7 @@ export const EmptyState = ({
   description,
   actionLabel,
   to,
+  onClick,
 }: EmptyStateProps) => (
   <div className="flex min-h-48 flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-muted/30 p-8 text-center">
     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-background">
@@ -31,6 +33,16 @@ export const EmptyState = ({
         {actionLabel}
         <ArrowRight className="h-4 w-4" />
       </Link>
+    )}
+    {actionLabel && onClick && !to && (
+      <button
+        type="button"
+        onClick={onClick}
+        className="mt-4 inline-flex w-fit items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+      >
+        {actionLabel}
+        <ArrowRight className="h-4 w-4" />
+      </button>
     )}
   </div>
 )

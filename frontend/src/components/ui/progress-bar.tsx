@@ -6,7 +6,13 @@ type ProgressBarProps = {
 }
 
 export const ProgressBar = ({ value, className }: ProgressBarProps) => (
-  <div className={`h-2 overflow-hidden rounded-full bg-muted ${className ?? ''}`}>
+  <div
+    role="progressbar"
+    aria-valuenow={clampPercentage(value)}
+    aria-valuemin={0}
+    aria-valuemax={100}
+    className={`h-2 overflow-hidden rounded-full bg-muted ${className ?? ''}`}
+  >
     <div
       className="h-full rounded-full bg-primary transition-all duration-500"
       style={{ width: `${clampPercentage(value)}%` }}
