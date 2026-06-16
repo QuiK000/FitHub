@@ -1,4 +1,5 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '../store/useAuthStore'
 import type { RoleName } from '../types/user.types'
 
@@ -9,6 +10,7 @@ type ProtectedRouteProps = {
 const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
   const { isAuthenticated, token, roles, user } = useAuthStore()
   const location = useLocation()
+  const { t } = useTranslation('common')
 
   if (!isAuthenticated && !token) {
     return <Navigate to="/login" replace state={{ from: location }} />
@@ -19,7 +21,7 @@ const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
       <div className="flex min-h-[50vh] items-center justify-center">
         <div className="flex items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3 text-sm text-foreground shadow-soft-lg">
           <span className="inline-flex h-4 w-4 animate-spin rounded-full border-2 border-border border-t-primary" />
-          Loading...
+          {t('buttons.loading')}
         </div>
       </div>
     )
