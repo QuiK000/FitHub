@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ClientProfileResponse {
+    private String id;
     private String firstname;
     private String lastname;
     private String phone;

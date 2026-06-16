@@ -27,6 +27,7 @@ public class ClientProfileMapper {
 
     public ClientProfileResponse toResponse(ClientProfile profile) {
         return ClientProfileResponse.builder()
+                .id(profile.getId() != null ? profile.getId() : null)
                 .firstname(profile.getFirstname())
                 .lastname(profile.getLastname())
                 .phone(profile.getPhone())
