@@ -41,13 +41,15 @@ export const getTrainerReviews = async (
   return data
 }
 
-export const getTrainerReviewSummary = async (
-  trainerId: string,
-): Promise<TrainerReviewSummaryResponse> => {
-  const { data } = await api.get<TrainerReviewSummaryResponse>(
-    `/reviews/trainers/${trainerId}/summary`,
-  )
-  return data
+export const getTrainerReviewSummary = async (): Promise<TrainerReviewSummaryResponse | null> => {
+  try {
+    const { data } = await api.get<TrainerReviewSummaryResponse>(
+      '/reviews/me/summary',
+    )
+    return data
+  } catch {
+    return null
+  }
 }
 
 export const createTrainerReview = async (
@@ -74,6 +76,17 @@ export const getMyReviews = async (
 ): Promise<PageResponse<TrainerReviewResponse>> => {
   const { data } = await api.get<PageResponse<TrainerReviewResponse>>(
     '/reviews/my-reviews',
+    { params: { page, size } },
+  )
+  return data
+}
+
+export const getMyTrainerReviews = async (
+  page = 0,
+  size = 10,
+): Promise<PageResponse<TrainerReviewResponse>> => {
+  const { data } = await api.get<PageResponse<TrainerReviewResponse>>(
+    '/reviews/me',
     { params: { page, size } },
   )
   return data

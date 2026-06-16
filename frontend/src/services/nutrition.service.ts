@@ -1,6 +1,6 @@
 import axios from 'axios'
 import api from './api'
-import type { PageResponse } from '../types/common.types'
+import type { MessageResponse, PageResponse } from '../types/common.types'
 import type {
   CreateMealPlanRequest,
   CreateMealRequest,
@@ -21,6 +21,7 @@ export type {
   LogWaterIntakeRequest,
   MealResponse,
   MealPlanResponse,
+  UpdateMealPlanRequest,
   WaterIntakeResponse,
 } from '../types/nutrition.types'
 
@@ -134,8 +135,8 @@ export const updateMeal = async (
 
 export const completeMeal = async (
   mealId: string,
-): Promise<MealResponse> => {
-  const { data } = await api.patch<MealResponse>(
+): Promise<MessageResponse> => {
+  const { data } = await api.patch<MessageResponse>(
     `/nutrition/meals/${mealId}/complete`,
   )
   return data
@@ -186,6 +187,15 @@ export const getWeeklyMealPlans = async (
   const { data } = await api.get<PageResponse<MealPlanResponse>>(
     '/nutrition/meal-plans/weekly',
     { params: { startDate } },
+  )
+  return data
+}
+
+export const deactivateFood = async (
+  foodId: string,
+): Promise<MessageResponse> => {
+  const { data } = await api.patch<MessageResponse>(
+    `/nutrition/foods/${foodId}/deactivate`,
   )
   return data
 }

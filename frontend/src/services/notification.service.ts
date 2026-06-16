@@ -76,3 +76,12 @@ export const getScheduledNotifications = async (
   )
   return data
 }
+
+export const broadcastNotification = async (payload: {
+  title: string
+  message: string
+  priority: string
+  type: string
+}): Promise<void> => {
+  await api.post('/notifications/broadcast', payload)
+}

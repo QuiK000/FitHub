@@ -7,11 +7,18 @@ import type {
     AttendanceSessionResponse,
     CheckInResponse,
     ClientWorkoutPlanResponse,
+    CreateExerciseRequest,
+    CreateTrainingSessionRequest,
     CreateWorkoutPlanRequest,
     ExerciseResponse,
     LogWorkoutRequest,
+    ReorderWorkoutPlanExerciseRequest,
     TrainingSessionResponse,
+    UpdateExerciseRequest,
+    UpdatePlanExerciseRequest,
+    UpdateTrainingSessionRequest,
     UpdateWorkoutPlanRequest,
+    WaitlistResponse,
     WorkoutLogResponse,
     WorkoutPlanExerciseResponse,
     WorkoutPlanResponse,
@@ -338,8 +345,8 @@ export const getWorkoutLogsByExercise = async (
 
 export const joinWaitlist = async (
     sessionId: string,
-): Promise<MessageResponse> => {
-    const {data} = await api.post<MessageResponse>(
+): Promise<WaitlistResponse> => {
+    const {data} = await api.post<WaitlistResponse>(
         `/sessions/${sessionId}/waitlist`,
     )
     return data
@@ -347,9 +354,131 @@ export const joinWaitlist = async (
 
 export const leaveWaitlist = async (
     sessionId: string,
+): Promise<void> => {
+    await api.delete(`/sessions/${sessionId}/waitlist`)
+}
+
+export const deletePlanExercise = async (
+    planId: string,
+    exerciseId: string,
+    day?: number,
 ): Promise<MessageResponse> => {
     const {data} = await api.delete<MessageResponse>(
-        `/sessions/${sessionId}/waitlist`,
+        `/workout-plans/${planId}/exercises/${exerciseId}`,
+        {params: {day}},
+    )
+    return data
+}
+
+export const updatePlanExercise = async (
+    planId: string,
+    exerciseId: string,
+    payload: UpdatePlanExerciseRequest,
+): Promise<WorkoutPlanExerciseResponse> => {
+    const {data} = await api.put<WorkoutPlanExerciseResponse>(
+        `/workout-plans/${planId}/exercises/${exerciseId}`,
+        payload,
+    )
+    return data
+}
+
+export const reorderPlanExercises = async (
+    planId: string,
+    payload: ReorderWorkoutPlanExerciseRequest,
+): Promise<MessageResponse> => {
+    const {data} = await api.patch<MessageResponse>(
+        `/workout-plans/${planId}/exercises/reorder`,
+        payload,
+    )
+    return data
+}
+
+export const getAllPlans = async (
+    page = 0,
+    size = 10,
+    difficulty?: string,
+): Promise<PageResponse<WorkoutPlanResponse>> => {
+    const {data} = await api.get<PageResponse<WorkoutPlanResponse>>(
+        '/workout-plans',
+        {params: {page, size, ...(difficulty ? {difficulty} : {})}},
+    )
+    return data
+}
+
+export const activatePlan = async (
+    planId: string,
+): Promise<MessageResponse> => {
+    const {data} = await api.patch<MessageResponse>(
+        `/workout-plans/${planId}/activate`,
+    )
+    return data
+}
+
+export const deactivatePlan = async (
+    planId: string,
+): Promise<MessageResponse> => {
+    const {data} = await api.patch<MessageResponse>(
+        `/workout-plans/${planId}/deactivate`,
+    )
+    return data
+}
+
+export const createExercise = async (
+    payload: CreateExerciseRequest,
+): Promise<ExerciseResponse> => {
+    const {data} = await api.post<ExerciseResponse>(
+        '/exercises',
+        payload,
+    )
+    return data
+}
+
+export const updateExercise = async (
+    exerciseId: string,
+    payload: UpdateExerciseRequest,
+): Promise<ExerciseResponse> => {
+    const {data} = await api.put<ExerciseResponse>(
+        `/exercises/${exerciseId}`,
+        payload,
+    )
+    return data
+}
+
+export const activateExercise = async (
+    exerciseId: string,
+): Promise<MessageResponse> => {
+    const {data} = await api.patch<MessageResponse>(
+        `/exercises/${exerciseId}/activate`,
+    )
+    return data
+}
+
+export const deactivateExercise = async (
+    exerciseId: string,
+): Promise<MessageResponse> => {
+    const {data} = await api.patch<MessageResponse>(
+        `/exercises/${exerciseId}/deactivate`,
+    )
+    return data
+}
+
+export const createSession = async (
+    payload: CreateTrainingSessionRequest,
+): Promise<TrainingSessionResponse> => {
+    const {data} = await api.post<TrainingSessionResponse>(
+        '/sessions',
+        payload,
+    )
+    return data
+}
+
+export const updateSession = async (
+    sessionId: string,
+    payload: UpdateTrainingSessionRequest,
+): Promise<TrainingSessionResponse> => {
+    const {data} = await api.put<TrainingSessionResponse>(
+        `/sessions/${sessionId}`,
+        payload,
     )
     return data
 }
