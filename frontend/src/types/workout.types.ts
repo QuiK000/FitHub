@@ -134,7 +134,7 @@ export interface CreateTrainingSessionRequest {
 }
 
 export interface UpdateTrainingSessionRequest {
-  starTime?: ISODateTimeString
+  startTime?: ISODateTimeString
   endTime?: ISODateTimeString
   maxParticipants?: number
 }

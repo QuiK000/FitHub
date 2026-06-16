@@ -1,6 +1,6 @@
 import type { ISODateTimeString } from './common.types'
 
-export type NotificationPriority = 'LOW' | 'NORMAL' | 'HIGH' | 'URGENT'
+export type NotificationPriority = 'LOW' | 'NORMAL' | 'MEDIUM' | 'HIGH' | 'URGENT'
 
 export type NotificationType =
   | 'SESSION_REMINDER'

@@ -52,7 +52,7 @@ export interface UpdateTrainerProfileRequest {
 }
 
 export interface ClientProfileResponse {
-  id?: string
+  id: string
   firstname: string
   lastname: string
   phone: string
@@ -110,14 +110,6 @@ export interface TrainerShortResponse {
 }
 
 export interface TrainerAttendanceMetrics {
-  totalSessions: number
-  totalClients: number
-  attendanceRate: number
-}
-
-export interface TrainerAnalyticsResponse {
-  trainerId: string
-  trainerName: string
   totalSessions: number
   totalClients: number
   attendanceRate: number

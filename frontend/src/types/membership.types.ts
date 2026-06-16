@@ -9,6 +9,7 @@ export type MembershipStatus =
 
 export type MembershipType = 'MONTHLY' | 'YEARLY' | 'VISITS'
 export type PaymentStatus = 'PAID' | 'PENDING' | 'FAILED'
+export type PaymentCurrency = 'USD' | 'EUR' | 'UAH' | 'TRX' | 'BTC' | 'ETH' | 'USDT'
 
 export interface CreateMembershipRequest {
   clientId: string
