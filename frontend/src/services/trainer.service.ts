@@ -1,3 +1,4 @@
+import axios from 'axios'
 import api from './api'
 import type { PageResponse } from '../types'
 import type {
@@ -29,6 +30,15 @@ export const getTrainers = async (
   return data
 }
 
+export const getTrainerById = async (
+  trainerId: string,
+): Promise<TrainerProfileResponse> => {
+  const { data } = await api.get<TrainerProfileResponse>(
+    `/profile/trainer/${trainerId}`,
+  )
+  return data
+}
+
 export const getTrainerReviews = async (
   trainerId: string,
   page = 0,
@@ -47,8 +57,11 @@ export const getTrainerReviewSummary = async (): Promise<TrainerReviewSummaryRes
       '/reviews/me/summary',
     )
     return data
-  } catch {
-    return null
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      return null
+    }
+    throw error
   }
 }
 

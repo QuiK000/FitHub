@@ -5,8 +5,10 @@ import axios, {
 } from 'axios'
 import type { AuthenticationResponse } from '../types/auth.types'
 
-const API_BASE_URL =
+export const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080/api/v1'
+
+const API_TIMEOUT = 30_000
 
 type RetriableRequestConfig = InternalAxiosRequestConfig & {
   _retry?: boolean
@@ -15,7 +17,7 @@ type RetriableRequestConfig = InternalAxiosRequestConfig & {
 export const api = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
-  timeout: 30000, // 30 seconds
+  timeout: API_TIMEOUT,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -24,7 +26,7 @@ export const api = axios.create({
 const refreshApi = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
-  timeout: 30000,
+  timeout: API_TIMEOUT,
   headers: {
     'Content-Type': 'application/json',
   },

@@ -1,6 +1,8 @@
 import api from './api'
 import type { PageResponse } from '../types'
 import type {
+  BroadcastNotificationRequest,
+  CreateNotificationRequest,
   NotificationResponse,
   NotificationSummaryResponse,
 } from '../types'
@@ -55,14 +57,9 @@ export const markAllAsRead = async (): Promise<void> => {
   await api.patch('/notifications/mark-all-read')
 }
 
-export const sendNotification = async (payload: {
-  recipientId: string
-  type: string
-  priority: string
-  title: string
-  message: string
-  actionUrl?: string
-}): Promise<void> => {
+export const sendNotification = async (
+  payload: CreateNotificationRequest,
+): Promise<void> => {
   await api.post('/notifications/send', payload)
 }
 
@@ -77,11 +74,8 @@ export const getScheduledNotifications = async (
   return data
 }
 
-export const broadcastNotification = async (payload: {
-  title: string
-  message: string
-  priority: string
-  type: string
-}): Promise<void> => {
+export const broadcastNotification = async (
+  payload: BroadcastNotificationRequest,
+): Promise<void> => {
   await api.post('/notifications/broadcast', payload)
 }

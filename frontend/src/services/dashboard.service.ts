@@ -4,6 +4,7 @@ import type {
   DashboardAnalyticsResponse,
 } from '../types/dashboard.types'
 import type { TrainerAnalyticsResponse, ClientAnalyticsResponse } from '../types'
+import type { RevenueStatsResponse } from '../types/membership.types'
 
 export type {
   AttendanceStatsResponse,
@@ -56,8 +57,8 @@ export const getClientAnalytics = async (
 export const getRevenueStats = async (
   from: string,
   to: string,
-): Promise<{ date: string; revenue: number }[]> => {
-  const { data } = await api.get<{ date: string; revenue: number }[]>(
+): Promise<RevenueStatsResponse[]> => {
+  const { data } = await api.get<RevenueStatsResponse[]>(
     '/analytics/revenue',
     { params: { from, to } },
   )

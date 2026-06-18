@@ -1,3 +1,4 @@
+import axios from 'axios'
 import api from './api'
 import type { MessageResponse, PageResponse } from '../types'
 import type {
@@ -15,6 +16,7 @@ import type {
     ReorderWorkoutPlanExerciseRequest,
     TrainingSessionResponse,
     UpdateExerciseRequest,
+    UpdateLogWorkoutRequest,
     UpdatePlanExerciseRequest,
     UpdateTrainingSessionRequest,
     UpdateWorkoutPlanRequest,
@@ -29,7 +31,6 @@ export type {
     AssignWorkoutPlanRequest,
     AttendanceResponse,
     AttendanceSessionResponse,
-    AttendanceStatsResponse,
     CheckInResponse,
     CheckInTrainingSessionRequest,
     ClientWorkoutPlanResponse,
@@ -70,12 +71,9 @@ export const getMyActiveAssignments =
                 '/workout-plans/my-assignments/active',
             )
             return data
-        } catch (error) {
-            if ((error as { response?: { status?: number } }).response?.status === 404) {
-                const {data} = await api.get<ClientWorkoutPlanResponse[]>(
-                    '/workout-plans/my-assignments',
-                )
-                return data
+    } catch (error) {
+        if (axios.isAxiosError(error) && error.response?.status === 404) {
+                return []
             }
 
             throw error
@@ -127,6 +125,37 @@ export const getMyWorkoutLogs = async (
         {
             params: {page, size},
         },
+    )
+    return data
+}
+
+export const getAllWorkoutLogs = async (
+    page = 0,
+    size = 10,
+): Promise<PageResponse<WorkoutLogResponse>> => {
+    const {data} = await api.get<PageResponse<WorkoutLogResponse>>(
+        '/workout-logs',
+        {params: {page, size}},
+    )
+    return data
+}
+
+export const getWorkoutLogById = async (
+    workoutLogId: string,
+): Promise<WorkoutLogResponse> => {
+    const {data} = await api.get<WorkoutLogResponse>(
+        `/workout-logs/${workoutLogId}`,
+    )
+    return data
+}
+
+export const updateWorkoutLog = async (
+    workoutLogId: string,
+    payload: UpdateLogWorkoutRequest,
+): Promise<WorkoutLogResponse> => {
+    const {data} = await api.put<WorkoutLogResponse>(
+        `/workout-logs/${workoutLogId}`,
+        payload,
     )
     return data
 }
@@ -338,6 +367,18 @@ export const getWorkoutLogsByExercise = async (
 ): Promise<PageResponse<WorkoutLogResponse>> => {
     const {data} = await api.get<PageResponse<WorkoutLogResponse>>(
         `/workout-logs/exercise/${exerciseId}`,
+        {params: {page, size}},
+    )
+    return data
+}
+
+export const getWorkoutLogsByAssignment = async (
+    assignmentId: string,
+    page = 0,
+    size = 10,
+): Promise<PageResponse<WorkoutLogResponse>> => {
+    const {data} = await api.get<PageResponse<WorkoutLogResponse>>(
+        `/workout-logs/assignment/${assignmentId}`,
         {params: {page, size}},
     )
     return data
