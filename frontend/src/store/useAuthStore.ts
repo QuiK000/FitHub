@@ -145,9 +145,6 @@ export const useAuthStore = create<AuthState>((set, get) => {
       } catch (error) {
         if (axios.isAxiosError(error) && error.response?.status === 401) {
           clearAuthState()
-        } else {
-          console.error('Failed to fetch current user', error)
-          clearAuthState()
         }
       }
     },

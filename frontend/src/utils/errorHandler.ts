@@ -8,14 +8,17 @@ export interface ApiError {
   details?: Record<string, unknown>
 }
 
-const authMessageByStatus: Record<number, string> = {
-  400: i18n.t('common:errors.badRequest'),
-  401: i18n.t('common:errors.unauthorized'),
-  403: i18n.t('common:errors.forbidden'),
-  404: i18n.t('common:errors.notFound'),
-  409: i18n.t('common:errors.conflict'),
-  422: i18n.t('common:errors.validationError'),
-  429: i18n.t('common:errors.rateLimitError'),
+const getAuthMessageByStatus = (status: number): string | null => {
+  const messages: Record<number, string> = {
+    400: i18n.t('common:errors.badRequest'),
+    401: i18n.t('common:errors.unauthorized'),
+    403: i18n.t('common:errors.forbidden'),
+    404: i18n.t('common:errors.notFound'),
+    409: i18n.t('common:errors.conflict'),
+    422: i18n.t('common:errors.validationError'),
+    429: i18n.t('common:errors.rateLimitError'),
+  }
+  return messages[status] ?? null
 }
 
 export const getApiErrorMessage = (
@@ -32,8 +35,9 @@ export const getApiErrorMessage = (
       return i18n.t('common:errors.networkError')
     }
 
-    if (status && authMessageByStatus[status]) {
-      return authMessageByStatus[status]
+    if (status) {
+      const authMessage = getAuthMessageByStatus(status)
+      if (authMessage) return authMessage
     }
 
     return responseData?.message || responseData?.error || fallback
