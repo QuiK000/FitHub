@@ -30,6 +30,11 @@ export const CreatePlanModal = ({ isOpen, onClose, onCreated }: CreatePlanModalP
     e.preventDefault()
     if (!form.name.trim()) return
 
+    const weeks = Number(form.durationWeeks)
+    const sessions = Number(form.sessionsPerWeek)
+    if (!Number.isFinite(weeks) || weeks < 1) return
+    if (!Number.isFinite(sessions) || sessions < 1 || sessions > 7) return
+
     setIsSubmitting(true)
     try {
       const payload: CreateWorkoutPlanRequest = {

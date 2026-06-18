@@ -65,7 +65,6 @@ export const AddExerciseModal = ({
           }))
         })
         .catch((err) => {
-          console.error(err)
           toast.error(getApiErrorMessage(err, t('addExercise.loadExercisesFailed')))
         })
         .finally(() => setIsLoadingExercises(false))

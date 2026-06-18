@@ -10,6 +10,7 @@ import {
 } from '../../services/workout.service'
 import { searchClients, type ClientProfileResponse } from '../../services/user.service'
 import { getApiErrorMessage } from '../../utils/errorHandler'
+import { toBackendDateTime, toDateInputValue } from '../../lib/utils'
 import toast from '../../utils/toast'
 
 type AssignPlanModalProps = {
@@ -30,10 +31,7 @@ export const AssignPlanModal = ({
   const [clients, setClients] = useState<ClientProfileResponse[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const [selectedClientId, setSelectedClientId] = useState<string>('')
-  const [startDate, setStartDate] = useState(() => {
-    const now = new Date()
-    return now.toISOString().slice(0, 10)
-  })
+  const [startDate, setStartDate] = useState(() => toDateInputValue())
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
@@ -41,7 +39,7 @@ export const AssignPlanModal = ({
     setSearchQuery('')
     setClients([])
     setSelectedClientId('')
-    setStartDate(new Date().toISOString().slice(0, 10))
+    setStartDate(toDateInputValue())
   }, [isOpen])
 
   const doSearch = useCallback(async (query: string) => {
@@ -53,9 +51,8 @@ export const AssignPlanModal = ({
     try {
       const res = await searchClients(query, 0, 10)
       setClients(res.content)
-    } catch (err) {
-      console.error(err)
-      toast.error(getApiErrorMessage(err, t('assign.searchFailed')))
+    } catch {
+      toast.error(getApiErrorMessage(undefined, t('assign.searchFailed')))
     } finally {
       setIsSearching(false)
     }
@@ -76,10 +73,9 @@ export const AssignPlanModal = ({
 
     setIsSubmitting(true)
     try {
-      const isoDate = new Date(startDate).toISOString()
       await assignPlanToClient(plan.id, {
         clientId: selectedClientId,
-        startDate: isoDate,
+        startDate: toBackendDateTime(startDate),
       })
       toast.success(t('assign.toastSuccess'))
       await onAssigned()
