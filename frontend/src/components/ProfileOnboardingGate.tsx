@@ -19,18 +19,20 @@ const ProfileOnboardingGate = () => {
   const isTrainer = roles.includes('TRAINER')
   const isOnboardingRoute = location.pathname === '/onboarding'
   const isTrainerProfileRoute = location.pathname === '/trainer-profile'
+  const hasClientProfile = user?.clientProfile != null
+  const hasTrainerProfile = user?.trainerProfile != null
 
   useEffect(() => {
     if (!isClient && !isTrainer) {
       return
     }
 
-    if (isClient && user?.clientProfile === null && !isOnboardingRoute) {
+    if (isClient && !hasClientProfile && !isOnboardingRoute) {
       navigate('/onboarding', { replace: true })
       return
     }
 
-    if (isTrainer && user?.trainerProfile === null && !isTrainerProfileRoute) {
+    if (isTrainer && !hasTrainerProfile && !isTrainerProfileRoute) {
       navigate('/trainer-profile', { replace: true })
       return
     }
@@ -83,7 +85,7 @@ const ProfileOnboardingGate = () => {
     return () => {
       isMounted = false
     }
-  }, [isClient, isTrainer, isOnboardingRoute, isTrainerProfileRoute, navigate, user?.clientProfile, user?.trainerProfile])
+  }, [isClient, isTrainer, isOnboardingRoute, isTrainerProfileRoute, navigate, hasClientProfile, hasTrainerProfile])
 
   if (!isClient && !isTrainer && (isOnboardingRoute || isTrainerProfileRoute) && roles.length > 0) {
     return <Navigate to="/dashboard" replace />

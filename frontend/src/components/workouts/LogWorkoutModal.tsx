@@ -96,7 +96,6 @@ export const LogWorkoutModal = ({
       await logWorkout(payload)
       await onLogged?.()
     } catch (err) {
-      console.error(err)
       toast.error(getApiErrorMessage(err, t('logWorkout.logError')))
     } finally {
       setIsSubmitting(false)
