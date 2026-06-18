@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import {
@@ -50,8 +50,9 @@ import {
   type TrainerReviewResponse,
 } from '../services/review.service'
 import { formatDate, formatCurrency } from '../lib/utils'
-import { broadcastNotification } from '../services/notification.service'
+import { broadcastNotification, type NotificationPriority, type NotificationType } from '../services/notification.service'
 import { getApiErrorMessage } from '../utils/errorHandler'
+import { useMountedRef } from '../utils/useMountedRef'
 import toast from '../utils/toast'
 
 type AdminTab = 'overview' | 'memberships' | 'broadcast' | 'reviews'
@@ -116,6 +117,7 @@ const OverviewTab = () => {
   const [analytics, setAnalytics] = useState<DashboardAnalyticsResponse | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const mounted = useMountedRef()
 
   useEffect(() => {
     const load = async () => {
@@ -123,11 +125,11 @@ const OverviewTab = () => {
       setError(null)
       try {
         const data = await getDashboardAnalytics()
-        setAnalytics(data)
+        if (mounted.current) setAnalytics(data)
       } catch {
-        setError(t('common:errors.serverError'))
+        if (mounted.current) setError(t('common:errors.serverError'))
       } finally {
-        setIsLoading(false)
+        if (mounted.current) setIsLoading(false)
       }
     }
     void load()
@@ -343,7 +345,7 @@ const MembershipTab = () => {
                 {selectedClient.firstname} {selectedClient.lastname}
               </p>
               <p className="text-xs text-muted-foreground">
-                {selectedClient.phone || t('memberships.noPhone')} · {t('memberships.memberSince', { date: new Date(selectedClient.createdAt).toLocaleDateString() })}
+                {selectedClient.phone || t('memberships.noPhone')} · {t('memberships.memberSince', { date: formatDate(selectedClient.createdAt) })}
               </p>
             </div>
             {selectedClient.id && (
@@ -447,22 +449,21 @@ const ReviewsTab = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [filterVisible, setFilterVisible] = useState<boolean | undefined>(undefined)
 
-  const loadReviews = async (isVisible?: boolean) => {
+  const loadReviews = useCallback(async (isVisible?: boolean) => {
     setIsLoading(true)
     try {
       const page = await getAllReviews(0, 50, { isVisible })
       setReviews(page.content)
-    } catch (err) {
-      console.error(err)
+    } catch {
       toast.error(t('common:errors.serverError'))
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [t])
 
   useEffect(() => {
     void loadReviews(filterVisible)
-  }, [filterVisible])
+  }, [filterVisible, loadReviews])
 
   const handleToggleVisibility = async (reviewId: string, currentVisibility: boolean) => {
     try {
@@ -594,13 +595,20 @@ const ReviewsTab = () => {
   )
 }
 
+interface BroadcastForm {
+  title: string
+  message: string
+  priority: NotificationPriority
+  type: NotificationType
+}
+
 const BroadcastTab = () => {
   const { t } = useTranslation(['admin', 'common'])
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<BroadcastForm>({
     title: '',
     message: '',
-    priority: 'NORMAL' as string,
-    type: 'GENERAL_ANNOUNCEMENT' as string,
+    priority: 'NORMAL',
+    type: 'GENERAL_ANNOUNCEMENT',
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -632,7 +640,7 @@ const BroadcastTab = () => {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-3">
             <label className="space-y-1.5">
               <span className="text-xs text-foreground">{t('broadcast.titleLabel')}</span>
               <Input
@@ -642,10 +650,26 @@ const BroadcastTab = () => {
               />
             </label>
             <label className="space-y-1.5">
+              <span className="text-xs text-foreground">{t('broadcast.typeLabel')}</span>
+              <select
+                value={form.type}
+                onChange={(e) => setForm((p) => ({ ...p, type: e.target.value as NotificationType }))}
+                className="flex h-10 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
+              >
+                <option value="GENERAL_ANNOUNCEMENT">{t('broadcast.types.GENERAL_ANNOUNCEMENT')}</option>
+                <option value="SESSION_REMINDER">{t('broadcast.types.SESSION_REMINDER')}</option>
+                <option value="MEMBERSHIP_EXPIRING">{t('broadcast.types.MEMBERSHIP_EXPIRING')}</option>
+                <option value="PAYMENT_SUCCESS">{t('broadcast.types.PAYMENT_SUCCESS')}</option>
+                <option value="PAYMENT_FAILED">{t('broadcast.types.PAYMENT_FAILED')}</option>
+                <option value="PROFILE_UPDATE_REMINDER">{t('broadcast.types.PROFILE_UPDATE_REMINDER')}</option>
+                <option value="MAINTENANCE_SCHEDULED">{t('broadcast.types.MAINTENANCE_SCHEDULED')}</option>
+              </select>
+            </label>
+            <label className="space-y-1.5">
               <span className="text-xs text-foreground">{t('broadcast.priorityLabel')}</span>
               <select
                 value={form.priority}
-                onChange={(e) => setForm((p) => ({ ...p, priority: e.target.value }))}
+                onChange={(e) => setForm((p) => ({ ...p, priority: e.target.value as NotificationPriority }))}
                 className="flex h-10 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
               >
                 <option value="LOW">{t('broadcast.priorities.LOW')}</option>

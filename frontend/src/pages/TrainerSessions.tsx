@@ -20,7 +20,7 @@ import {
 import { searchClients, type ClientProfileResponse } from '../services/user.service'
 import { useMountedRef } from '../utils/useMountedRef'
 import { getApiErrorMessage } from '../utils/errorHandler'
-import { formatDateTime } from '../lib/utils'
+import { formatDateTime, toBackendDateTime } from '../lib/utils'
 import toast from '../utils/toast'
 
 const TrainerSessions = () => {
@@ -68,8 +68,7 @@ const TrainerSessions = () => {
         setTotalPages(result.totalPages)
         setCurrentPage(page)
       }
-    } catch (err) {
-      console.error(err)
+    } catch {
       toast.error(t('errors.loadFailed'))
     } finally {
       if (mounted.current) setIsLoading(false)
@@ -101,8 +100,8 @@ const TrainerSessions = () => {
     try {
       const result = await getAttendanceBySession(sessionId)
       setAttendances(result)
-    } catch (err) {
-      console.error(err)
+    } catch {
+      // Attendance list will show empty state
     } finally {
       setIsLoadingAttendances(false)
     }
@@ -334,7 +333,11 @@ const SessionFormModal = ({
     e.preventDefault()
     setIsSubmitting(true)
     try {
-      await createSession(form)
+      await createSession({
+        ...form,
+        startTime: toBackendDateTime(form.startTime),
+        endTime: toBackendDateTime(form.endTime),
+      })
       toast.success(t('common:messages.created'))
       onSuccess()
     } catch (err) {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
 import {
@@ -20,7 +20,7 @@ import {
 } from '../services/workout.service'
 import { getApiErrorMessage } from '../utils/errorHandler'
 import toast from '../utils/toast'
-import { formatDateTime } from '../lib/utils'
+import { formatDateTime, getAppDateTimeMs } from '../lib/utils'
 import { EmptyState } from '../components/ui/empty-state'
 import { Pagination } from '../components/ui/pagination'
 import { InfoTile } from '../components/ui/info-tile'
@@ -56,8 +56,7 @@ const Sessions = () => {
         setCurrentPage(page)
         setJoinedSessionIds(new Set(attendance.map((a) => a.session.sessionId)))
       }
-    } catch (err) {
-      console.error(err)
+    } catch {
       setError(t('errors.loadFailed'))
     } finally {
       if (mounted.current) setIsLoading(false)
@@ -94,12 +93,23 @@ const Sessions = () => {
     }
   }
 
-  const now = Date.now()
-  const upcoming = sessions.filter(
-    (s) => new Date(s.startTime).getTime() >= now && s.status === 'SCHEDULED',
+  const [now, setNow] = useState(() => Date.now())
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 60_000)
+    return () => clearInterval(id)
+  }, [])
+  const upcoming = useMemo(
+    () => sessions.filter(
+      (s) => getAppDateTimeMs(s.startTime) >= now && s.status === 'SCHEDULED',
+    ),
+    [sessions, now],
   )
-  const past = sessions.filter(
-    (s) => new Date(s.startTime).getTime() < now || s.status !== 'SCHEDULED',
+  const past = useMemo(
+    () => sessions.filter(
+      (s) => getAppDateTimeMs(s.startTime) < now || s.status !== 'SCHEDULED',
+    ),
+    [sessions, now],
   )
 
   const filteredSessions = activeFilter === 'upcoming'
@@ -161,7 +171,7 @@ const Sessions = () => {
         <>
           <div className="grid gap-4 md:grid-cols-2">
             {filteredSessions.map((session) => {
-              const isPast = new Date(session.startTime).getTime() < now || session.status !== 'SCHEDULED'
+              const isPast = getAppDateTimeMs(session.startTime) < now || session.status !== 'SCHEDULED'
               return (
                 <SessionCard
                   key={session.id}

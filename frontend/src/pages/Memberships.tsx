@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   CalendarDays,
@@ -21,7 +21,7 @@ import {
   type MembershipResponse,
 } from '../services/membership.service'
 import { getMyPayments, type PaymentResponse } from '../services/payment.service'
-import { formatDate } from '../lib/utils'
+import { formatDate, getAppDateTimeMs } from '../lib/utils'
 import { InfoTile } from '../components/ui/info-tile'
 import { SummaryCard } from '../components/ui/summary-card'
 import {
@@ -31,6 +31,8 @@ import {
 } from '../components/ui/status-badge'
 import { EmptyState } from '../components/ui/empty-state'
 import { useMountedRef } from '../utils/useMountedRef'
+
+const MS_PER_DAY = 86_400_000
 
 const Memberships = () => {
   const { t } = useTranslation(['memberships', 'common'])
@@ -63,9 +65,19 @@ const Memberships = () => {
     void load()
   }, [])
 
-  const daysRemaining = active
-    ? Math.max(0, Math.ceil((new Date(active.endDate).getTime() - Date.now()) / 86_400_000))
-    : null
+  const [now, setNow] = useState(() => Date.now())
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 60_000)
+    return () => clearInterval(id)
+  }, [])
+
+  const daysRemaining = useMemo(
+    () => active
+      ? Math.max(0, Math.ceil((getAppDateTimeMs(active.endDate) - now) / MS_PER_DAY))
+      : null,
+    [active, now],
+  )
 
   return (
     <div className="space-y-6">

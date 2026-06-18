@@ -96,8 +96,7 @@ const Workouts = () => {
           recentLogs: recentLogsPage.content,
         })
       }
-    } catch (err) {
-      console.error(err)
+    } catch {
       if (mounted.current) setError(t('errorLoading'))
     } finally {
       if (mounted.current) setIsLoading(false)

@@ -50,7 +50,14 @@ import type {
   TrainingSessionResponse,
 } from '../types'
 import type { TrainerAnalyticsResponse, DashboardAnalyticsResponse } from '../types'
-import { formatDate, clampPercentage, formatCurrency, type IconType } from '../lib/utils'
+import {
+  formatDate,
+  clampPercentage,
+  formatCurrency,
+  getAppDateTimeMs,
+  parseAppDate,
+  type IconType,
+} from '../lib/utils'
 import { useMountedRef } from '../utils/useMountedRef'
 import { ProgressBar } from '../components/ui/progress-bar'
 import { EmptyState } from '../components/ui/empty-state'
@@ -481,7 +488,6 @@ const unwrapResult = <T,>(
   fallback: T,
 ): T => {
   if (result.status === 'fulfilled') return result.value
-  console.error(`Failed to load dashboard ${String(key)}`, result.reason)
   errors[key] = 'loadFailed'
   return fallback
 }
@@ -490,16 +496,16 @@ const getNextUpcomingSession = (sessions: TrainingSessionResponse[]) => {
   const now = Date.now()
   return (
     sessions
-      .filter((session) => new Date(session.startTime).getTime() >= now)
+      .filter((session) => getAppDateTimeMs(session.startTime) >= now)
       .sort(
         (a, b) =>
-          new Date(a.startTime).getTime() - new Date(b.startTime).getTime(),
+          getAppDateTimeMs(a.startTime) - getAppDateTimeMs(b.startTime),
       )[0] ?? null
   )
 }
 
 const getDaysRemaining = (endDate: string) => {
-  const diff = new Date(endDate).getTime() - Date.now()
+  const diff = getAppDateTimeMs(endDate) - Date.now()
   return Math.max(0, Math.ceil(diff / 86_400_000))
 }
 
@@ -507,7 +513,7 @@ const formatTime = (value: string) =>
   new Intl.DateTimeFormat(undefined, {
     hour: 'numeric',
     minute: '2-digit',
-  }).format(new Date(value))
+  }).format(parseAppDate(value) ?? new Date(value))
 
 const WorkoutPlanPanel = ({
   assignment,

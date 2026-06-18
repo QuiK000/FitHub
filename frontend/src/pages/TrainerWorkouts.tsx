@@ -73,8 +73,8 @@ const TrainerWorkouts = () => {
         if (plansResult.status === 'fulfilled') setPlans(plansResult.value.content)
         if (assignmentsResult.status === 'fulfilled') setAssignments(assignmentsResult.value.content)
       }
-    } catch (err) {
-      console.error(err)
+    } catch {
+      // Promise.allSettled handles individual failures
     } finally {
       if (mounted.current) setIsLoading(false)
     }

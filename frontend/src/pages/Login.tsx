@@ -36,15 +36,6 @@ const Login = () => {
     try {
       const auth = await login({ email, password })
 
-      try {
-        localStorage.setItem('access_token', auth.accessToken)
-        if (auth.refreshToken) {
-          localStorage.setItem('refresh_token', auth.refreshToken)
-        }
-      } catch {
-        // ignore persistence errors
-      }
-
       const user = await getCurrentUser()
       setAuth(auth.accessToken, auth.refreshToken, user)
 
@@ -66,12 +57,10 @@ const Login = () => {
         ) {
           navigate('/onboarding', { replace: true })
         } else {
-          console.error('Unexpected profile lookup error', profileErr)
           setError(t('login.errors.profileError'))
         }
       }
     } catch (err) {
-      console.error(err)
       const message = getApiErrorMessage(
         err,
         t('login.errors.invalidCredentials'),

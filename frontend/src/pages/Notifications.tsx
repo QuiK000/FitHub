@@ -23,6 +23,7 @@ import {
   type NotificationResponse,
   type NotificationSummaryResponse,
 } from '../services/notification.service'
+import { API_BASE_URL } from '../services/api'
 import toast from '../utils/toast'
 import { useMountedRef } from '../utils/useMountedRef'
 
@@ -45,8 +46,8 @@ const Notifications = () => {
         if (notiPage.status === 'fulfilled') setNotifications(notiPage.value.content)
         if (summaryData.status === 'fulfilled') setSummary(summaryData.value)
       }
-    } catch (err) {
-      console.error(err)
+    } catch {
+      // Handled by empty state UI
     } finally {
       if (mounted.current) setIsLoading(false)
     }
@@ -62,7 +63,7 @@ const Notifications = () => {
 
     try {
       const es = new EventSource(
-        `${import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080/api/v1'}/notifications/stream?token=${token}`,
+        `${API_BASE_URL}/notifications/stream?token=${token}`,
       )
       es.onmessage = () => {
         void loadData()
@@ -98,7 +99,7 @@ const Notifications = () => {
         prev ? { ...prev, unreadCount: Math.max(0, prev.unreadCount - 1) } : prev,
       )
     } catch {
-      // silent
+      toast.error(t('common:toast.readFailed'))
     }
   }
 

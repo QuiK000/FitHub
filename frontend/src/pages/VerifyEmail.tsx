@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
@@ -6,11 +6,14 @@ import { CheckCircle2, Mail, RotateCcw, ShieldCheck } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { resendVerification, verifyEmail } from '../services/auth.service'
 import ThemeToggle from '../components/ThemeToggle'
+import { getApiErrorMessage } from '../utils/errorHandler'
+import toast from '../utils/toast'
 
 const VerifyEmail = () => {
   const { t } = useTranslation('auth')
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const [token, setToken] = useState(searchParams.get('token') ?? '')
   const [email, setEmail] = useState(searchParams.get('email') ?? '')
@@ -19,6 +22,12 @@ const VerifyEmail = () => {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [resendSuccess, setResendSuccess] = useState<string | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    }
+  }, [])
 
   const tokenPreview = useMemo(() => {
     if (!token) return '—'
@@ -35,12 +44,13 @@ const VerifyEmail = () => {
     try {
       const response = await verifyEmail({ token: token.trim() })
       setSuccess(response.message || t('verifyEmail.success.verified'))
-      window.setTimeout(() => {
+      timeoutRef.current = setTimeout(() => {
         navigate('/login', { replace: true })
       }, 1000)
     } catch (err) {
-      console.error(err)
-      setError(t('verifyEmail.errors.verificationFailed'))
+      const message = getApiErrorMessage(err, t('verifyEmail.errors.verificationFailed'))
+      setError(message)
+      toast.error(message)
     } finally {
       setIsSubmitting(false)
     }
@@ -60,8 +70,9 @@ const VerifyEmail = () => {
       const response = await resendVerification({ email: email.trim() })
       setResendSuccess(response.message || t('verifyEmail.success.resent'))
     } catch (err) {
-      console.error(err)
-      setError(t('verifyEmail.errors.resendFailed'))
+      const message = getApiErrorMessage(err, t('verifyEmail.errors.resendFailed'))
+      setError(message)
+      toast.error(message)
     } finally {
       setIsResending(false)
     }

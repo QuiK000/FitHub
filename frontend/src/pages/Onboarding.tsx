@@ -97,7 +97,6 @@ const Onboarding = () => {
       toast.success(t('success.created', { ns: 'common' }))
       navigate('/dashboard', { replace: true })
     } catch (err) {
-      console.error(err)
       toast.error(
         getApiErrorMessage(
           err,
@@ -159,7 +158,7 @@ const Onboarding = () => {
                   value={form.phone}
                   error={errors.phone}
                   onChange={(value) => updateField('phone', value)}
-                  placeholder="+12025550123"
+                  placeholder={t('fields.phonePlaceholder')}
                 />
                 <FormField
                   id="birthdate"

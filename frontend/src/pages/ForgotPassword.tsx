@@ -30,7 +30,6 @@ const ForgotPassword = () => {
       setSuccess(message)
       toast.success(message)
     } catch (err) {
-      console.error(err)
       const message = getApiErrorMessage(
         err,
         t('forgotPassword.errors.sendFailed'),

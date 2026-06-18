@@ -14,6 +14,7 @@ import type {
 } from '../types/user.types'
 import { getApiErrorMessage } from '../utils/errorHandler'
 import { useMountedRef } from '../utils/useMountedRef'
+import { formatDate } from '../lib/utils'
 import toast from '../utils/toast'
 
 type ProfileForm = {
@@ -68,7 +69,6 @@ const Profile = () => {
           setForm(createFormFromProfile(data))
         }
       } catch (err) {
-        console.error(err)
         if (mounted.current) {
           const message = getApiErrorMessage(
             err,
@@ -92,19 +92,11 @@ const Profile = () => {
 
   const formattedBirthdate =
     profile?.birthdate &&
-    new Date(profile.birthdate).toLocaleDateString(undefined, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    })
+    formatDate(profile.birthdate)
 
   const formattedCreatedAt =
     profile?.createdAt &&
-    new Date(profile.createdAt).toLocaleDateString(undefined, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    })
+    formatDate(profile.createdAt)
 
   const canSave = useMemo(
     () => Object.keys(validateProfileForm(form, t)).length === 0,
@@ -158,7 +150,6 @@ const Profile = () => {
       setIsEditOpen(false)
       toast.success(response.message || t('common:toast.updated'))
     } catch (err) {
-      console.error(err)
       toast.error(getApiErrorMessage(err, t('common:errors.serverError')))
     } finally {
       setIsSaving(false)
@@ -345,7 +336,7 @@ const Profile = () => {
                   value={form.phone}
                   error={formErrors.phone}
                   onChange={(value) => updateField('phone', value)}
-                  placeholder="+12025550123"
+                  placeholder={t('editModal.phonePlaceholder')}
                 />
                 <EditField
                   label={t('editModal.birthdate')}

@@ -53,6 +53,7 @@ import {
   completeGoal,
 } from '../services/progress.service'
 import { getApiErrorMessage } from '../utils/errorHandler'
+import { getActiveExercises, type ExerciseResponse } from '../services/workout.service'
 import toast from '../utils/toast'
 
 type ProgressTab = 'overview' | 'measurements' | 'goals' | 'records' | 'photos'
@@ -95,8 +96,7 @@ const Progress = () => {
         if (recordsData.status === 'fulfilled') setRecords(recordsData.value.content)
         if (photosData.status === 'fulfilled') setPhotos(photosData.value.content)
       }
-    } catch (err) {
-      console.error(err)
+    } catch {
       toast.error(t('common:toast.progressLoadFailed'))
     } finally {
       if (mounted.current) setIsLoading(false)
@@ -1053,6 +1053,18 @@ const CreateRecordModal = ({
     notes: '',
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [exercises, setExercises] = useState<ExerciseResponse[]>([])
+  const [exerciseSearch, setExerciseSearch] = useState('')
+
+  useEffect(() => {
+    void getActiveExercises(0, 100).then((res) => setExercises(res.content)).catch(() => {})
+  }, [])
+
+  const filteredExercises = exerciseSearch
+    ? exercises.filter((e) => e.name.toLowerCase().includes(exerciseSearch.toLowerCase()))
+    : exercises
+
+  const selectedExercise = exercises.find((e) => e.id === form.exerciseId)
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -1092,7 +1104,31 @@ const CreateRecordModal = ({
           </button>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <ModalInput label={t('records.modal.exerciseId')} value={form.exerciseId} onChange={(v) => setForm((p) => ({ ...p, exerciseId: v }))} placeholder={t('records.modal.exerciseIdPlaceholder')} />
+          <label className="space-y-1.5">
+            <span className="text-xs text-foreground">{t('records.modal.exerciseId')}</span>
+            <div className="relative">
+              <Input
+                value={selectedExercise ? selectedExercise.name : exerciseSearch}
+                onChange={(e) => { setExerciseSearch(e.target.value); setForm((p) => ({ ...p, exerciseId: '' })) }}
+                placeholder={t('records.modal.exerciseIdPlaceholder')}
+              />
+              {exerciseSearch && !form.exerciseId && filteredExercises.length > 0 && (
+                <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-48 overflow-y-auto rounded-xl border border-border bg-card shadow-soft-lg">
+                  {filteredExercises.map((ex) => (
+                    <button
+                      key={ex.id}
+                      type="button"
+                      onClick={() => { setForm((p) => ({ ...p, exerciseId: ex.id })); setExerciseSearch('') }}
+                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition hover:bg-accent"
+                    >
+                      <span className="font-medium text-foreground">{ex.name}</span>
+                      <span className="text-xs text-muted-foreground">{ex.primaryMuscleGroup}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </label>
           <label className="space-y-1.5">
             <span className="text-xs text-foreground">{t('records.modal.recordType')}</span>
             <select

@@ -23,6 +23,7 @@ import { Pagination } from '../components/ui/pagination'
 import { getApiErrorMessage } from '../utils/errorHandler'
 import toast from '../utils/toast'
 import { useMountedRef } from '../utils/useMountedRef'
+import { formatDate } from '../lib/utils'
 
 const Trainers = () => {
   const { t } = useTranslation(['trainers', 'common'])
@@ -47,8 +48,7 @@ const Trainers = () => {
         setTotalPages(pageResult.totalPages)
         setCurrentPage(page)
       }
-    } catch (err) {
-      console.error(err)
+    } catch {
       toast.error(t('common:toast.trainersLoadFailed'))
     } finally {
       if (mounted.current) setIsLoading(false)
@@ -446,7 +446,7 @@ const ReviewRow = ({ review }: { review: TrainerReviewResponse }) => (
         </div>
       </div>
       <span className="text-xs text-muted-foreground">
-        {new Date(review.createdAt).toLocaleDateString()}
+        {formatDate(review.createdAt)}
       </span>
     </div>
     {review.comment && (

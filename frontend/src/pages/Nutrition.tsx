@@ -182,7 +182,6 @@ const Nutrition = () => {
       setCustomWaterAmount('')
       await loadNutrition()
     } catch (error) {
-      console.error(error)
       toast.error(getApiErrorMessage(error, t('common:toast.waterAmountError')))
     } finally {
       setIsLoggingWater(false)
@@ -221,7 +220,6 @@ const Nutrition = () => {
       setTargetCalories('')
       await loadNutrition()
     } catch (error) {
-      console.error(error)
       toast.error(getApiErrorMessage(error, t('mealPlan.createFailed')))
     } finally {
       setIsCreatingMealPlan(false)
@@ -255,14 +253,18 @@ const Nutrition = () => {
         foodId: f.food.id,
         servings: f.servings,
       }))
-      await addMealToPlan(planId, { mealType: selectedMealType, foods })
+      await addMealToPlan(planId, {
+        mealType: selectedMealType,
+        name: t('common:enums.mealType.' + selectedMealType),
+        description: t('meal.description', { type: t('common:enums.mealType.' + selectedMealType) }),
+        foods,
+      })
       toast.success(t('meal.added'))
       setPendingFoods(prev => ({ ...prev, [selectedMealType]: [] }))
       setFoodSearchQuery('')
       setFoodSearchResults([])
       await loadNutrition()
     } catch (error) {
-      console.error(error)
       toast.error(getApiErrorMessage(error, t('meal.addFailed')))
     } finally {
       setIsAddingMeal(false)
@@ -277,7 +279,6 @@ const Nutrition = () => {
       toast.success(t('meal.completed'))
       await loadNutrition()
     } catch (error) {
-      console.error(error)
       toast.error(getApiErrorMessage(error, t('meal.completeFailed')))
     } finally {
       setCompletingMealId(null)
@@ -297,8 +298,7 @@ const Nutrition = () => {
     try {
       const result = await searchFoods(query, 0, 10)
       setFoodSearchResults(result.content)
-    } catch (error) {
-      console.error(error)
+    } catch {
       setFoodSearchResults([])
     } finally {
       setIsSearchingFoods(false)
@@ -584,7 +584,6 @@ const unwrapResult = <T,>(
   fallback: T,
 ): T => {
   if (result.status === 'fulfilled') return result.value
-  console.error(`Failed to load nutrition ${String(key)}`, result.reason)
   errors[key] = 'loadFailed'
   return fallback
 }

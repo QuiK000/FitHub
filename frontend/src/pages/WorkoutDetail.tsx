@@ -69,14 +69,20 @@ const WorkoutDetail = () => {
       const assignmentData = await getMyAssignmentById(assignmentId)
       const [planData, logsPage] = await Promise.all([
         getWorkoutPlanById(assignmentData.workoutPlan.id),
-        getMyWorkoutLogs(0, 8),
+        getMyWorkoutLogs(0, 50),
       ])
+      const planExerciseIds = new Set(
+        planData.exercises.map((exercise) => exercise.exercise.exerciseId),
+      )
 
       setAssignment(assignmentData)
       setPlan(planData)
-      setRecentLogs(logsPage.content)
-    } catch (err) {
-      console.error(err)
+      setRecentLogs(
+        logsPage.content
+          .filter((log) => planExerciseIds.has(log.exercise.exerciseId))
+          .slice(0, 8),
+      )
+    } catch {
       setError(t('detail.notAvailable'))
     } finally {
       setIsLoading(false)

@@ -1,5 +1,5 @@
 import type { FormEvent } from 'react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
@@ -13,12 +13,19 @@ const ResetPassword = () => {
   const { t } = useTranslation('auth')
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [token, setToken] = useState(searchParams.get('token') ?? '')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    }
+  }, [])
 
   const tokenPreview = useMemo(() => {
     if (!token) return t('auth:resetPassword.noToken')
@@ -52,11 +59,10 @@ const ResetPassword = () => {
       const message = response.message || t('resetPassword.success.reset')
       setSuccess(message)
       toast.success(message)
-      window.setTimeout(() => {
+      timeoutRef.current = setTimeout(() => {
         navigate('/login', { replace: true })
       }, 1200)
     } catch (err) {
-      console.error(err)
       const message = getApiErrorMessage(err, t('resetPassword.errors.resetFailed'))
       setError(message)
       toast.error(message)

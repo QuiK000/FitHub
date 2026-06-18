@@ -56,8 +56,7 @@ const ExerciseManagement = () => {
       setExercises(filtered)
       setTotalPages(searchQuery ? 1 : result.totalPages)
       setCurrentPage(page)
-    } catch (err) {
-      console.error(err)
+    } catch {
       toast.error(t('common:errors.loadFailed'))
     } finally {
       setIsLoading(false)

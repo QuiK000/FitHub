@@ -6,6 +6,8 @@ import { motion } from 'framer-motion'
 import { Dumbbell, Mail, Lock } from 'lucide-react'
 import { register } from '../services/auth.service'
 import ThemeToggle from '../components/ThemeToggle'
+import { getApiErrorMessage } from '../utils/errorHandler'
+import toast from '../utils/toast'
 
 const Register = () => {
   const { t } = useTranslation('auth')
@@ -52,8 +54,9 @@ const Register = () => {
         state: { email },
       })
     } catch (err) {
-      console.error(err)
-      setError(t('register.errors.registrationFailed'))
+      const message = getApiErrorMessage(err, t('register.errors.registrationFailed'))
+      setError(message)
+      toast.error(message)
     } finally {
       setIsSubmitting(false)
     }

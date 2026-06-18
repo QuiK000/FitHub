@@ -81,7 +81,6 @@ const TrainerProfile = () => {
           }
         }
       } catch (err) {
-        console.error(err)
         setError(getApiErrorMessage(err, t('common:errors.serverError')))
       } finally {
         if (mounted.current) setIsLoading(false)
@@ -151,7 +150,6 @@ const TrainerProfile = () => {
       await fetchCurrentUser()
       navigate('/dashboard', { replace: true })
     } catch (err) {
-      console.error(err)
       toast.error(getApiErrorMessage(err, t('common:errors.serverError')))
     } finally {
       setIsSaving(false)
