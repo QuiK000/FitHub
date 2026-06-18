@@ -25,7 +25,7 @@ export interface ExtendMembershipRequest {
 export interface CreatePaymentRequest {
   membershipId: string
   amount: number
-  currency: string
+  currency: PaymentCurrency
   transactionHash?: string
 }
 

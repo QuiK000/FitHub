@@ -53,12 +53,12 @@ export interface MealFoodRequest {
 export interface CreateMealRequest {
   mealType: MealType
   mealTime?: ISODateTimeString
-  name?: string
-  description?: string
+  name: string
+  description: string
   foods: MealFoodRequest[]
 }
 
-export type UpdateMealRequest = CreateMealRequest
+export type UpdateMealRequest = Partial<CreateMealRequest>
 
 export interface LogWaterIntakeRequest {
   amountMl: number
