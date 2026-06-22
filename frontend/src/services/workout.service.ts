@@ -1,5 +1,5 @@
-import axios from 'axios'
 import api from './api'
+import { handleNotFound } from './api-helpers'
 import type { MessageResponse, PageResponse } from '../types'
 import type {
     AddExerciseToPlanRequest,
@@ -66,18 +66,10 @@ export type {
 
 export const getMyActiveAssignments =
     async (): Promise<ClientWorkoutPlanResponse[]> => {
-        try {
-            const {data} = await api.get<ClientWorkoutPlanResponse[]>(
-                '/workout-plans/my-assignments/active',
-            )
-            return data
-    } catch (error) {
-        if (axios.isAxiosError(error) && error.response?.status === 404) {
-                return []
-            }
-
-            throw error
-        }
+        const result = await handleNotFound(() =>
+            api.get<ClientWorkoutPlanResponse[]>('/workout-plans/my-assignments/active').then((r) => r.data),
+        )
+        return result ?? []
     }
 
 export const getMyAssignmentById = async (

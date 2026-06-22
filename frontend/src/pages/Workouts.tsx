@@ -82,18 +82,17 @@ const Workouts = () => {
     setError(null)
 
     try {
-      const [activeAssignments, allAssignments, recentLogsPage] =
-        await Promise.all([
-          getMyActiveAssignments(),
-          getMyAssignments(),
-          getMyWorkoutLogs(0, 5),
-        ])
+      const [activeResult, allResult, logsResult] = await Promise.allSettled([
+        getMyActiveAssignments(),
+        getMyAssignments(),
+        getMyWorkoutLogs(0, 5),
+      ])
 
       if (mounted.current) {
         setState({
-          activeAssignments,
-          allAssignments,
-          recentLogs: recentLogsPage.content,
+          activeAssignments: activeResult.status === 'fulfilled' ? activeResult.value : [],
+          allAssignments: allResult.status === 'fulfilled' ? allResult.value : [],
+          recentLogs: logsResult.status === 'fulfilled' ? logsResult.value.content : [],
         })
       }
     } catch {
@@ -108,7 +107,7 @@ const Workouts = () => {
   }, [isClient])
 
   const titleName =
-    user?.clientProfile?.firstname ?? user?.clientProfile?.lastname ?? t('common:fallbacks.client')
+    user?.clientProfile?.firstname || user?.clientProfile?.lastname || t('common:fallbacks.client')
 
   const totalCompleted = useMemo(
     () =>

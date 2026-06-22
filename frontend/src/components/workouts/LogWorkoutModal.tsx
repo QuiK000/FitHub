@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
@@ -45,13 +45,15 @@ export const LogWorkoutModal = ({
   const [form, setForm] = useState<LogForm>(() => createInitialForm(exercises))
   const [errors, setErrors] = useState<LogFormErrors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const prevIsOpen = useRef(isOpen)
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !prevIsOpen.current) {
       setForm(createInitialForm(exercises))
       setErrors({})
     }
-  }, [exercises, isOpen])
+    prevIsOpen.current = isOpen
+  }, [isOpen, exercises])
 
   const selectedExercise = useMemo(
     () =>

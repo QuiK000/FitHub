@@ -1,4 +1,4 @@
-import type { ISODateString, ISODateTimeString } from './common.types'
+import type { ISODateTimeString } from './common.types'
 import type { ClientShortResponse, TrainerShortResponse } from './user.types'
 
 export type ClientWorkoutStatus =
@@ -259,11 +259,6 @@ export interface AttendanceSessionResponse {
   id: string
   checkInTime: ISODateTimeString
   client: ClientShortResponse
-}
-
-export interface AttendanceStatsResponse {
-  date: ISODateString
-  checkIns: number
 }
 
 export interface WaitlistResponse {

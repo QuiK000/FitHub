@@ -22,6 +22,8 @@ import {
   CardHeader,
   CardTitle,
 } from '../components/ui/card'
+import { workoutStatusColors } from '../components/ui/status-badge'
+import { useMountedRef } from '../utils/useMountedRef'
 import {
   type ClientWorkoutPlanResponse,
   type WorkoutLogResponse,
@@ -40,14 +42,6 @@ import { StatusBadge } from '../components/ui/status-badge'
 import { MetricCard } from '../components/ui/metric-card'
 import toast from '../utils/toast'
 
-const workoutStatusColors: Record<string, string> = {
-  ASSIGNED: 'bg-amber-500/10 text-amber-600',
-  NOT_STARTED: 'bg-muted text-muted-foreground',
-  IN_PROGRESS: 'bg-blue-500/10 text-blue-600',
-  COMPLETED: 'bg-emerald-500/10 text-emerald-600',
-  CANCELLED: 'bg-red-500/10 text-red-600',
-}
-
 const WorkoutDetail = () => {
   const { t } = useTranslation(['workouts', 'common'])
   const { id } = useParams<{ id: string }>()
@@ -60,6 +54,7 @@ const WorkoutDetail = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isLogOpen, setIsLogOpen] = useState(false)
+  const mounted = useMountedRef()
 
   const load = async (assignmentId: string) => {
     setIsLoading(true)
@@ -67,25 +62,32 @@ const WorkoutDetail = () => {
 
     try {
       const assignmentData = await getMyAssignmentById(assignmentId)
-      const [planData, logsPage] = await Promise.all([
+      const [planResult, logsResult] = await Promise.allSettled([
         getWorkoutPlanById(assignmentData.workoutPlan.id),
         getMyWorkoutLogs(0, 50),
       ])
-      const planExerciseIds = new Set(
-        planData.exercises.map((exercise) => exercise.exercise.exerciseId),
-      )
 
-      setAssignment(assignmentData)
-      setPlan(planData)
-      setRecentLogs(
-        logsPage.content
-          .filter((log) => planExerciseIds.has(log.exercise.exerciseId))
-          .slice(0, 8),
-      )
+      if (mounted.current) {
+        setAssignment(assignmentData)
+        if (planResult.status === 'fulfilled') {
+          const planData = planResult.value
+          setPlan(planData)
+          const planExerciseIds = new Set(
+            planData.exercises.map((exercise) => exercise.exercise.exerciseId),
+          )
+          if (logsResult.status === 'fulfilled') {
+            setRecentLogs(
+              logsResult.value.content
+                .filter((log) => planExerciseIds.has(log.exercise.exerciseId))
+                .slice(0, 8),
+            )
+          }
+        }
+      }
     } catch {
-      setError(t('detail.notAvailable'))
+      if (mounted.current) setError(t('detail.notAvailable'))
     } finally {
-      setIsLoading(false)
+      if (mounted.current) setIsLoading(false)
     }
   }
 
@@ -402,7 +404,7 @@ const ExerciseRow = ({ exercise }: { exercise: WorkoutPlanExerciseResponse }) =>
         )}
         {exercise.durationSeconds && (
           <span className="rounded-full bg-background px-2 py-1">
-            {t('detail.restTime', { n: exercise.durationSeconds })}
+            {t('detail.exerciseDuration', { n: exercise.durationSeconds })}
           </span>
         )}
         {exercise.restSeconds && (
