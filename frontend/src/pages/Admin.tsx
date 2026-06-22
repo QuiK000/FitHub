@@ -27,6 +27,8 @@ import {
   CardTitle,
 } from '../components/ui/card'
 import { Input } from '../components/ui/input'
+import { Textarea } from '../components/ui/form-field'
+import { Modal } from '../components/ui/modal'
 import { MetricCard } from '../components/ui/metric-card'
 import { StatusBadge, membershipStatusColors } from '../components/ui/status-badge'
 import { searchClients, type ClientProfileResponse } from '../services/user.service'
@@ -406,7 +408,10 @@ const MembershipTab = () => {
                 {(m.status === 'ACTIVE' || m.status === 'FROZEN') && (
                   <>
                     <ActionBtn icon={CalendarDays} label={t('memberships.actions.extend')} onClick={() => void handleAction(() => extendMembership(m.id, 1), t('memberships.actions.extend'))} />
-                    <ActionBtn icon={XCircle} label={t('memberships.actions.cancel')} onClick={() => void handleAction(() => cancelMembership(m.id), t('memberships.actions.cancel'))} danger />
+                    <ActionBtn icon={XCircle} label={t('memberships.actions.cancel')} onClick={() => {
+                      if (!window.confirm(t('memberships.cancelConfirm'))) return
+                      void handleAction(() => cancelMembership(m.id), t('memberships.actions.cancel'))
+                    }} danger />
                   </>
                 )}
               </div>
@@ -448,6 +453,9 @@ const ReviewsTab = () => {
   const [reviews, setReviews] = useState<TrainerReviewResponse[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [filterVisible, setFilterVisible] = useState<boolean | undefined>(undefined)
+  const [hideModalOpen, setHideModalOpen] = useState(false)
+  const [hideReviewId, setHideReviewId] = useState<string | null>(null)
+  const [hideReason, setHideReason] = useState('')
 
   const loadReviews = useCallback(async (isVisible?: boolean) => {
     setIsLoading(true)
@@ -466,14 +474,40 @@ const ReviewsTab = () => {
   }, [filterVisible, loadReviews])
 
   const handleToggleVisibility = async (reviewId: string, currentVisibility: boolean) => {
+    if (currentVisibility) {
+      setHideReviewId(reviewId)
+      setHideReason('')
+      setHideModalOpen(true)
+      return
+    }
     try {
-      await updateReviewVisibility(reviewId, { visible: !currentVisibility })
+      await updateReviewVisibility(reviewId, { visible: true })
       toast.success(t('common:toast.reviewVisibilityUpdated'))
       setReviews((prev) =>
         prev.map((r) =>
-          r.id === reviewId ? { ...r, visible: !currentVisibility } : r,
+          r.id === reviewId ? { ...r, visible: true } : r,
         ),
       )
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, t('common:errors.serverError')))
+    }
+  }
+
+  const handleConfirmHide = async (e: FormEvent) => {
+    e.preventDefault()
+    if (!hideReviewId) return
+    try {
+      const reason = hideReason.trim() || undefined
+      await updateReviewVisibility(hideReviewId, { visible: false, reason })
+      toast.success(t('common:toast.reviewVisibilityUpdated'))
+      setReviews((prev) =>
+        prev.map((r) =>
+          r.id === hideReviewId ? { ...r, visible: false } : r,
+        ),
+      )
+      setHideModalOpen(false)
+      setHideReviewId(null)
+      setHideReason('')
     } catch (err) {
       toast.error(getApiErrorMessage(err, t('common:errors.serverError')))
     }
@@ -591,6 +625,41 @@ const ReviewsTab = () => {
           </p>
         </div>
       )}
+
+      <Modal
+        isOpen={hideModalOpen}
+        onClose={() => setHideModalOpen(false)}
+        title={t('reviews.hideModalTitle')}
+        size="sm"
+      >
+        <form onSubmit={(e) => void handleConfirmHide(e)} className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            {t('reviews.hideModalDescription')}
+          </p>
+          <Textarea
+            value={hideReason}
+            onChange={(e) => setHideReason(e.target.value)}
+            placeholder={t('reviews.hideReasonPrompt')}
+            rows={3}
+            autoFocus
+          />
+          <div className="flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => setHideModalOpen(false)}
+              className="inline-flex h-9 items-center justify-center rounded-xl border border-border bg-background px-4 text-sm font-semibold text-foreground transition-all hover:bg-accent"
+            >
+              {t('common:actions.cancel')}
+            </button>
+            <button
+              type="submit"
+              className="inline-flex h-9 items-center justify-center rounded-xl bg-destructive px-4 text-sm font-semibold text-white transition-all hover:bg-destructive/90"
+            >
+              {t('reviews.hideButton')}
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   )
 }

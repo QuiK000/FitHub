@@ -99,11 +99,11 @@ const TrainerSessions = () => {
     setIsLoadingAttendances(true)
     try {
       const result = await getAttendanceBySession(sessionId)
-      setAttendances(result)
+      if (mounted.current) setAttendances(result)
     } catch {
       // Attendance list will show empty state
     } finally {
-      setIsLoadingAttendances(false)
+      if (mounted.current) setIsLoadingAttendances(false)
     }
   }
 
@@ -328,9 +328,25 @@ const SessionFormModal = ({
     maxParticipants: 10,
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
+    const newErrors: Record<string, string> = {}
+
+    if (!form.startTime) newErrors.startTime = t('form.validation.startTimeRequired')
+    if (!form.endTime) newErrors.endTime = t('form.validation.endTimeRequired')
+    if (form.startTime && form.endTime && form.endTime <= form.startTime) {
+      newErrors.endTime = t('form.validation.endTimeAfterStart')
+    }
+    if (form.maxParticipants < 1) newErrors.maxParticipants = t('form.validation.participantsMin')
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      return
+    }
+    setErrors({})
+
     setIsSubmitting(true)
     try {
       await createSession({
@@ -389,6 +405,7 @@ const SessionFormModal = ({
                 onChange={(e) => setForm({ ...form, startTime: e.target.value })}
                 required
               />
+              {errors.startTime && <p className="text-xs text-destructive">{errors.startTime}</p>}
             </div>
             <div className="space-y-1.5">
               <Label>{t('form.endTime')}</Label>
@@ -398,6 +415,7 @@ const SessionFormModal = ({
                 onChange={(e) => setForm({ ...form, endTime: e.target.value })}
                 required
               />
+              {errors.endTime && <p className="text-xs text-destructive">{errors.endTime}</p>}
             </div>
           </div>
 

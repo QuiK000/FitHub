@@ -24,6 +24,7 @@ import {
   CardHeader,
   CardTitle,
 } from '../components/ui/card'
+import { MetricCard } from '../components/ui/metric-card'
 import {
   getDashboardAnalytics,
   getAttendanceStats,
@@ -154,25 +155,25 @@ const Analytics = () => {
           <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <MetricCard
               icon={Users2}
-              label={t('metrics.activeClients')}
+              title={t('metrics.activeClients')}
               value={analytics?.activeClients?.toString() ?? '0'}
               tone="bg-blue-500"
             />
             <MetricCard
               icon={CalendarDays}
-              label={t('metrics.activeMemberships')}
+              title={t('metrics.activeMemberships')}
               value={analytics?.activeMemberships?.toString() ?? '0'}
               tone="bg-emerald-500"
             />
             <MetricCard
               icon={DollarSign}
-              label={t('metrics.revenue')}
+              title={t('metrics.revenue')}
               value={formatCurrency(analytics?.revenue)}
               tone="bg-violet-500"
             />
             <MetricCard
               icon={Activity}
-              label={t('metrics.todayCheckIns')}
+              title={t('metrics.todayCheckIns')}
               value={analytics?.todayCheckIns?.toString() ?? '0'}
               tone="bg-amber-500"
             />
@@ -273,8 +274,8 @@ const Analytics = () => {
                       <AreaChart data={revenueChartData}>
                         <defs>
                           <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="hsl(142, 76%, 36%)" stopOpacity={0.3} />
-                            <stop offset="95%" stopColor="hsl(142, 76%, 36%)" stopOpacity={0} />
+                            <stop offset="5%" stopColor="hsl(var(--success))" stopOpacity={0.3} />
+                            <stop offset="95%" stopColor="hsl(var(--success))" stopOpacity={0} />
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
@@ -304,7 +305,7 @@ const Analytics = () => {
                         <Area
                           type="monotone"
                           dataKey="revenue"
-                          stroke="hsl(142, 76%, 36%)"
+                          stroke="hsl(var(--success))"
                           strokeWidth={2}
                           fillOpacity={1}
                           fill="url(#colorRevenue)"
@@ -395,38 +396,6 @@ const Analytics = () => {
     </div>
   )
 }
-
-const MetricCard = ({
-  icon: Icon,
-  label,
-  value,
-  tone,
-}: {
-  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
-  label: string
-  value: string
-  tone: string
-}) => (
-  <motion.div
-    initial={{ opacity: 0, y: 10 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.25 }}
-  >
-    <Card className="h-full">
-      <CardContent className="flex h-full flex-col justify-between p-5">
-          <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="text-xs font-medium text-muted-foreground">{label}</p>
-            <p className="mt-2 text-2xl font-bold text-foreground">{value}</p>
-          </div>
-          <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${tone}`}>
-            <Icon className="h-5 w-5 text-white" />
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  </motion.div>
-)
 
 const SummaryCard = ({
   label,

@@ -58,6 +58,7 @@ import {
   parseAppDate,
   type IconType,
 } from '../lib/utils'
+import toast from '../utils/toast'
 import { useMountedRef } from '../utils/useMountedRef'
 import { ProgressBar } from '../components/ui/progress-bar'
 import { EmptyState } from '../components/ui/empty-state'
@@ -101,97 +102,118 @@ const Dashboard = () => {
   const mounted = useMountedRef()
 
   useEffect(() => {
+    let cancelled = false
+
     if (!isClient) {
       const loadTrainerAdminData = async () => {
         setIsLoading(true)
+
+        const safetyTimeout = setTimeout(() => {
+          if (mounted.current && !cancelled) setIsLoading(false)
+        }, 10_000)
+
         try {
           if (isTrainer) {
             const data = await getMyTrainerAnalytics()
-            if (mounted.current) setTrainerAnalytics(data)
+            if (mounted.current && !cancelled) setTrainerAnalytics(data)
           } else if (isAdmin) {
             const data = await getDashboardAnalytics()
-            if (mounted.current) setAdminAnalytics(data)
+            if (mounted.current && !cancelled) setAdminAnalytics(data)
           }
         } catch {
-          // analytics will remain null, values show as 0
+          if (mounted.current && !cancelled) toast.error(t('errors.loadFailed'))
         } finally {
-          if (mounted.current) setIsLoading(false)
+          clearTimeout(safetyTimeout)
+          if (mounted.current && !cancelled) setIsLoading(false)
         }
       }
       void loadTrainerAdminData()
-      return
+      return () => { cancelled = true }
     }
 
     const loadDashboard = async () => {
       setIsLoading(true)
       setErrors({})
 
-      const [
-        membershipResult,
-        waterResult,
-        assignmentsResult,
-        sessionsResult,
-        goalsResult,
-        measurementResult,
-      ] = await Promise.allSettled([
-        getMyActiveMembership(),
-        getTodayWaterIntake(),
-        getMyActiveAssignments(),
-        getTrainingSessions(0, 12),
-        getActiveGoals(0, 3),
-        getLatestBodyMeasurement(),
-      ])
+      const safetyTimeout = setTimeout(() => {
+        if (mounted.current && !cancelled) setIsLoading(false)
+      }, 10_000)
 
-      const nextErrors: DashboardErrors = {}
+      try {
+        const [
+          membershipResult,
+          waterResult,
+          assignmentsResult,
+          sessionsResult,
+          goalsResult,
+          measurementResult,
+        ] = await Promise.allSettled([
+          getMyActiveMembership(),
+          getTodayWaterIntake(),
+          getMyActiveAssignments(),
+          getTrainingSessions(0, 12),
+          getActiveGoals(0, 3),
+          getLatestBodyMeasurement(),
+        ])
 
-      const membership = unwrapResult(
-        membershipResult,
-        'membership',
-        nextErrors,
-        null,
-      )
-      const water = unwrapResult(waterResult, 'water', nextErrors, null)
-      const assignments = unwrapResult(
-        assignmentsResult,
-        'assignments',
-        nextErrors,
-        [],
-      )
-      const sessionsPage = unwrapResult(
-        sessionsResult,
-        'nextSession',
-        nextErrors,
-        { content: [], totalElements: 0, totalPages: 0, number: 0, size: 0 },
-      )
-      const goalsPage = unwrapResult(goalsResult, 'goals', nextErrors, {
-        content: [],
-        totalElements: 0,
-        totalPages: 0,
-        number: 0,
-        size: 0,
-      })
-      const latestMeasurement = unwrapResult(
-        measurementResult,
-        'latestMeasurement',
-        nextErrors,
-        null,
-      )
+        const nextErrors: DashboardErrors = {}
 
-      if (mounted.current) {
-        setData({
-          membership,
-          water,
-          assignments,
-          nextSession: getNextUpcomingSession(sessionsPage.content),
-          goals: goalsPage.content,
-          latestMeasurement,
+        const membership = unwrapResult(
+          membershipResult,
+          'membership',
+          nextErrors,
+          null,
+        )
+        const water = unwrapResult(waterResult, 'water', nextErrors, null)
+        const assignments = unwrapResult(
+          assignmentsResult,
+          'assignments',
+          nextErrors,
+          [],
+        )
+        const sessionsPage = unwrapResult(
+          sessionsResult,
+          'nextSession',
+          nextErrors,
+          { content: [], totalElements: 0, totalPages: 0, number: 0, size: 0 },
+        )
+        const goalsPage = unwrapResult(goalsResult, 'goals', nextErrors, {
+          content: [],
+          totalElements: 0,
+          totalPages: 0,
+          number: 0,
+          size: 0,
         })
-        setErrors(nextErrors)
-        setIsLoading(false)
+        const latestMeasurement = unwrapResult(
+          measurementResult,
+          'latestMeasurement',
+          nextErrors,
+          null,
+        )
+
+        if (mounted.current && !cancelled) {
+          setData({
+            membership,
+            water,
+            assignments,
+            nextSession: getNextUpcomingSession(sessionsPage.content),
+            goals: goalsPage.content,
+            latestMeasurement,
+          })
+          setErrors(nextErrors)
+        }
+      } catch {
+        if (mounted.current && !cancelled) {
+          toast.error(t('errors.loadFailed'))
+        }
+      } finally {
+        clearTimeout(safetyTimeout)
+        if (mounted.current && !cancelled) setIsLoading(false)
       }
     }
 
     void loadDashboard()
+    return () => { cancelled = true }
   }, [isClient, isTrainer, isAdmin])
 
   const greetingName =

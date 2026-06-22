@@ -112,7 +112,7 @@ const Progress = () => {
       <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {t('tabs.overview')}
+            {getTabs(t).find((tab) => tab.key === activeTab)?.label ?? t('tabs.overview')}
           </p>
           <h1 className="mt-2 text-2xl font-bold text-foreground md:text-3xl">
             {t('title')}
@@ -244,6 +244,7 @@ const OverviewTab = ({
                 label={t('trend.muscleMass')}
                 change={trends.totalMuscleMassChange}
                 unit="kg"
+                inverted
               />
             </div>
           </CardContent>
@@ -542,18 +543,23 @@ const TrendTile = ({
   label,
   change,
   unit,
+  inverted = false,
 }: {
   label: string
   change: number | null
   unit: string
-}) => (
-  <div className="rounded-xl bg-muted px-4 py-3">
-    <p className="text-xs text-muted-foreground">{label}</p>
-    <p className={`mt-1 text-lg font-bold ${change != null && change <= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'}`}>
-      {change != null ? `${change > 0 ? '+' : ''}${change.toFixed(1)} ${unit}` : '—'}
-    </p>
-  </div>
-)
+  inverted?: boolean
+}) => {
+  const isPositive = change != null && (inverted ? change >= 0 : change <= 0)
+  return (
+    <div className="rounded-xl bg-muted px-4 py-3">
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className={`mt-1 text-lg font-bold ${isPositive ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground'}`}>
+        {change != null ? `${change > 0 ? '+' : ''}${change.toFixed(1)} ${unit}` : '—'}
+      </p>
+    </div>
+  )
+}
 
 const MetricCard = ({
   icon: Icon,
@@ -871,11 +877,12 @@ const CreateMeasurementModal = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 px-4 py-6 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 px-4 py-6 backdrop-blur-sm" onClick={onClose} onKeyDown={(e) => { if (e.key === 'Escape') onClose() }}>
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         className="max-h-[calc(100vh-3rem)] w-full max-w-lg overflow-y-auto rounded-2xl border border-border bg-card p-6 shadow-soft-lg"
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-5 flex items-center justify-between">
           <div>
@@ -969,11 +976,12 @@ const CreateGoalModal = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 px-4 py-6 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 px-4 py-6 backdrop-blur-sm" onClick={onClose} onKeyDown={(e) => { if (e.key === 'Escape') onClose() }}>
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         className="max-h-[calc(100vh-3rem)] w-full max-w-lg overflow-y-auto rounded-2xl border border-border bg-card p-6 shadow-soft-lg"
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-5 flex items-center justify-between">
           <div>
@@ -1088,11 +1096,12 @@ const CreateRecordModal = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 px-4 py-6 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 px-4 py-6 backdrop-blur-sm" onClick={onClose} onKeyDown={(e) => { if (e.key === 'Escape') onClose() }}>
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         className="max-h-[calc(100vh-3rem)] w-full max-w-lg overflow-y-auto rounded-2xl border border-border bg-card p-6 shadow-soft-lg"
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-5 flex items-center justify-between">
           <div>
@@ -1240,11 +1249,12 @@ const CreatePhotoModal = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 px-4 py-6 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 px-4 py-6 backdrop-blur-sm" onClick={onClose} onKeyDown={(e) => { if (e.key === 'Escape') onClose() }}>
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         className="max-h-[calc(100vh-3rem)] w-full max-w-lg overflow-y-auto rounded-2xl border border-border bg-card p-6 shadow-soft-lg"
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-5 flex items-center justify-between">
           <div>

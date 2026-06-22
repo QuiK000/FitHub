@@ -46,15 +46,19 @@ const Sessions = () => {
     setIsLoading(true)
     setError(null)
     try {
-      const [sessionsPage, attendance] = await Promise.all([
-        getTrainingSessions(page, 12),
+      const [sessionsResult, attendanceResult] = await Promise.allSettled([
+        getTrainingSessions(page, 50),
         isClient ? getMyAttendance() : Promise.resolve([]),
       ])
       if (mounted.current) {
-        setSessions(sessionsPage.content)
-        setTotalPages(sessionsPage.totalPages)
-        setCurrentPage(page)
-        setJoinedSessionIds(new Set(attendance.map((a) => a.session.sessionId)))
+        if (sessionsResult.status === 'fulfilled') {
+          setSessions(sessionsResult.value.content)
+          setTotalPages(sessionsResult.value.totalPages)
+          setCurrentPage(page)
+        }
+        if (attendanceResult.status === 'fulfilled') {
+          setJoinedSessionIds(new Set(attendanceResult.value.map((a) => a.session.sessionId)))
+        }
       }
     } catch {
       setError(t('errors.loadFailed'))

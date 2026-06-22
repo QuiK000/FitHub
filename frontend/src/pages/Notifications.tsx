@@ -61,19 +61,35 @@ const Notifications = () => {
     const token = localStorage.getItem('access_token')
     if (!token) return
 
-    try {
-      const es = new EventSource(
-        `${API_BASE_URL}/notifications/stream?token=${token}`,
-      )
-      es.onmessage = () => {
-        void loadData()
+    let reconnectTimeout: ReturnType<typeof setTimeout>
+    let reconnectAttempts = 0
+    const maxReconnectDelay = 30_000
+
+    const connect = () => {
+      try {
+        const es = new EventSource(
+          `${API_BASE_URL}/notifications/stream?token=${token}`,
+        )
+        es.onmessage = () => {
+          reconnectAttempts = 0
+          void loadData()
+        }
+        es.onerror = () => {
+          es.close()
+          const delay = Math.min(1000 * 2 ** reconnectAttempts, maxReconnectDelay)
+          reconnectAttempts++
+          reconnectTimeout = setTimeout(connect, delay)
+        }
+        eventSourceRef.current = es
+      } catch {
+        // SSE not supported
       }
-      eventSourceRef.current = es
-    } catch {
-      // SSE not supported or URL not available
     }
 
+    connect()
+
     return () => {
+      clearTimeout(reconnectTimeout)
       eventSourceRef.current?.close()
     }
   }, [])

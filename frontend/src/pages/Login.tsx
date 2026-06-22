@@ -36,6 +36,7 @@ const Login = () => {
     try {
       const auth = await login({ email, password })
 
+      setAuth(auth.accessToken, auth.refreshToken, null)
       const user = await getCurrentUser()
       setAuth(auth.accessToken, auth.refreshToken, user)
 

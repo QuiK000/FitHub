@@ -75,6 +75,7 @@ const Trainers = () => {
       setReviews(page.content)
     } catch {
       setReviews([])
+      toast.error(t('common:errors.loadFailed'))
     } finally {
       setIsLoadingReviews(false)
     }

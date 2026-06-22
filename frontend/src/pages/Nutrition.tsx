@@ -109,45 +109,48 @@ const Nutrition = () => {
     setIsLoading(true)
     setErrors({})
 
-    const [waterResult, weeklyWaterResult, todayPlanResult, plansResult] =
-      await Promise.allSettled([
-        getTodayWaterIntake(),
-        getWeeklyWaterIntake(),
-        getTodayMealPlan(todayIso()),
-        getMyMealPlans(0, 5),
-      ])
+    try {
+      const [waterResult, weeklyWaterResult, todayPlanResult, plansResult] =
+        await Promise.allSettled([
+          getTodayWaterIntake(),
+          getWeeklyWaterIntake(),
+          getTodayMealPlan(todayIso()),
+          getMyMealPlans(0, 5),
+        ])
 
-    const nextErrors: NutritionErrors = {}
-    const todayWater = unwrapResult(waterResult, 'todayWater', nextErrors, null)
-    const weeklyWater = unwrapResult(
-      weeklyWaterResult,
-      'weeklyWater',
-      nextErrors,
-      [],
-    )
-    const todayMealPlan = unwrapResult(
-      todayPlanResult,
-      'todayMealPlan',
-      nextErrors,
-      null,
-    )
-    const mealPlansPage = unwrapResult(plansResult, 'mealPlans', nextErrors, {
-      content: [],
-      totalElements: 0,
-      totalPages: 0,
-      number: 0,
-      size: 0,
-    })
-
-    if (mounted.current) {
-      setState({
-        todayWater,
-        weeklyWater,
-        todayMealPlan,
-        mealPlans: mealPlansPage.content,
+      const nextErrors: NutritionErrors = {}
+      const todayWater = unwrapResult(waterResult, 'todayWater', nextErrors, null)
+      const weeklyWater = unwrapResult(
+        weeklyWaterResult,
+        'weeklyWater',
+        nextErrors,
+        [],
+      )
+      const todayMealPlan = unwrapResult(
+        todayPlanResult,
+        'todayMealPlan',
+        nextErrors,
+        null,
+      )
+      const mealPlansPage = unwrapResult(plansResult, 'mealPlans', nextErrors, {
+        content: [],
+        totalElements: 0,
+        totalPages: 0,
+        number: 0,
+        size: 0,
       })
-      setErrors(nextErrors)
-      setIsLoading(false)
+
+      if (mounted.current) {
+        setState({
+          todayWater,
+          weeklyWater,
+          todayMealPlan,
+          mealPlans: mealPlansPage.content,
+        })
+        setErrors(nextErrors)
+      }
+    } finally {
+      if (mounted.current) setIsLoading(false)
     }
   }
 
@@ -300,6 +303,7 @@ const Nutrition = () => {
       setFoodSearchResults(result.content)
     } catch {
       setFoodSearchResults([])
+      toast.error(t('common:errors.loadFailed'))
     } finally {
       setIsSearchingFoods(false)
     }
@@ -335,13 +339,13 @@ const Nutrition = () => {
           ))
         ) : (
           <>
-            <MetricCard
+            <MetricCardNutrition
               icon={Droplets}
               label={t('water.today')}
               value={`${Math.round(waterProgress)}%`}
               detail={`${waterTotal} / ${waterTarget} ml`}
             />
-            <MetricCard
+            <MetricCardNutrition
               icon={Flame}
               label={t('calories.today')}
               value={`${state.todayMealPlan?.totalCalories ?? 0}`}
@@ -351,7 +355,7 @@ const Nutrition = () => {
                   : t('calories.noTarget')
               }
             />
-            <MetricCard
+            <MetricCardNutrition
               icon={Leaf}
               label={t('weeklyHydration.title')}
               value={`${weeklyAverage}%`}
@@ -594,7 +598,7 @@ const getMealCompletion = (plan: MealPlanResponse) => {
   return clampPercentage((completedMeals / plan.meals.length) * 100)
 }
 
-const MetricCard = ({
+const MetricCardNutrition = ({
   icon: Icon,
   label,
   value,
@@ -845,6 +849,11 @@ const FoodSearchInput = ({
   const { t } = useTranslation(['nutrition'])
   const containerRef = useRef<HTMLDivElement>(null)
   const [isOpen, setIsOpen] = useState(false)
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+
+  useEffect(() => {
+    return () => clearTimeout(debounceRef.current)
+  }, [])
 
   useEffect(() => {
     if (!isOpen) return
@@ -870,7 +879,11 @@ const FoodSearchInput = ({
             type="text"
             placeholder={t('food.searchPlaceholder')}
             value={query}
-            onChange={(event) => onSearch(event.target.value)}
+            onChange={(event) => {
+              const value = event.target.value
+              clearTimeout(debounceRef.current)
+              debounceRef.current = setTimeout(() => onSearch(value), 300)
+            }}
             onFocus={() => { if (results.length > 0) setIsOpen(true) }}
             className="h-8 w-full rounded-lg border border-border bg-background pl-8 pr-3 text-xs text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />
