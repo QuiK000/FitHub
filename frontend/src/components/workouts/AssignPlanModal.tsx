@@ -51,8 +51,8 @@ export const AssignPlanModal = ({
     try {
       const res = await searchClients(query, 0, 10)
       setClients(res.content)
-    } catch {
-      toast.error(getApiErrorMessage(undefined, t('assign.searchFailed')))
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, t('assign.searchFailed')))
     } finally {
       setIsSearching(false)
     }
@@ -138,7 +138,7 @@ export const AssignPlanModal = ({
                         className="flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm transition hover:bg-accent first:rounded-t-xl last:rounded-b-xl"
                       >
                         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-                          {client.firstname[0]}{client.lastname[0]}
+                          {(client.firstname?.[0] ?? '').toUpperCase()}{(client.lastname?.[0] ?? '').toUpperCase()}
                         </div>
                         <div>
                           <p className="font-medium text-foreground">{client.firstname} {client.lastname}</p>

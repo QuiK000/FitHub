@@ -25,15 +25,25 @@ export const CreatePlanModal = ({ isOpen, onClose, onCreated }: CreatePlanModalP
     sessionsPerWeek: '3',
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    if (!form.name.trim()) return
+    const newErrors: Record<string, string> = {}
+
+    if (!form.name.trim()) newErrors.name = t('createPlan.validation.nameRequired')
 
     const weeks = Number(form.durationWeeks)
+    if (!Number.isFinite(weeks) || weeks < 1) newErrors.durationWeeks = t('createPlan.validation.weeksInvalid')
+
     const sessions = Number(form.sessionsPerWeek)
-    if (!Number.isFinite(weeks) || weeks < 1) return
-    if (!Number.isFinite(sessions) || sessions < 1 || sessions > 7) return
+    if (!Number.isFinite(sessions) || sessions < 1 || sessions > 7) newErrors.sessionsPerWeek = t('createPlan.validation.sessionsInvalid')
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      return
+    }
+    setErrors({})
 
     setIsSubmitting(true)
     try {
@@ -90,6 +100,7 @@ export const CreatePlanModal = ({ isOpen, onClose, onCreated }: CreatePlanModalP
                   placeholder={t('createPlan.namePlaceholder')}
                   required
                 />
+                {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
               </label>
 
               <label className="space-y-1.5">
@@ -125,6 +136,7 @@ export const CreatePlanModal = ({ isOpen, onClose, onCreated }: CreatePlanModalP
                     value={form.durationWeeks}
                     onChange={(e) => setForm((p) => ({ ...p, durationWeeks: e.target.value }))}
                   />
+                  {errors.durationWeeks && <p className="text-xs text-destructive">{errors.durationWeeks}</p>}
                 </label>
                 <label className="space-y-1.5">
                   <span className="text-xs text-foreground">{t('createPlan.sessionsPerWeek')}</span>
@@ -135,6 +147,7 @@ export const CreatePlanModal = ({ isOpen, onClose, onCreated }: CreatePlanModalP
                     value={form.sessionsPerWeek}
                     onChange={(e) => setForm((p) => ({ ...p, sessionsPerWeek: e.target.value }))}
                   />
+                  {errors.sessionsPerWeek && <p className="text-xs text-destructive">{errors.sessionsPerWeek}</p>}
                 </label>
               </div>
 

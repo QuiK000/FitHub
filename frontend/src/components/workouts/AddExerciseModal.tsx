@@ -52,29 +52,35 @@ export const AddExerciseModal = ({
     notes: '',
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   useEffect(() => {
-    if (isOpen) {
-      setIsLoadingExercises(true)
-      getActiveExercises(0, 200)
-        .then((res) => {
-          setExercises(res.content)
-          setForm((prev) => ({
-            ...prev,
-            exerciseId: res.content[0]?.id ?? '',
-          }))
-        })
-        .catch((err) => {
-          toast.error(getApiErrorMessage(err, t('addExercise.loadExercisesFailed')))
-        })
-        .finally(() => setIsLoadingExercises(false))
+    if (!isOpen) return
 
-      const nextOrder = plan.exercises.length + 1
-      setForm((prev) => ({
-        ...prev,
-        orderIndex: String(nextOrder),
-      }))
-    }
+    let isMounted = true
+    setIsLoadingExercises(true)
+    getActiveExercises(0, 200)
+      .then((res) => {
+        if (!isMounted) return
+        setExercises(res.content)
+        setForm((prev) => ({
+          ...prev,
+          exerciseId: res.content[0]?.id ?? '',
+        }))
+      })
+      .catch((err) => {
+        if (!isMounted) return
+        toast.error(getApiErrorMessage(err, t('addExercise.loadExercisesFailed')))
+      })
+      .finally(() => { if (isMounted) setIsLoadingExercises(false) })
+
+    const nextOrder = plan.exercises.length + 1
+    setForm((prev) => ({
+      ...prev,
+      orderIndex: String(nextOrder),
+    }))
+
+    return () => { isMounted = false }
   }, [isOpen, plan.exercises.length])
 
   const updateField = (field: keyof ExerciseForm, value: string) => {
@@ -83,7 +89,15 @@ export const AddExerciseModal = ({
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    if (!form.exerciseId) return
+    const newErrors: Record<string, string> = {}
+
+    if (!form.exerciseId) newErrors.exerciseId = t('addExercise.validation.exerciseRequired')
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      return
+    }
+    setErrors({})
 
     setIsSubmitting(true)
     try {
@@ -157,6 +171,7 @@ export const AddExerciseModal = ({
                     ))
                   )}
                 </select>
+                {errors.exerciseId && <p className="text-xs text-destructive">{errors.exerciseId}</p>}
               </label>
 
               <div className="grid grid-cols-2 gap-3">
