@@ -1,0 +1,60 @@
+{
+  "badge": "Профіль",
+  "title": "{{name}}",
+  "subtitle": "Керуйте своїми особистими даними та тренувальними показниками.",
+  "editButton": "Редагувати профіль",
+  "accountDetails": {
+    "title": "Деталі облікового запису",
+    "subtitle": "Основна інформація, що використовується у вашому досвіді FitHub.",
+    "email": "Електронна пошта",
+    "phone": "Телефон",
+    "accountStatus": "Статус облікового запису",
+    "memberSince": "Член з",
+    "birthdate": "Дата народження",
+    "gender": "Стать",
+    "active": "Активний",
+    "inactive": "Неактивний",
+    "phonePlaceholder": "Додайте номер телефону",
+    "birthdatePlaceholder": "Додайте дату народження",
+    "notAvailable": "Недоступно"
+  },
+  "physicalStats": {
+    "title": "Фізичні показники",
+    "subtitle": "Дані, які ваші тренери використовують для адаптації ваших сесій.",
+    "currentWeight": "Поточна вага",
+    "weightValue": "{{weight}} кг",
+    "weightPlaceholder": "Додайте вагу",
+    "height": "Зріст",
+    "heightValue": "{{height}} см",
+    "heightPlaceholder": "Додайте зріст",
+    "hydrationTarget": "Щоденна ціль гідратації",
+    "hydrationValue": "{{target}} ml",
+    "hydrationPlaceholder": "Встановіть свою ціль"
+  },
+  "editModal": {
+    "badge": "Редагувати профіль",
+    "subtitle": "Оновіть базову інформацію та показники.",
+    "firstName": "Ім'я",
+    "lastName": "Прізвище",
+    "phone": "Телефон",
+    "phonePlaceholder": "+380501234567",
+    "birthdate": "Дата народження",
+    "height": "Зріст (см)",
+    "weight": "Вага (кг)",
+    "waterTarget": "Ціль води (ml)",
+    "gender": "Стать",
+    "genderLabels": {
+      "male": "Чоловік",
+      "female": "Жінка",
+      "other": "Інше"
+    },
+    "cancelButton": "Скасувати",
+    "saveButton": "Зберегти зміни"
+  },
+  "loading": "Завантаження профілю...",
+  "errors": {
+    "loadFailed": "Не вдалося завантажити ваш профіль зараз.",
+    "saveFailed": "Не вдалося зберегти зміни профілю.",
+    "fixFields": "Будь ласка, виправте виділені поля профілю."
+  }
+}

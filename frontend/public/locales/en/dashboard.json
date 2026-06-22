@@ -1,0 +1,108 @@
+{
+  "badge": "Client dashboard",
+  "title": "Welcome back, {{name}}",
+  "subtitle": "Your membership, hydration, training, and progress signals in one focused view for {{date}}.",
+  "openWorkouts": "Open workouts",
+  "trackProgress": "Track progress",
+  "trainer": {
+    "badge": "Dashboard",
+    "welcome": "Welcome back, {{name}}",
+    "overview": "Overview of your gym operations and key metrics.",
+    "title": "Trainer Dashboard",
+    "desc": "Use the navigation sidebar to access workout plans, sessions, analytics, and client management.",
+    "quickAccess": "Quick Access",
+    "workouts": "Workouts",
+    "sessions": "Sessions",
+    "analytics": "Analytics",
+    "managePlans": "Manage Plans",
+    "viewSessions": "View Sessions"
+  },
+  "membership": {
+    "title": "Membership",
+    "notActive": "Not active",
+    "days": "{{count}} days",
+    "explorePlan": "Explore a plan to unlock sessions",
+    "validUntil": "Valid until {{date}}",
+    "statusTitle": "Membership Status",
+    "statusDesc": "Your access window and remaining visit context.",
+    "activePlan": "Active plan",
+    "daysRemaining": "{{count}} day(s) remaining",
+    "validFrom": "Valid from",
+    "validUntilDate": "Valid until",
+    "visitsLeft": "Visits left",
+    "unlimited": "Unlimited",
+    "noActive": "No active membership",
+    "noActiveDesc": "You do not have an active membership yet. Explore plans to unlock training access.",
+    "explorePlans": "Explore plans"
+  },
+  "water": {
+    "title": "Water today",
+    "ofTarget": "of {{target}} ml target",
+    "mlLogged": "{{total}} / {{target}} ml",
+    "intakesLogged": "{{count}} intake(s) logged today.",
+    "noIntakes": "No water logged today. Start with one glass and build momentum.",
+    "hydrationTitle": "Hydration",
+    "hydrationDesc": "Keep today's water target visible and easy to scan.",
+    "noTarget": "No hydration target yet",
+    "noTargetDesc": "Set your daily water target from your profile to start tracking intake.",
+    "updateProfile": "Update profile"
+  },
+  "workoutPlan": {
+    "title": "Workout plan",
+    "none": "None",
+    "noActive": "No active workout plan",
+    "noActiveDesc": "Once a trainer assigns your plan, today's training focus will appear here.",
+    "browseWorkouts": "Browse workouts",
+    "activeWorkoutPlan": "Active workout plan",
+    "sessionsPerWeek": "{{count}} sessions/week",
+    "complete": "% complete",
+    "logged": "{{completed}} / {{total}} workouts"
+  },
+  "nextSession": {
+    "title": "Next session",
+    "noUpcoming": "No upcoming sessions",
+    "noUpcomingDesc": "Join a class or book a personal session when the next schedule opens.",
+    "viewSessions": "View sessions",
+    "training": "training",
+    "withTrainer": "With {{name}}",
+    "starts": "Starts",
+    "capacity": "Capacity"
+  },
+  "goals": {
+    "title": "Active goals",
+    "noGoals": "Create a goal to track your next milestone",
+    "activeGoalsTitle": "Goals & Measurements",
+    "activeGoalsDesc": "The latest progress signals from your tracking history.",
+    "noActiveGoals": "No active goals",
+    "noActiveGoalsDesc": "Create your first goal to turn progress into something visible.",
+    "openProgress": "Open progress",
+    "noMeasurements": "No measurements yet",
+    "noMeasurementsDesc": "Log your first body measurement to unlock trend tracking.",
+    "addMeasurement": "Add measurement"
+  },
+  "measurements": {
+    "latest": "Latest measurement",
+    "weight": "Weight",
+    "bodyFat": "Body fat",
+    "muscle": "Muscle",
+    "bmi": "BMI"
+  },
+  "todayPlan": {
+    "title": "Today's Plan",
+    "desc": "The highest-value actions for your next workout day."
+  },
+  "admin": {
+    "activeClients": "Active clients",
+    "activeMemberships": "Active memberships",
+    "revenue": "Revenue",
+    "todayCheckIns": "Check-ins today"
+  },
+  "fallbacks": {
+    "there": "there",
+    "admin": "Admin"
+  },
+  "errors": {
+    "loadFailed": "Some dashboard sections could not be refreshed. The rest of your overview is still available.",
+    "unableToLoad": "Unable to load dashboard data."
+  }
+}

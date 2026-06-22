@@ -1,0 +1,100 @@
+{
+  "badge": "Админ",
+  "title": "Администрирование",
+  "subtitle": "Управляйте членствами, отправляйте уведомления и просматривайте аналитику системы.",
+  "tabs": {
+    "overview": "Обзор",
+    "memberships": "Членства",
+    "reviews": "Отзывы",
+    "broadcast": "Рассылка",
+    "exercises": "Упражнения"
+  },
+  "exercises": {
+    "title": "Управление упражнениями",
+    "subtitle": "Создавайте, редактируйте и управляйте библиотекой упражнений",
+    "create": "Новое упражнение",
+    "edit": "Редактировать упражнение",
+    "name": "Название упражнения",
+    "category": "Категория",
+    "muscleGroup": "Группа мышц",
+    "description": "Описание",
+    "activate": "Активировать",
+    "deactivate": "Деактивировать"
+  },
+  "overview": {
+    "activeClients": "Активные клиенты",
+    "activeMemberships": "Активные членства",
+    "revenue": "Доход",
+    "todayCheckIns": "Сегодняшние посещения"
+  },
+  "memberships": {
+    "findClient": "Найти клиента",
+    "searchPlaceholder": "Поиск по имени или email...",
+    "searchHint": "Начните вводить имя или email клиента для поиска",
+    "noClientsFound": "Клиенты не найдены",
+    "noPhone": "Без телефона",
+    "memberSince": "Клиент с {{date}}",
+    "selectClientFirst": "Сначала выберите клиента",
+    "selectClientHint": "Ищите клиента выше для управления его членствами.",
+    "noMemberships": "У этого клиента пока нет членств.",
+    "createButton": "Создать членство",
+    "noResults": "Членства для этого клиента не найдены.",
+    "actions": {
+      "activate": "Активировать",
+      "freeze": "Заморозить",
+      "unfreeze": "Разморозить",
+      "cancel": "Отменить",
+      "extend": "Продлить"
+    },
+    "visitsLeft": "Осталось {{count}} посещений",
+    "unlimited": "Безлимитные посещения",
+    "createModal": {
+      "badge": "Новое членство",
+      "title": "Создать членство",
+      "clientId": "ID клиента",
+      "planType": "Тип плана",
+      "types": {
+        "monthly": "Ежемесячный",
+        "yearly": "Годовой",
+        "visits": "По посещениям"
+      },
+      "durationMonths": "Длительность (месяцев)",
+      "visitsLimit": "Лимит посещений",
+      "visitsLimitPlaceholder": "напр. 10",
+      "createButton": "Создать"
+    }
+  },
+  "reviews": {
+    "title": "Модерация отзывов",
+    "filters": {
+      "all": "Все",
+      "visible": "Видимые",
+      "hidden": "Скрытые"
+    },
+    "trainerReview": "Отзыв о тренере",
+    "noReviews": "Отзывы не найдены",
+    "noReviewsDesc": "Отзывы от клиентов появятся здесь.",
+    "visible": "Видимый",
+    "hidden": "Скрытый",
+    "hideReasonPrompt": "Введите причину скрытия этого отзыва (необязательно):",
+    "hideModalTitle": "Скрыть отзыв",
+    "hideModalDescription": "Этот отзыв будет скрыт из публичного просмотра. Вы можете необязательно указать причину.",
+    "hideButton": "Скрыть"
+  },
+  "broadcast": {
+    "title": "Уведомление для всех",
+    "subtitle": "Отправьте уведомление всем пользователям.",
+    "titleLabel": "Заголовок",
+    "titlePlaceholder": "Заголовок уведомления",
+    "priorityLabel": "Приоритет",
+    "priorities": {
+      "LOW": "Низкий",
+      "NORMAL": "Обычный",
+      "HIGH": "Высокий",
+      "URGENT": "Срочный"
+    },
+    "messageLabel": "Сообщение",
+    "messagePlaceholder": "Текст уведомления...",
+    "sendButton": "Отправить"
+  }
+}

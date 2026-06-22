@@ -1,0 +1,60 @@
+{
+  "badge": "Profile",
+  "title": "{{name}}",
+  "subtitle": "Manage your personal details and training metrics.",
+  "editButton": "Edit profile",
+  "accountDetails": {
+    "title": "Account details",
+    "subtitle": "Core information used across your FitHub experience.",
+    "email": "Email",
+    "phone": "Phone",
+    "accountStatus": "Account status",
+    "memberSince": "Member since",
+    "birthdate": "Birthdate",
+    "gender": "Gender",
+    "active": "Active",
+    "inactive": "Inactive",
+    "phonePlaceholder": "Add a contact number",
+    "birthdatePlaceholder": "Add your birthdate",
+    "notAvailable": "Not available"
+  },
+  "physicalStats": {
+    "title": "Physical stats",
+    "subtitle": "Data your trainers use to tailor your sessions.",
+    "currentWeight": "Current weight",
+    "weightValue": "{{weight}} kg",
+    "weightPlaceholder": "Add weight",
+    "height": "Height",
+    "heightValue": "{{height}} cm",
+    "heightPlaceholder": "Add height",
+    "hydrationTarget": "Daily hydration target",
+    "hydrationValue": "{{target}} ml",
+    "hydrationPlaceholder": "Set your target"
+  },
+  "editModal": {
+    "badge": "Edit profile",
+    "subtitle": "Update your basic information and metrics.",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "phone": "Phone",
+    "phonePlaceholder": "+12025550123",
+    "birthdate": "Birthdate",
+    "height": "Height (cm)",
+    "weight": "Weight (kg)",
+    "waterTarget": "Water target (ml)",
+    "gender": "Gender",
+    "genderLabels": {
+      "male": "Male",
+      "female": "Female",
+      "other": "Other"
+    },
+    "cancelButton": "Cancel",
+    "saveButton": "Save changes"
+  },
+  "loading": "Loading your profile...",
+  "errors": {
+    "loadFailed": "Unable to load your profile right now.",
+    "saveFailed": "Unable to save profile changes.",
+    "fixFields": "Please fix the highlighted profile fields."
+  }
+}

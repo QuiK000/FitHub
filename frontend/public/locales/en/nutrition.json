@@ -1,0 +1,86 @@
+{
+  "title": "Fuel and hydration",
+  "subtitle": "Track today's water, meal plan, calories, and weekly consistency.",
+  "badgeLabel": "Nutrition",
+  "editTargets": "Edit targets",
+  "water": {
+    "today": "Water today",
+    "ofTarget": "of {{target}} ml target",
+    "mlLogged": "{{total}} / {{target}} ml",
+    "logged": "logged today",
+    "loggedAmount": "{{amount}} ml logged.",
+    "noIntakes": "No water logged today. Start with a small entry and build momentum.",
+    "quickAdd": "Quick add",
+    "customAmount": "Custom amount in ml",
+    "logWater": "Log water",
+    "weekly": "Weekly Hydration",
+    "weeklyDesc": "Seven-day water progress at a glance.",
+    "noWeekly": "No weekly water history",
+    "noWeeklyDesc": "Your hydration week will populate once you start logging water.",
+    "quickAddAmount": "+{{amount}} ml"
+  },
+  "calories": {
+    "today": "Calories today",
+    "ofTarget": "of {{target}} target",
+    "noTarget": "No calorie target set"
+  },
+  "weeklyHydration": {
+    "title": "Weekly hydration",
+    "avg": "Average target completion"
+  },
+  "mealPlan": {
+    "todayTitle": "Today's Meal Plan",
+    "todayDesc": "Meal plan totals and completion for today.",
+    "noPlan": "No meal plan for today",
+    "noPlanDesc": "Create a plan to start tracking your nutrition.",
+    "createBelow": "Create below",
+    "createToday": "Create today's plan",
+    "targetCalories": "Target calories (optional)",
+    "createPlan": "Create plan",
+    "createFailed": "Unable to create meal plan.",
+    "recentTitle": "Recent Meal Plans",
+    "recentDesc": "Your latest nutrition planning history.",
+    "noRecent": "No meal plans yet",
+    "noRecentDesc": "Meal plans you create will appear here with calorie and macro totals.",
+    "calories": "calories",
+    "ofCalories": "of {{target}} calories",
+    "caloriesLoggedToday": "calories logged today",
+    "meals": "{{count}} meal(s)",
+    "completed": "Completed",
+    "open": "Open",
+    "editButton": "Edit Plan",
+    "editTitle": "Edit Meal Plan",
+    "editSuccess": "Meal plan updated.",
+    "targetProtein": "Protein (g)",
+    "targetCarbs": "Carbs (g)",
+    "targetFat": "Fat (g)"
+  },
+  "meal": {
+    "done": "Done",
+    "planned": "Planned",
+    "foods": "{{count}} food item(s)",
+    "addMeal": "Add a meal to this plan",
+    "add": "Add meal",
+    "added": "Meal added to plan",
+    "addFailed": "Failed to add meal",
+    "markComplete": "Mark as complete",
+    "completed": "Meal marked as complete",
+    "completeFailed": "Failed to complete meal"
+  },
+  "mealTypes": {
+    "BREAKFAST": "Breakfast",
+    "MORNING_SNACK": "Morning Snack",
+    "LUNCH": "Lunch",
+    "AFTERNOON_SNACK": "Afternoon Snack",
+    "DINNER": "Dinner",
+    "EVENING_SNACK": "Evening Snack",
+    "PRE_WORKOUT": "Pre-workout",
+    "POST_WORKOUT": "Post-workout"
+  },
+  "food": {
+    "searchPlaceholder": "Search foods..."
+  },
+  "errors": {
+    "loadFailed": "Some nutrition sections could not be refreshed. The available sections are still shown."
+  }
+}

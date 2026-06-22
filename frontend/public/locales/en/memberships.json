@@ -1,0 +1,62 @@
+{
+  "badge": "Memberships",
+  "title": "Your membership",
+  "subtitle": "Active plan details and membership history.",
+  "activePlan": "Active Plan",
+  "activePlanDesc": "Your current membership status.",
+  "planType": "Plan type",
+  "daysRemaining": "{{count}} day(s) remaining",
+  "validFrom": "Valid from",
+  "validUntil": "Valid until",
+  "status": "Status",
+  "visitsLeft": "{{count}} visits left",
+  "unlimited": "Unlimited",
+  "noActive": "No active membership",
+  "noActiveDesc": "Contact the gym to get started with a plan.",
+  "summary": {
+    "title": "Membership Summary",
+    "subtitle": "Quick overview of your access.",
+    "total": "Total memberships",
+    "active": "Active",
+    "expired": "Expired",
+    "cancelled": "Cancelled"
+  },
+  "history": "History",
+  "paymentHistory": "Payment History",
+  "browse": {
+    "title": "Choose your plan",
+    "subtitle": "Select the membership that fits your goals.",
+    "monthly": {
+      "name": "Monthly"
+    },
+    "yearly": {
+      "name": "Yearly"
+    },
+    "visits": {
+      "name": "Visit Pass"
+    },
+    "features": {
+      "unlimitedGym": "Unlimited gym access",
+      "groupClasses": "Group classes",
+      "basicTracking": "Basic tracking",
+      "advancedAnalytics": "Advanced analytics",
+      "prioritySupport": "Priority support",
+      "visitPass10": "10 visit passes"
+    },
+    "savings": "Save $59.89",
+    "perPass": "pass",
+    "perMonth": "month",
+    "perYear": "year",
+    "processing": "Processing...",
+    "purchaseButton": "Get started",
+    "success": "Membership created successfully.",
+    "failed": "Failed to process your purchase."
+  },
+  "statusValues": {
+    "ACTIVE": "Active",
+    "EXPIRED": "Expired",
+    "FROZEN": "Frozen",
+    "CANCELLED": "Cancelled",
+    "CREATED": "Created"
+  }
+}

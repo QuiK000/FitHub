@@ -1,0 +1,100 @@
+{
+  "badge": "Адмін",
+  "title": "Адміністрування",
+  "subtitle": "Керуйте членствами, надсилайте сповіщення та переглядайте аналітику системи.",
+  "tabs": {
+    "overview": "Огляд",
+    "memberships": "Членства",
+    "reviews": "Відгуки",
+    "broadcast": "Розсилка",
+    "exercises": "Вправи"
+  },
+  "exercises": {
+    "title": "Керування вправами",
+    "subtitle": "Створюйте, редагуйте та керуйте бібліотекою вправ",
+    "create": "Нова вправа",
+    "edit": "Редагувати вправу",
+    "name": "Назва вправи",
+    "category": "Категорія",
+    "muscleGroup": "Група м'язів",
+    "description": "Опис",
+    "activate": "Активувати",
+    "deactivate": "Деактивувати"
+  },
+  "overview": {
+    "activeClients": "Активні клієнти",
+    "activeMemberships": "Активні членства",
+    "revenue": "Дохід",
+    "todayCheckIns": "Сьогоднішні відвідування"
+  },
+  "memberships": {
+    "findClient": "Знайти клієнта",
+    "searchPlaceholder": "Пошук за ім'ям або email...",
+    "searchHint": "Почніть вводити ім'я або email клієнта для пошуку",
+    "noClientsFound": "Клієнтів не знайдено",
+    "noPhone": "Без телефону",
+    "memberSince": "Клієнт з {{date}}",
+    "selectClientFirst": "Спочатку оберіть клієнта",
+    "selectClientHint": "Шукайте клієнта вище для керування його членствами.",
+    "noMemberships": "У цього клієнта ще немає членств.",
+    "createButton": "Створити членство",
+    "noResults": "Членства для цього клієнта не знайдено.",
+    "actions": {
+      "activate": "Активувати",
+      "freeze": "Заморозити",
+      "unfreeze": "Розморозити",
+      "cancel": "Скасувати",
+      "extend": "Продовжити"
+    },
+    "visitsLeft": "Залишилось {{count}} відвідувань",
+    "unlimited": "Необмежені відвідування",
+    "createModal": {
+      "badge": "Нове членство",
+      "title": "Створити членство",
+      "clientId": "ID клієнта",
+      "planType": "Тип плану",
+      "types": {
+        "monthly": "Щомісячний",
+        "yearly": "Річний",
+        "visits": "За відвідуваннями"
+      },
+      "durationMonths": "Тривалість (місяців)",
+      "visitsLimit": "Ліміт відвідувань",
+      "visitsLimitPlaceholder": "напр. 10",
+      "createButton": "Створити"
+    }
+  },
+  "reviews": {
+    "title": "Модерація відгуків",
+    "filters": {
+      "all": "Усі",
+      "visible": "Видимі",
+      "hidden": "Приховані"
+    },
+    "trainerReview": "Відгук про тренера",
+    "noReviews": "Відгуків не знайдено",
+    "noReviewsDesc": "Відгуки від клієнтів з'являться тут.",
+    "visible": "Видимий",
+    "hidden": "Прихований",
+    "hideReasonPrompt": "Введіть причину приховання цього відгуку (необов'язково):",
+    "hideModalTitle": "Приховати відгук",
+    "hideModalDescription": "Цей відгук буде приховано з публічного перегляду. Ви можете необов'язково вказати причину.",
+    "hideButton": "Приховати"
+  },
+  "broadcast": {
+    "title": "Сповіщення для всіх",
+    "subtitle": "Надішліть сповіщення всім користувачам.",
+    "titleLabel": "Заголовок",
+    "titlePlaceholder": "Заголовок сповіщення",
+    "priorityLabel": "Пріоритет",
+    "priorities": {
+      "LOW": "Низький",
+      "NORMAL": "Звичайний",
+      "HIGH": "Високий",
+      "URGENT": "Терміновий"
+    },
+    "messageLabel": "Повідомлення",
+    "messagePlaceholder": "Текст сповіщення...",
+    "sendButton": "Надіслати"
+  }
+}

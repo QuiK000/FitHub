@@ -1,0 +1,55 @@
+{
+  "badge": "Sessions",
+  "title": "Training sessions",
+  "subtitle": "Browse upcoming group and personal training sessions, join, or check in.",
+  "upcoming": "Upcoming",
+  "past": "Past / Completed",
+  "filter": {
+    "all": "All"
+  },
+  "errors": {
+    "loadFailed": "Unable to load training sessions.",
+    "joinFailed": "Unable to join session."
+  },
+  "fallbacks": {
+    "trainer": "Trainer"
+  },
+  "form": {
+    "sessionType": "Session Type",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "capacity": "Max Participants",
+    "validation": {
+      "startTimeRequired": "Start time is required.",
+      "endTimeRequired": "End time is required.",
+      "endTimeAfterStart": "End time must be after start time.",
+      "participantsMin": "At least 1 participant is required."
+    }
+  },
+  "viewAttendance": "View Attendance",
+  "checkInClient": "Check in client",
+  "joined": "Joined",
+  "alreadyJoined": "Already joined",
+  "sessionFull": "Join waitlist",
+  "waitlisted": "Added to waitlist.",
+  "emptyState": {
+    "title": "No sessions found",
+    "description": "Check back later for new training sessions."
+  },
+  "noUpcoming": "No upcoming sessions",
+  "noUpcomingDesc": "Check back later for new training sessions.",
+  "type": {
+    "GROUP": "Group",
+    "PERSONAL": "Personal"
+  },
+  "status": {
+    "SCHEDULED": "Scheduled",
+    "COMPLETED": "Completed",
+    "CANCELLED": "Cancelled"
+  },
+  "join": "Join ({{spots}} spots)",
+  "joining": "Joining...",
+  "startsAt": "Starts",
+  "capacity": "Capacity",
+  "withTrainer": "With {{name}}"
+}

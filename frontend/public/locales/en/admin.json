@@ -1,0 +1,101 @@
+{
+  "badge": "Admin",
+  "title": "Administration",
+  "subtitle": "Manage memberships, broadcast notifications, and view system analytics.",
+  "tabs": {
+    "overview": "Overview",
+    "memberships": "Memberships",
+    "reviews": "Reviews",
+    "broadcast": "Broadcast",
+    "exercises": "Exercises"
+  },
+  "exercises": {
+    "title": "Exercise Management",
+    "subtitle": "Create, edit, and manage the exercise library",
+    "create": "New Exercise",
+    "edit": "Edit Exercise",
+    "name": "Exercise Name",
+    "category": "Category",
+    "muscleGroup": "Muscle Group",
+    "description": "Description",
+    "activate": "Activate",
+    "deactivate": "Deactivate"
+  },
+  "overview": {
+    "activeClients": "Active clients",
+    "activeMemberships": "Active memberships",
+    "revenue": "Revenue",
+    "todayCheckIns": "Today check-ins"
+  },
+  "memberships": {
+    "findClient": "Find Client",
+    "searchPlaceholder": "Search by name or email...",
+    "searchHint": "Start typing a client's name or email to search",
+    "noClientsFound": "No clients found",
+    "noPhone": "No phone",
+    "memberSince": "Member since {{date}}",
+    "selectClientFirst": "Select a client first",
+    "selectClientHint": "Search for a client above to manage their memberships.",
+    "noMemberships": "This client doesn't have any memberships yet.",
+    "createButton": "Create membership",
+    "noResults": "No memberships found for this client.",
+    "actions": {
+      "activate": "Activate",
+      "freeze": "Freeze",
+      "unfreeze": "Unfreeze",
+      "cancel": "Cancel",
+      "extend": "Extend"
+    },
+    "cancelConfirm": "Are you sure you want to cancel this membership? This action cannot be undone.",
+    "visitsLeft": "{{count}} visits left",
+    "unlimited": "Unlimited visits",
+    "createModal": {
+      "badge": "New membership",
+      "title": "Create membership",
+      "clientId": "Client ID",
+      "planType": "Plan type",
+      "types": {
+        "monthly": "Monthly",
+        "yearly": "Yearly",
+        "visits": "Visits"
+      },
+      "durationMonths": "Duration (months)",
+      "visitsLimit": "Visits limit",
+      "visitsLimitPlaceholder": "e.g. 10",
+      "createButton": "Create"
+    }
+  },
+  "reviews": {
+    "title": "Review Moderation",
+    "filters": {
+      "all": "All",
+      "visible": "Visible",
+      "hidden": "Hidden"
+    },
+    "trainerReview": "Trainer review",
+    "noReviews": "No reviews found",
+    "noReviewsDesc": "Reviews from clients will appear here.",
+    "visible": "Visible",
+    "hidden": "Hidden",
+    "hideReasonPrompt": "Enter a reason for hiding this review (optional):",
+    "hideModalTitle": "Hide Review",
+    "hideModalDescription": "This review will be hidden from public view. You can optionally provide a reason.",
+    "hideButton": "Hide Review"
+  },
+  "broadcast": {
+    "title": "Broadcast notification",
+    "subtitle": "Send a notification to all users.",
+    "titleLabel": "Title",
+    "titlePlaceholder": "Notification title",
+    "priorityLabel": "Priority",
+    "priorities": {
+      "LOW": "Low",
+      "NORMAL": "Normal",
+      "HIGH": "High",
+      "URGENT": "Urgent"
+    },
+    "messageLabel": "Message",
+    "messagePlaceholder": "Notification message...",
+    "sendButton": "Send broadcast"
+  }
+}

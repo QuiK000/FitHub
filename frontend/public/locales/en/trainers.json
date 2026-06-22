@@ -1,0 +1,40 @@
+{
+  "badge": "Trainers",
+  "title": "Find your trainer",
+  "subtitle": "Browse trainers, check specializations, and read reviews.",
+  "searchPlaceholder": "Search trainers...",
+  "searchButton": "Search",
+  "yearsExperience": "{{count}} years experience",
+  "viewDetails": "View details & reviews",
+  "noData": "No trainers found",
+  "noDataDesc": "Try adjusting your search or check back later.",
+  "experienceYears": "Experience years",
+  "specializations": "Specializations",
+  "noSpecializations": "No specializations available",
+  "bioDescription": "Bio description",
+  "bioPlaceholder": "Describe your training approach...",
+  "newTrainer": "New Trainer",
+  "setup": "Trainer Setup",
+  "setupDesc": "Complete your trainer profile to get started.",
+  "editProfile": "Edit Profile",
+  "createProfile": "Create Profile",
+  "editProfileDesc": "Update your trainer information.",
+  "createProfileDesc": "Fill in your details to create your trainer profile.",
+  "detail": {
+    "profileLabel": "Trainer profile",
+    "experience": "{{count}} years experience"
+  },
+  "reviews": {
+    "title": "Reviews",
+    "rating": "Rating",
+    "starCount": "{{count}} star(s)",
+    "writeReview": "Write review",
+    "noReviews": "No reviews yet. Be the first to leave a review.",
+    "commentOptional": "Comment (optional)",
+    "commentPlaceholder": "Share your experience...",
+    "submitButton": "Submit"
+  },
+  "errors": {
+    "reviewFailed": "Failed to submit review."
+  }
+}

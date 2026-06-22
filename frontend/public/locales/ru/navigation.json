@@ -1,0 +1,35 @@
+{
+  "sidebar": {
+    "brand": "FitHub",
+    "subtitle": "Панель управления",
+    "items": {
+      "dashboard": "Панель",
+      "workouts": "Тренировки",
+      "memberships": "Членства",
+      "profile": "Профиль",
+      "analytics": "Аналитика",
+      "nutrition": "Питание",
+      "progress": "Прогресс",
+      "trainers": "Тренеры",
+      "sessions": "Сессии",
+      "notifications": "Уведомления",
+      "admin": "Админ",
+      "myPlans": "Мои планы",
+      "trainerSessions": "Мои тренировки",
+      "exerciseManagement": "Упражнения"
+    },
+    "trainingLoad": {
+      "label": "Тренировочная нагрузка",
+      "value": "Недельная: {{percentage}}%"
+    },
+    "signOut": "Выйти"
+  },
+  "header": {
+    "todayOverview": "Обзор сегодня",
+    "performanceHub": "Центр производительности",
+    "liveMembers": "Онлайн члены",
+    "online": "{{count}} онлайн",
+    "member": "Член",
+    "fithubMember": "Участник FitHub"
+  }
+}

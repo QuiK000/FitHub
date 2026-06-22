@@ -1,0 +1,236 @@
+{
+  "buttons": {
+    "submit": "Отправить",
+    "cancel": "Отмена",
+    "save": "Сохранить",
+    "edit": "Редактировать",
+    "delete": "Удалить",
+    "close": "Закрыть",
+    "back": "Назад",
+    "next": "Далее",
+    "confirm": "Подтвердить",
+    "loading": "Загрузка...",
+    "saveChanges": "Сохранить изменения",
+    "search": "Поиск",
+    "create": "Создать",
+    "send": "Отправить"
+  },
+  "labels": {
+    "email": "Электронная почта",
+    "password": "Пароль",
+    "confirmPassword": "Подтвердите пароль",
+    "firstName": "Имя",
+    "lastName": "Фамилия",
+    "phone": "Телефон",
+    "search": "Поиск",
+    "filter": "Фильтр",
+    "sort": "Сортировка",
+    "notes": "Заметки",
+    "optional": "(необязательно)"
+  },
+  "messages": {
+    "success": "Успешно!",
+    "error": "Произошла ошибка",
+    "loading": "Загрузка...",
+    "noData": "Нет данных",
+    "comingSoon": "Скоро будет",
+    "saved": "Успешно сохранено",
+    "updated": "Успешно обновлено",
+    "created": "Успешно создано",
+    "deleted": "Успешно удалено",
+    "failed": "Операция не удалась"
+  },
+  "toast": {
+    "joinedSession": "Вы успешно присоединились к тренировке.",
+    "membershipCreated": "Абонемент создан.",
+    "broadcastSent": "Рассылка уведомлений отправлена.",
+    "allRead": "Все уведомления помечены как прочитанные.",
+    "readFailed": "Не удалось пометить уведомления как прочитанные.",
+    "trainersLoadFailed": "Не удалось загрузить тренеров.",
+    "reviewSubmitted": "Отзыв отправлен.",
+    "progressLoadFailed": "Не удалось загрузить данные прогресса.",
+    "measurementSaved": "Измерение сохранено.",
+    "goalCreated": "Цель создана.",
+    "progressUpdated": "Прогресс обновлен.",
+    "goalCompleted": "Цель достигнута!",
+    "recordSaved": "Рекорд сохранен.",
+    "waterAmountError": "Введите положительное количество воды.",
+    "caloriesError": "Целевое количество калорий должно быть положительным числом.",
+    "mealPlanCreated": "План питания создан на сегодня.",
+    "workoutLogged": "Тренировка успешно записана.",
+    "profileFixFields": "Пожалуйста, исправьте выделенные поля профиля.",
+    "onboardingFixFields": "Пожалуйста, заполните выделенные поля анкеты.",
+    "profileCreated": "Профиль создан. Добро пожаловать в FitHub.",
+    "noSessions": "Не удалось загрузить тренировки.",
+    "sessionJoined": "Вы успешно присоединились к тренировке.",
+    "joinFailed": "Не удалось присоединиться к тренировке.",
+    "reviewVisibilityUpdated": "Видимость отзыва обновлена.",
+    "planCreated": "Тренировочный план создан.",
+    "planAssigned": "План назначен клиенту.",
+    "exerciseAdded": "Упражнение добавлено в план.",
+    "assignmentStarted": "Назначение начато.",
+    "assignmentCompleted": "Назначение завершено.",
+    "assignmentCancelled": "Назначение отменено.",
+    "profileDeactivated": "Профиль деактивирован.",
+    "updated": "Профиль успешно обновлен.",
+    "created": "Профиль успешно создан."
+  },
+  "gender": {
+    "male": "Мужчина",
+    "female": "Женщина",
+    "other": "Другое"
+  },
+  "fallbacks": {
+    "client": "Клиент",
+    "trainer": "Тренер",
+    "admin": "Администратор",
+    "member": "Участник",
+    "fithubMember": "Участник FitHub",
+    "there": "там",
+    "initialT": "Т"
+  },
+  "errors": {
+    "required": "Это поле обязательно",
+    "invalidEmail": "Некорректный адрес электронной почты",
+    "badRequest": "Неверный запрос. Пожалуйста, проверьте введенные данные.",
+    "conflict": "Этот ресурс уже существует.",
+    "validationError": "Ошибка валидации. Пожалуйста, проверьте введенные данные.",
+    "networkError": "Ошибка сети. Пожалуйста, попробуйте еще раз.",
+    "serverError": "Ошибка сервера. Пожалуйста, попробуйте позже.",
+    "unauthorized": "Не авторизовано. Пожалуйста, войдите в систему.",
+    "forbidden": "У вас нет прав доступа к этому ресурсу.",
+    "notFound": "Ресурс не найден.",
+    "loadFailed": "Не удалось загрузить данные.",
+    "resourceNotFound": "Ресурс не найден.",
+    "rateLimitError": "Слишком много запросов. Пожалуйста, попробуйте позже.",
+    "error": "Произошла ошибка."
+  },
+  "pagination": {
+    "previous": "Назад",
+    "next": "Далее",
+    "page": "Страница {{current}} из {{total}}",
+    "showing": "Показано {{from}}–{{to}} из {{total}}"
+  },
+  "validation": {
+    "firstNameRequired": "Имя обязательно.",
+    "lastNameRequired": "Фамилия обязательна.",
+    "phoneFormat": "Используйте формат E.164, например +12025550123.",
+    "genderRequired": "Пол обязателен.",
+    "heightPositive": "Рост должен быть положительным.",
+    "weightPositive": "Вес должен быть положительным.",
+    "waterTargetPositive": "Целевое потребление воды должно быть положительным целым числом.",
+    "birthdateValid": "Введите допустимую дату рождения.",
+    "experienceRequired": "Опыт должен быть не менее 1 года.",
+    "descriptionRequired": "Описание обязательно."
+  },
+  "footer": {
+    "copyright": "© 2026 FitHub. Все права защищены.",
+    "terms": "Условия использования",
+    "privacy": "Политика конфиденциальности"
+  },
+  "status": {
+    "active": "Активен",
+    "inactive": "Неактивен",
+    "loading": "Загрузка..."
+  },
+  "enums": {
+    "difficultyLevel": {
+      "BEGINNER": "Начинающий",
+      "INTERMEDIATE": "Средний",
+      "ADVANCED": "Продвинутый",
+      "EXPERT": "Эксперт"
+    },
+    "trainingType": {
+      "GROUP": "Групповая",
+      "PERSONAL": "Персональная"
+    },
+    "membershipType": {
+      "MONTHLY": "Ежемесячный",
+      "YEARLY": "Годовой",
+      "VISITS": "По посещениям"
+    },
+    "membershipStatus": {
+      "ACTIVE": "Активен",
+      "EXPIRED": "Истек",
+      "FROZEN": "Заморожен",
+      "CANCELLED": "Отменен",
+      "CREATED": "Создан"
+    },
+    "paymentStatus": {
+      "PAID": "Оплачен",
+      "PENDING": "В ожидании",
+      "COMPLETED": "Завершен",
+      "FAILED": "Не удался"
+    },
+    "goalType": {
+      "WEIGHT_LOSS": "Снижение веса",
+      "MUSCLE_GAIN": "Набор мышечной массы",
+      "ENDURANCE": "Выносливость",
+      "STRENGTH": "Сила"
+    },
+    "recordType": {
+      "MAX_WEIGHT": "Максимальный вес",
+      "MAX_REPS": "Максимальное количество повторений",
+      "MAX_DISTANCE": "Максимальная дистанция",
+      "BEST_TIME": "Лучшее время"
+    },
+    "photoAngle": {
+      "FRONT": "Спереди",
+      "BACK": "Сзади",
+      "SIDE_LEFT": "Слева сбоку",
+      "SIDE_RIGHT": "Справа сбоку"
+    },
+    "sessionStatus": {
+      "SCHEDULED": "Запланирована",
+      "COMPLETED": "Завершена",
+      "CANCELLED": "Отменена",
+      "IN_PROGRESS": "В процессе"
+    },
+    "assignmentStatus": {
+      "ASSIGNED": "Назначено",
+      "IN_PROGRESS": "В процессе",
+      "COMPLETED": "Завершено",
+      "CANCELLED": "Отменено"
+    },
+    "exerciseCategory": {
+      "STRENGTH": "Сила",
+      "CARDIO": "Кардио",
+      "FLEXIBILITY": "Гибкость",
+      "BALANCE": "Баланс",
+      "PLYOMETRIC": "Плиометрика",
+      "OLYMPIC_LIFTING": "Олимпийская тяга",
+      "POWERLIFTING": "Пауэрлифтинг",
+      "CALISTHENICS": "Калистеника",
+      "STRETCHING": "Растяжка",
+      "YOGA": "Йога",
+      "PILATES": "Пилатес"
+    },
+    "muscleGroup": {
+      "CHEST": "Грудь",
+      "BACK": "Спина",
+      "SHOULDERS": "Плечи",
+      "BICEPS": "Бицепсы",
+      "TRICEPS": "Трицепсы",
+      "FOREARMS": "Предплечья",
+      "CORE": "Кор",
+      "ABS": "Пресс",
+      "OBLIQUES": "Косые мышцы",
+      "LOWER_BACK": "Поясница",
+      "QUADS": "Квадрицепсы",
+      "HAMSTRINGS": "Задняя поверхность бедра",
+      "GLUTES": "Ягодицы",
+      "CALVES": "Икры",
+      "FULL_BODY": "Всё тело"
+    }
+  },
+  "notFound": {
+    "title": "Страница не найдена",
+    "description": "Страница, которую вы ищете, не существует или была перемещена.",
+    "backToHome": "Вернуться на главную"
+  },
+  "errorBoundary": {
+    "title": "Что-то пошло не так",
+    "description": "Произошла непредвиденная ошибка. Попробуйте перезагрузить страницу.",
+    "reload": "Перезагрузить"
+  }
+}

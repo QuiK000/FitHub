@@ -1,0 +1,67 @@
+{
+  "header": {
+    "brand": "FitHub",
+    "signIn": "Sign in",
+    "getStarted": "Get started"
+  },
+  "hero": {
+    "badge": "Your complete fitness companion",
+    "title": "Transform your fitness journey with",
+    "titleHighlight": "intelligent tracking",
+    "subtitle": "Track workouts, monitor progress, and achieve your fitness goals with our comprehensive platform designed for athletes and fitness enthusiasts.",
+    "ctaPrimary": "Start tracking free",
+    "ctaSecondary": "Sign in",
+    "benefits": "No credit card required \u2022 Free forever \u2022 Cancel anytime"
+  },
+  "stats": {
+    "users": {
+      "value": "10K+",
+      "label": "Active users"
+    },
+    "workouts": {
+      "value": "500K+",
+      "label": "Workouts logged"
+    },
+    "achievement": {
+      "value": "95%",
+      "label": "Goal achievement"
+    }
+  },
+  "features": {
+    "title": "Everything you need to succeed",
+    "subtitle": "Powerful features designed to help you track, analyze, and optimize your fitness journey.",
+    "workoutLogging": {
+      "title": "Workout Logging",
+      "description": "Track every rep, set, and exercise with our intuitive logging system. Build custom routines and monitor your progress over time."
+    },
+    "progressAnalytics": {
+      "title": "Progress Analytics",
+      "description": "Visualize your fitness journey with detailed charts and insights. See your strength gains, volume trends, and performance metrics."
+    },
+    "nutritionTracking": {
+      "title": "Nutrition Tracking",
+      "description": "Monitor your macros and calories to fuel your workouts. Set nutrition goals and track your daily intake effortlessly."
+    },
+    "performanceMetrics": {
+      "title": "Performance Metrics",
+      "description": "Track key performance indicators like one-rep max, volume load, and training frequency to optimize your results."
+    },
+    "goalSetting": {
+      "title": "Goal Setting",
+      "description": "Set SMART fitness goals and track your progress. Get motivated with milestone celebrations and achievement badges."
+    },
+    "communitySupport": {
+      "title": "Community Support",
+      "description": "Connect with like-minded fitness enthusiasts. Share your progress, get inspired, and stay accountable together."
+    }
+  },
+  "cta": {
+    "title": "Ready to start your fitness journey?",
+    "subtitle": "Join thousands of athletes and fitness enthusiasts who trust FitHub to track their progress and achieve their goals.",
+    "button": "Create your free account"
+  },
+  "footer": {
+    "brand": "FitHub",
+    "copyright": "\u00a9 2026 FitHub. All rights reserved."
+  }
+}

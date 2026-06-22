@@ -1,0 +1,40 @@
+{
+  "badge": "Тренеры",
+  "title": "Найдите своего тренера",
+  "subtitle": "Просматривайте тренеров, проверяйте специализации и читайте отзывы.",
+  "searchPlaceholder": "Поиск тренеров...",
+  "searchButton": "Найти",
+  "yearsExperience": "{{count}} лет опыта",
+  "viewDetails": "Посмотреть детали и отзывы",
+  "noData": "Тренеры не найдены",
+  "noDataDesc": "Попробуйте изменить параметры поиска или проверьте позже.",
+  "experienceYears": "Стаж (лет)",
+  "specializations": "Специализации",
+  "noSpecializations": "Специализации отсутствуют",
+  "bioDescription": "Описание био",
+  "bioPlaceholder": "Опишите свой подход к тренировкам...",
+  "newTrainer": "Новый тренер",
+  "setup": "Настройка тренера",
+  "setupDesc": "Заполните профиль тренера, чтобы начать.",
+  "editProfile": "Редактировать профиль",
+  "createProfile": "Создать профиль",
+  "editProfileDesc": "Обновите информацию тренера.",
+  "createProfileDesc": "Заполните данные для создания профиля тренера.",
+  "detail": {
+    "profileLabel": "Профиль тренера",
+    "experience": "{{count}} лет опыта"
+  },
+  "reviews": {
+    "title": "Отзывы",
+    "writeReview": "Написать отзыв",
+    "noReviews": "Отзывов пока нет. Будьте первым, кто оставит отзыв.",
+    "rating": "Оценка",
+    "starCount": "{{count}} звезда(ы)",
+    "commentOptional": "Комментарий (необязательно)",
+    "commentPlaceholder": "Поделитесь своим опытом...",
+    "submitButton": "Отправить"
+  },
+  "errors": {
+    "reviewFailed": "Не удалось отправить отзыв."
+  }
+}

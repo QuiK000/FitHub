@@ -1,0 +1,35 @@
+{
+  "sidebar": {
+    "brand": "FitHub",
+    "subtitle": "Dashboard",
+    "items": {
+      "dashboard": "Dashboard",
+      "workouts": "Workouts",
+      "memberships": "Memberships",
+      "profile": "Profile",
+      "analytics": "Analytics",
+      "nutrition": "Nutrition",
+      "progress": "Progress",
+      "trainers": "Trainers",
+      "sessions": "Sessions",
+      "notifications": "Notifications",
+      "admin": "Admin",
+      "myPlans": "My Plans",
+      "trainerSessions": "My Sessions",
+      "exerciseManagement": "Exercises"
+    },
+    "trainingLoad": {
+      "label": "Training Load",
+      "value": "Weekly: {{percentage}}%"
+    },
+    "signOut": "Sign out"
+  },
+  "header": {
+    "todayOverview": "Today's Overview",
+    "performanceHub": "Performance Hub",
+    "liveMembers": "Live members",
+    "online": "{{count}} online",
+    "member": "Member",
+    "fithubMember": "FitHub member"
+  }
+}

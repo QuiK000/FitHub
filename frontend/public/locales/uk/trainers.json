@@ -1,0 +1,40 @@
+{
+  "badge": "Тренери",
+  "title": "Знайдіть свого тренера",
+  "subtitle": "Переглядайте тренерів, перевіряйте спеціалізації та читайте відгуки.",
+  "searchPlaceholder": "Пошук тренерів...",
+  "searchButton": "Пошук",
+  "yearsExperience": "{{count}} років досвіду",
+  "viewDetails": "Деталі та відгуки",
+  "noData": "Тренерів не знайдено",
+  "noDataDesc": "Спробуйте змінити параметри пошуку або перевірте пізніше.",
+  "experienceYears": "Роки досвіду",
+  "specializations": "Спеціалізації",
+  "noSpecializations": "Спеціалізації відсутні",
+  "bioDescription": "Опис біо",
+  "bioPlaceholder": "Опишіть свій підхід до тренувань...",
+  "newTrainer": "Новий тренер",
+  "setup": "Налаштування тренера",
+  "setupDesc": "Заповніть профіль тренера, щоб розпочати.",
+  "editProfile": "Редагувати профіль",
+  "createProfile": "Створити профіль",
+  "editProfileDesc": "Оновіть інформацію тренера.",
+  "createProfileDesc": "Заповніть дані для створення профілю тренера.",
+  "detail": {
+    "profileLabel": "Профіль тренера",
+    "experience": "{{count}} років досвіду"
+  },
+  "reviews": {
+    "title": "Відгуки",
+    "writeReview": "Написати відгук",
+    "noReviews": "Ще немає відгуків. Будьте першим, хто залишить відгук.",
+    "rating": "Оцінка",
+    "starCount": "{{count}} зірка(ок)",
+    "commentOptional": "Коментар (необов'язково)",
+    "commentPlaceholder": "Поділіться своїм досвідом...",
+    "submitButton": "Надіслати"
+  },
+  "errors": {
+    "reviewFailed": "Не вдалося надіслати відгук."
+  }
+}

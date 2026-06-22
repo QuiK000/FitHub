@@ -1,0 +1,36 @@
+{
+  "badge": "Analytics",
+  "title": "Performance overview",
+  "subtitle": "Key metrics, attendance trends, and popular sessions.",
+  "metrics": {
+    "activeClients": "Active clients",
+    "activeMemberships": "Active memberships",
+    "revenue": "Revenue",
+    "todayCheckIns": "Today check-ins"
+  },
+  "chart": {
+    "title": "Attendance (30 days)",
+    "subtitle": "Daily check-in count over the last month.",
+    "noData": "No attendance data available",
+    "totalCheckIns": "Total check-ins",
+    "avgCheckIns": "Daily average",
+    "perDay": "per day",
+    "peakDay": "Peak day"
+  },
+  "revenue": {
+    "title": "Revenue Overview",
+    "subtitle": "Total: ${{amount}} over {{period}}d"
+  },
+  "quickStats": {
+    "title": "Quick Stats",
+    "conversionRate": "Client conversion",
+    "revenuePerClient": "Revenue / client",
+    "avgCheckIn": "Avg check-ins/day"
+  },
+  "popularSessions": {
+    "title": "Popular Sessions",
+    "subtitle": "Most attended sessions recently.",
+    "attendees": "{{count}} attendees",
+    "noData": "No session data available"
+  }
+}
